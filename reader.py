@@ -3,7 +3,7 @@ import os
 import struct
 import biff12
 from cStringIO import StringIO
-from handler import Handler, BasicHandler, StringTableHandler, StringInstanceHandler, SheetHandler, RowHandler, CellHandler
+from handlers import Handler, BasicHandler, StringTableHandler, StringInstanceHandler, SheetHandler, RowHandler, CellHandler
 
 uint32_t = struct.Struct('I')
 uint16_t = struct.Struct('H')
