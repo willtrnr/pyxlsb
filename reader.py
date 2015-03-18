@@ -157,9 +157,7 @@ class BIFF12Reader(object):
       reclen = self.read_len()
       if recid is None or reclen is None:
         raise StopIteration
-
       ret = (self.handlers.get(recid) or Handler()).read(RecordReader(self._fp.read(reclen)), recid, reclen)
-
       if self.debug:
         print '{:08X} {:04X} {:>8} {}'.format(self._fp.tell() - 8 - reclen, recid, reclen, ret)
     return (recid, ret)
