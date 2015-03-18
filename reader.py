@@ -51,7 +51,8 @@ class RecordReader(object):
     if intval & 0x02 != 0:
       v = float(intval >> 2)
     else:
-      buff = array.array('B', ('\x00' * 4) + uint32_t.pack(intval & 0xFFFFFFFC))
+      buff = array.array('B', '\x00\x00\x00\x00')
+      buff.fromstring(uint32_t.pack(intval & 0xFFFFFFFC))
       v = double_t.unpack(buff.tostring())[0]
     if intval & 0x01 != 0:
       v /= 100
