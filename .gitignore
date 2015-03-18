@@ -1,0 +1,11 @@
+*.bak
+*.db-journal
+*.log
+*.pyc
+*.pyd
+*.pyo
+*.sublime-*
+*.xls*
+*~
+tmp_mod.doc
+~*
