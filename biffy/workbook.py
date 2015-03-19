@@ -28,7 +28,7 @@ class Workbook(object):
       for item in reader:
         if item[0] == biff12.SHEET:
           self.sheets.append(item[1].name)
-        elif item[0] == biff12.SHEETS_END:
+        if item[0] == biff12.SHEETS_END:
           break
 
     temp = TemporaryFile()
@@ -37,14 +37,26 @@ class Workbook(object):
       temp.seek(0, os.SEEK_SET)
     self.stringtable = StringTable(fp=temp)
 
-  def get_sheet(self, idx):
+  def get_sheet(self, idx, rels=False):
     if isinstance(idx, basestring):
       idx = self.sheets.index(idx) + 1
+    if idx < 1 or idx > len(self.sheets):
+      raise IndexError('sheet index out of range')
+
     temp = TemporaryFile()
     with self._zf.open('xl/worksheets/sheet{}.bin'.format(idx), 'r') as zf:
       temp.write(zf.read())
       temp.seek(0, os.SEEK_SET)
-    return Worksheet(fp=temp, stringtable=self.stringtable)
+
+    if rels:
+      rels_temp = TemporaryFile()
+      with self._zf.open('xl/worksheets/_rels/sheet{}.bin.rels'.format(idx), 'r') as zf:
+        rels_temp.write(zf.read())
+        rels_temp.seek(0, os.SEEK_SET)
+    else:
+      rels_temp = None
+
+    return Worksheet(fp=temp, rels_fp=rels_temp, stringtable=self.stringtable)
 
   def close(self):
     self._zf.close()

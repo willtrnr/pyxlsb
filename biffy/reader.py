@@ -3,7 +3,7 @@ import os
 import struct
 import biff12
 from cStringIO import StringIO
-from handlers import Handler, BasicHandler, StringTableHandler, StringInstanceHandler, SheetHandler, RowHandler, CellHandler
+from handlers import Handler, BasicHandler, StringTableHandler, StringInstanceHandler, SheetHandler, RowHandler, CellHandler, HyperlinkHandler
 
 uint32_t = struct.Struct('I')
 uint16_t = struct.Struct('H')
@@ -13,6 +13,12 @@ double_t = struct.Struct('d')
 class RecordReader(object):
   def __init__(self, buf):
     self._fp = StringIO(buf)
+
+  def tell(self):
+    return self._fp.tell()
+
+  def seek(self, offset, whence=os.SEEK_SET):
+    self._fp.seek(offset, whence)
 
   def skip(self, size):
     self._fp.seek(size, os.SEEK_CUR)
@@ -91,11 +97,10 @@ class BIFF12Reader(object):
     biff12.SI:      StringInstanceHandler(),
 
     # Worksheet part handlers
-    biff12.WORKSHEET:     BasicHandler('worksheet'),
-    biff12.WORKSHEET_END: BasicHandler('/worksheet'),
-    biff12.SHEETDATA:     BasicHandler('sheetData'),
-    biff12.SHEETDATA_END: BasicHandler('/sheetData'),
-    # Sheet data cells handlers
+    biff12.WORKSHEET:       BasicHandler('worksheet'),
+    biff12.WORKSHEET_END:   BasicHandler('/worksheet'),
+    biff12.SHEETDATA:       BasicHandler('sheetData'),
+    biff12.SHEETDATA_END:   BasicHandler('/sheetData'),
     biff12.ROW:             RowHandler(),
     biff12.BLANK:           CellHandler(),
     biff12.NUM:             CellHandler(),
@@ -106,7 +111,8 @@ class BIFF12Reader(object):
     biff12.FORMULA_STRING:  CellHandler(),
     biff12.FORMULA_FLOAT:   CellHandler(),
     biff12.FORMULA_BOOL:    CellHandler(),
-    biff12.FORMULA_BOOLERR: CellHandler()
+    biff12.FORMULA_BOOLERR: CellHandler(),
+    biff12.HYPERLINK:       HyperlinkHandler()
   }
 
   def __init__(self, fp):
@@ -122,6 +128,12 @@ class BIFF12Reader(object):
 
   def __exit__(self, type, value, traceback):
     self.close()
+
+  def tell(self):
+    return self._fp.tell()
+
+  def seek(self, offset, whence=os.SEEK_SET):
+    self._fp.seek(offset, whence)
 
   def read_id(self):
     v = 0
@@ -153,13 +165,15 @@ class BIFF12Reader(object):
   def next(self):
     ret = None
     while ret is None:
+      if self.debug:
+        pos = self._fp.tell()
       recid = self.read_id()
       reclen = self.read_len()
       if recid is None or reclen is None:
         raise StopIteration
       ret = (self.handlers.get(recid) or Handler()).read(RecordReader(self._fp.read(reclen)), recid, reclen)
       if self.debug:
-        print '{:08X}  {:04X}  {:<6} {}'.format(self._fp.tell() - 8 - reclen, recid, reclen, ret)
+        print '{:08X}  {:04X}  {:<6} {}'.format(pos, recid, reclen, ret)
     return (recid, ret)
 
   def close(self):

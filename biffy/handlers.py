@@ -98,3 +98,18 @@ class CellHandler(Handler):
     elif recid == biff12.FORMULA_BOOLERR:
       val = hex(reader.read_byte())
     return self.cls._make([col, None, val])
+
+
+class HyperlinkHandler(Handler):
+  cls = namedtuple('hyperlink', ['r1', 'r2', 'c1', 'c2', 'rId'])
+
+  def __init__(self):
+    super(HyperlinkHandler, self).__init__()
+
+  def read(self, reader, recid, reclen):
+    r1 = reader.read_int()
+    r2 = reader.read_int()
+    c1 = reader.read_int()
+    c2 = reader.read_int()
+    rId = reader.read_string()
+    return self.cls._make([r1, r2, c1, c2, rId])

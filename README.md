@@ -33,14 +33,11 @@ The `rows()` method will hand out an iterator to read the worksheet rows.
 
 ```
 #!python
-for row in sheet.rows():
-  print row
+for r, cells in sheet.rows():
+  print r, cells
 ```
 
-Do note that a worksheet instance can currently only be read once.
-You must get a fresh instance from the workbook for every pass.
-
-Also, dates will appear as `float`s.
+Do note that dates will appear as `float`s.
 You must use the `convert_date(date)` method from the biffy module to turn them into `datetime` instances.
 
     print biffy.convert_date(41235.45578)
