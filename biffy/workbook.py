@@ -28,7 +28,7 @@ class Workbook(object):
       for item in reader:
         if item[0] == biff12.SHEET:
           self.sheets.append(item[1].name)
-        if item[0] == biff12.SHEETS_END:
+        elif item[0] == biff12.SHEETS_END:
           break
 
     temp = TemporaryFile()
