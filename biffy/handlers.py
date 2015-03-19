@@ -70,7 +70,7 @@ class RowHandler(Handler):
 
 
 class CellHandler(Handler):
-  cls = namedtuple('c', ['t', 'r', 'f', 'v'])
+  cls = namedtuple('c', ['c', 'f', 'v'])
 
   def __init__(self):
     super(CellHandler, self).__init__()
@@ -97,4 +97,4 @@ class CellHandler(Handler):
       val = reader.read_byte() != 0
     elif recid == biff12.FORMULA_BOOLERR:
       val = hex(reader.read_byte())
-    return self.cls._make([recid, col, None, val])
+    return self.cls._make([col, None, val])

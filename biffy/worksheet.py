@@ -31,9 +31,12 @@ class Worksheet(object):
         row_num = item[1].r
         row = []
       elif item[0] >= biff12.BLANK and item[0] <= biff12.FORMULA_BOOLERR:
-        while len(row) <= item[1].r:
+        while len(row) <= item[1].c:
           row.append(None)
-        row[item[1].r] = self._stringtable[item[1].v] if item[0] == biff12.STRING and not self._stringtable is None else item[1].v
+        if item[0] == biff12.STRING and not self._stringtable is None:
+          row[item[1].c] = self._stringtable[item[1].v]
+        else:
+          row[item[1].c] = item[1].v
       elif item[0] == biff12.SHEETDATA_END:
         break
     if row:
