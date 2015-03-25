@@ -58,6 +58,34 @@ class SheetHandler(Handler):
     return self.cls._make([sheetid, relid, name])
 
 
+class DimensionHandler(Handler):
+  cls = namedtuple('dimension', ['r', 'c', 'h', 'w'])
+
+  def __init__(self):
+    super(DimensionHandler, self).__init__()
+
+  def read(self, reader, recid, reclen):
+    r1 = reader.read_int()
+    r2 = reader.read_int()
+    c1 = reader.read_int()
+    c2 = reader.read_int()
+    return self.cls._make([r1, c1, r2 - r1 + 1, c2 - c1 + 1])
+
+
+class ColumnHandler(Handler):
+  cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
+
+  def __init__(self):
+    super(ColumnHandler, self).__init__()
+
+  def read(self, reader, recid, reclen):
+    c1 = reader.read_int()
+    c2 = reader.read_int()
+    width = reader.read_int() / 256
+    style = reader.read_int()
+    return self.cls._make([c1, c2, width, style])
+
+
 class RowHandler(Handler):
   cls = namedtuple('row', ['r'])
 
@@ -70,14 +98,14 @@ class RowHandler(Handler):
 
 
 class CellHandler(Handler):
-  cls = namedtuple('c', ['c', 'f', 'v'])
+  cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
   def __init__(self):
     super(CellHandler, self).__init__()
 
   def read(self, reader, recid, reclen):
     col = reader.read_int()
-    reader.skip(4)
+    style = reader.read_int()
     val = None
     if recid == biff12.NUM:
       val = reader.read_float()
@@ -97,11 +125,11 @@ class CellHandler(Handler):
       val = reader.read_byte() != 0
     elif recid == biff12.FORMULA_BOOLERR:
       val = hex(reader.read_byte())
-    return self.cls._make([col, None, val])
+    return self.cls._make([col, val, None, style])
 
 
 class HyperlinkHandler(Handler):
-  cls = namedtuple('hyperlink', ['r1', 'r2', 'c1', 'c2', 'rId'])
+  cls = namedtuple('hyperlink', ['r', 'c', 'h', 'w', 'rId'])
 
   def __init__(self):
     super(HyperlinkHandler, self).__init__()
@@ -112,4 +140,4 @@ class HyperlinkHandler(Handler):
     c1 = reader.read_int()
     c2 = reader.read_int()
     rId = reader.read_string()
-    return self.cls._make([r1, r2, c1, c2, rId])
+    return self.cls._make([r1, c1, r2 - r1 + 1, c2 - c1 + 1, rId])

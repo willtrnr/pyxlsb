@@ -14,6 +14,8 @@ class Worksheet(object):
       self._rels = None
     self._stringtable = stringtable
     self._data_offset = 0
+    self.dimension = None
+    self.cols = list()
     self.rels = dict()
     self.hyperlinks = dict()
     self._parse()
@@ -30,30 +32,32 @@ class Worksheet(object):
         self.rels[el.attrib['Id']] = el.attrib['Target']
 
     for item in self._reader:
-      if item[0] == biff12.SHEETDATA:
+      if item[0] == biff12.DIMENSION:
+        self.dimension = item[1]
+      elif item[0] == biff12.COL:
+        self.cols.append(item[1])
+      elif item[0] == biff12.SHEETDATA:
         self._data_offset = self._reader.tell()
         if self._rels is None:
           break
       elif item[0] == biff12.HYPERLINK and not self._rels is None:
-        for r in xrange(item[1].r1, item[1].r2 + 1):
-          for c in xrange(item[1].c1, item[1].c2 + 1):
-            self.hyperlinks[r, c] = item[1].rId
+        for r in xrange(item[1].h):
+          for c in xrange(item[1].w):
+            self.hyperlinks[item[1].r + r, item[1].c + c] = item[1].rId
 
   def rows(self):
     self._reader.seek(self._data_offset, os.SEEK_SET)
     row_num = 0
-    row = []
+    row = [None] * self.dimension.w
     for item in self._reader:
       if item[0] == biff12.ROW and item[1].r != row_num:
         while row_num + 1 < item[1].r:
-          yield row_num, []
+          yield row_num, [None] * self.dimension.w
           row_num += 1
         yield row_num, row
         row_num = item[1].r
-        row = []
+        row = [None] * self.dimension.w
       elif item[0] >= biff12.BLANK and item[0] <= biff12.FORMULA_BOOLERR:
-        while len(row) <= item[1].c:
-          row.append(None)
         if item[0] == biff12.STRING and not self._stringtable is None:
           row[item[1].c] = self._stringtable[item[1].v]
         else:

@@ -31,11 +31,14 @@ class Workbook(object):
         elif item[0] == biff12.SHEETS_END:
           break
 
-    temp = TemporaryFile()
-    with self._zf.open('xl/sharedStrings.bin', 'r') as zf:
-      temp.write(zf.read())
-      temp.seek(0, os.SEEK_SET)
-    self.stringtable = StringTable(fp=temp)
+    try:
+      temp = TemporaryFile()
+      with self._zf.open('xl/sharedStrings.bin', 'r') as zf:
+        temp.write(zf.read())
+        temp.seek(0, os.SEEK_SET)
+      self.stringtable = StringTable(fp=temp)
+    except KeyError:
+      pass
 
   def get_sheet(self, idx, rels=False):
     if isinstance(idx, basestring):

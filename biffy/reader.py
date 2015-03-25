@@ -3,7 +3,7 @@ import os
 import struct
 import biff12
 from cStringIO import StringIO
-from handlers import Handler, BasicHandler, StringTableHandler, StringInstanceHandler, SheetHandler, RowHandler, CellHandler, HyperlinkHandler
+from handlers import *
 
 uint32_t = struct.Struct('I')
 uint16_t = struct.Struct('H')
@@ -99,8 +99,12 @@ class BIFF12Reader(object):
     # Worksheet part handlers
     biff12.WORKSHEET:       BasicHandler('worksheet'),
     biff12.WORKSHEET_END:   BasicHandler('/worksheet'),
+    biff12.DIMENSION:       DimensionHandler(),
     biff12.SHEETDATA:       BasicHandler('sheetData'),
     biff12.SHEETDATA_END:   BasicHandler('/sheetData'),
+    biff12.COLS:            BasicHandler('cols'),
+    biff12.COLS_END:        BasicHandler('/cols'),
+    biff12.COL:             ColumnHandler(),
     biff12.ROW:             RowHandler(),
     biff12.BLANK:           CellHandler(),
     biff12.NUM:             CellHandler(),
