@@ -33,8 +33,8 @@ The `rows()` method will hand out an iterator to read the worksheet rows.
 
 ```
 #!python
-for r, cells in sheet.rows():
-  print r, cells
+for row in sheet.rows():
+  print row
 ```
 
 Do note that dates will appear as `float`s.

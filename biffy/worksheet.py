@@ -1,7 +1,10 @@
 import biff12
 import os
 import xml.etree.ElementTree as ElementTree
+from collections import namedtuple
 from reader import BIFF12Reader
+
+Cell = namedtuple('Cell', ['r', 'c', 'v'])
 
 class Worksheet(object):
   def __init__(self, fp, rels_fp=None, stringtable=None):
@@ -48,24 +51,24 @@ class Worksheet(object):
   def rows(self):
     self._reader.seek(self._data_offset, os.SEEK_SET)
     row_num = 0
-    row = [None] * self.dimension.w
+    row = [Cell._make([row_num, i, None]) for i in xrange(self.dimension.w)]
     for item in self._reader:
       if item[0] == biff12.ROW and item[1].r != row_num:
         while row_num + 1 < item[1].r:
-          yield row_num, [None] * self.dimension.w
+          yield [Cell._make([row_num, i, None]) for i in xrange(self.dimension.w)]
           row_num += 1
-        yield row_num, row
+        yield row
         row_num = item[1].r
-        row = [None] * self.dimension.w
+        row = [Cell._make([row_num, i, None]) for i in xrange(self.dimension.w)]
       elif item[0] >= biff12.BLANK and item[0] <= biff12.FORMULA_BOOLERR:
         if item[0] == biff12.STRING and not self._stringtable is None:
-          row[item[1].c] = self._stringtable[item[1].v]
+          row[item[1].c] = Cell._make([row_num, item[1].c, self._stringtable[item[1].v]])
         else:
-          row[item[1].c] = item[1].v
+          row[item[1].c] = Cell._make([row_num, item[1].c, item[1].v])
       elif item[0] == biff12.SHEETDATA_END:
         break
     if row:
-      yield row_num, row
+      yield row
 
   def close(self):
     self._reader.close()
