@@ -42,7 +42,7 @@ class Workbook(object):
 
   def get_sheet(self, idx, rels=False):
     if isinstance(idx, basestring):
-      idx = self.sheets.index(idx) + 1
+      idx = [s.lower() for s in self.sheets].index(idx.lower()) + 1
     if idx < 1 or idx > len(self.sheets):
       raise IndexError('sheet index out of range')
 
