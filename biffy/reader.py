@@ -30,17 +30,13 @@ class RecordReader(object):
     buff = self._fp.read(4)
     if len(buff) < 4:
       return None
-    buff = array.array('B', buff)
-    buff.byteswap()
-    return uint32_t.unpack(buff.tostring())[0]
+    return uint32_t.unpack(buff)[0]
 
   def read_short(self):
     buff = self._fp.read(2)
     if len(buff) < 2:
       return None
-    buff = array.array('B', buff)
-    buff.byteswap()
-    return uint16_t.unpack(buff.tostring())[0]
+    return unit16_t.unpack(buff)[0]
 
   def read_byte(self):
     byte = self._fp.read(1)
@@ -57,9 +53,7 @@ class RecordReader(object):
     if intval & 0x02 != 0:
       v = float(intval >> 2)
     else:
-      buff = array.array('B', '\x00\x00\x00\x00')
-      buff.fromstring(uint32_t.pack(intval & 0xFFFFFFFC))
-      v = double_t.unpack(buff.tostring())[0]
+      v = double_t.unpack('\x00\x00\x00\x00' + uint32_t.pack(intval & 0xFFFFFFFC))[0]
     if intval & 0x01 != 0:
       v /= 100
     return v
@@ -75,12 +69,10 @@ class RecordReader(object):
     l = self.read_int()
     if l is None:
       return None
-    for i in xrange(l):
-      c = self.read_short()
-      if c is None:
-        return None
-      s += unichr(c)
-    return s
+    buff = self.read(l * 2)
+    if len(buff) < l * 2:
+      return None
+    return buff.decode('latin_1').replace('\x00', '')
 
 
 class BIFF12Reader(object):
