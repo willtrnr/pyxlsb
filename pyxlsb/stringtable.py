@@ -1,5 +1,5 @@
-import biff12
-from reader import BIFF12Reader
+from . import biff12
+from .reader import BIFF12Reader
 
 class StringTable(object):
   def __init__(self, fp):

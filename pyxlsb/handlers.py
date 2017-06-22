@@ -1,4 +1,4 @@
-import biff12
+from . import biff12
 from collections import namedtuple
 
 class Handler(object):

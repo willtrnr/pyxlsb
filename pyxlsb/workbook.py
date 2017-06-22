@@ -1,9 +1,13 @@
-import biff12
 import os
-from reader import BIFF12Reader
-from stringtable import StringTable
+import sys
+from . import biff12
+from .reader import BIFF12Reader
+from .stringtable import StringTable
+from .worksheet import Worksheet
 from tempfile import TemporaryFile
-from worksheet import Worksheet
+
+if sys.version_info > (3,):
+  basestring = (str, bytes)
 
 class Workbook(object):
   def __init__(self, fp):

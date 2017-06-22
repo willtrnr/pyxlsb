@@ -1,9 +1,13 @@
 import array
-import biff12
 import io
 import os
 import struct
-from handlers import *
+import sys
+from . import biff12
+from .handlers import *
+
+if sys.version_info > (3,):
+  xrange = range
 
 uint32_t = struct.Struct('I')
 uint16_t = struct.Struct('H')
@@ -53,7 +57,7 @@ class RecordReader(object):
     if intval & 0x02 != 0:
       v = float(intval >> 2)
     else:
-      v = double_t.unpack('\x00\x00\x00\x00' + uint32_t.pack(intval & 0xFFFFFFFC))[0]
+      v = double_t.unpack(b'\x00\x00\x00\x00' + uint32_t.pack(intval & 0xFFFFFFFC))[0]
     if intval & 0x01 != 0:
       v /= 100
     return v
@@ -119,6 +123,9 @@ class BIFF12Reader(object):
   def __iter__(self):
     return self
 
+  def __next__(self):
+    return self.next()
+
   def __enter__(self):
     return self
 
@@ -169,7 +176,7 @@ class BIFF12Reader(object):
         raise StopIteration
       ret = (self.handlers.get(recid) or Handler()).read(RecordReader(self._fp.read(reclen)), recid, reclen)
       if self.debug:
-        print '{:08X}  {:04X}  {:<6} {}'.format(pos, recid, reclen, ret)
+        print('{:08X}  {:04X}  {:<6} {}'.format(pos, recid, reclen, ret))
     return (recid, ret)
 
   def close(self):

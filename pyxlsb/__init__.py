@@ -1,8 +1,7 @@
-from biff12 import *
-from handlers import Handler
-from reader import BIFF12Reader
-from workbook import Workbook
-from worksheet import Worksheet
+from .handlers import Handler
+from .reader import BIFF12Reader
+from .workbook import Workbook
+from .worksheet import Worksheet
 
 def open_workbook(name):
   from zipfile import ZipFile

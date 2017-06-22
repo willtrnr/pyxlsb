@@ -31,14 +31,14 @@ The `rows()` method will hand out an iterator to read the worksheet rows.
 
 ```python
 for row in sheet.rows():
-  print row
+  print(row)
 ```
 
 Do note that dates will appear as `float`s.
 You must use the `convert_date(date)` method from the `pyxlsb` module to turn them into `datetime` instances.
 
 ```python
-print pyxlsb.convert_date(41235.45578)
+print(pyxlsb.convert_date(41235.45578))
 ```
 
 Install

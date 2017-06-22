@@ -1,8 +1,12 @@
-import biff12
 import os
+import sys
 import xml.etree.ElementTree as ElementTree
+from . import biff12
+from .reader import BIFF12Reader
 from collections import namedtuple
-from reader import BIFF12Reader
+
+if sys.version_info > (3,):
+  xrange = range
 
 Cell = namedtuple('Cell', ['r', 'c', 'v'])
 
