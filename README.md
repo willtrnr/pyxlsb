@@ -1,7 +1,7 @@
-BIFFY
-=====
+PyXLSB
+======
 
-BIFFY is an Excel 2007-2010 Binary Workbook (XLSB / BIFF12) parser for Python.
+PyXLSB is an Excel 2007-2010 Binary Workbook (XLSB / BIFF12) parser for Python.
 The library is currently extremely limited, but functional enough for basic data extraction.
 
 Usage
@@ -11,8 +11,8 @@ The module exposes an `open_workbook(name)` method (similar to Xlrd and OpenPyXl
 The Workbook object representing the file is returned.
 
 ```python
-import biffy
-wb = biffy.open_workbook('workbook.xlsb')
+import pyxlsb
+wb = pyxlsb.open_workbook('workbook.xlsb')
 ```
 
 The Workbook object exposes a `get_sheet(idx)` method for retrieving a Worksheet instance.
@@ -35,10 +35,10 @@ for row in sheet.rows():
 ```
 
 Do note that dates will appear as `float`s.
-You must use the `convert_date(date)` method from the biffy module to turn them into `datetime` instances.
+You must use the `convert_date(date)` method from the `pyxlsb` module to turn them into `datetime` instances.
 
 ```python
-print biffy.convert_date(41235.45578)
+print pyxlsb.convert_date(41235.45578)
 ```
 
 Install
