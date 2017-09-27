@@ -3,6 +3,8 @@
 *.pyd
 *.pyo
 *.sublime-*
+*.egg-info
+*.rst
 build
 dist
 venv
