@@ -10,9 +10,10 @@ if sys.version_info > (3,):
   basestring = (str, bytes)
 
 class Workbook(object):
-  def __init__(self, fp):
+  def __init__(self, fp, debug=False):
     super(Workbook, self).__init__()
     self._zf = fp
+    self._debug = debug
     self.sheets = list()
     self.stringtable = None
     self._parse()
@@ -28,7 +29,7 @@ class Workbook(object):
       with self._zf.open('xl/workbook.bin', 'r') as zf:
         temp.write(zf.read())
         temp.seek(0, os.SEEK_SET)
-      reader = BIFF12Reader(fp=temp)
+      reader = BIFF12Reader(fp=temp, debug=self._debug)
       for item in reader:
         if item[0] == biff12.SHEET:
           self.sheets.append(item[1].name)
@@ -63,7 +64,7 @@ class Workbook(object):
     else:
       rels_temp = None
 
-    return Worksheet(fp=temp, rels_fp=rels_temp, stringtable=self.stringtable)
+    return Worksheet(fp=temp, rels_fp=rels_temp, stringtable=self.stringtable, debug=self._debug)
 
   def close(self):
     self._zf.close()

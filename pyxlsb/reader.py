@@ -115,9 +115,9 @@ class BIFF12Reader(object):
     biff12.HYPERLINK:       HyperlinkHandler()
   }
 
-  def __init__(self, fp):
+  def __init__(self, fp, debug=False):
     super(BIFF12Reader, self).__init__()
-    self.debug = False
+    self._debug = debug
     self._fp = fp
 
   def __iter__(self):
@@ -168,15 +168,16 @@ class BIFF12Reader(object):
   def next(self):
     ret = None
     while ret is None:
-      if self.debug:
+      if self._debug:
         pos = self._fp.tell()
       recid = self.read_id()
       reclen = self.read_len()
       if recid is None or reclen is None:
         raise StopIteration
-      ret = (self.handlers.get(recid) or Handler()).read(RecordReader(self._fp.read(reclen)), recid, reclen)
-      if self.debug:
-        print('{:08X}  {:04X}  {:<6} {}'.format(pos, recid, reclen, ret))
+      recdata = self._fp.read(reclen)
+      ret = (self.handlers.get(recid) or Handler()).read(RecordReader(recdata), recid, reclen)
+      if self._debug:
+        print('{:08X}  {:04X}  {:<6} {} {}'.format(pos, recid, reclen, ' '.join('{:02X}'.format(b) for b in recdata), ret))
     return (recid, ret)
 
   def close(self):

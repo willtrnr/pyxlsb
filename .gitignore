@@ -1,10 +1,10 @@
-*.h
+*.egg-info/
 *.pyc
 *.pyd
 *.pyo
-*.sublime-*
-*.egg-info
 *.rst
-build
-dist
-venv
+*.sublime-*
+*.xlsb
+build/
+dist/
+venv/

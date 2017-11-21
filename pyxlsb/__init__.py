@@ -3,10 +3,10 @@ from .reader import BIFF12Reader
 from .workbook import Workbook
 from .worksheet import Worksheet
 
-def open_workbook(name):
+def open_workbook(name, debug=False):
   from zipfile import ZipFile
   zf = ZipFile(name, 'r')
-  return Workbook(fp=zf)
+  return Workbook(fp=zf, debug=debug)
 
 def convert_date(date):
   if not isinstance(date, int) and not isinstance(date, float):
