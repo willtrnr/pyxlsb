@@ -13,7 +13,7 @@ proc.wait()
 
 setup(
   name='pyxlsb',
-  version='1.0.1',
+  version='1.0.2',
 
   description='Excel 2007-2010 Binary Workbook (xlsb) parser',
   long_description=README,
@@ -35,7 +35,8 @@ setup(
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5'
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6'
   ],
 
   packages=['pyxlsb']
