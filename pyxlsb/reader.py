@@ -1,22 +1,19 @@
-import array
 import io
 import os
 import struct
-import sys
 from . import biff12
 from .handlers import *
 
-if sys.version_info > (3,):
-  xrange = range
-
-uint32_t = struct.Struct('I')
-uint16_t = struct.Struct('H')
-uint8_t = struct.Struct('B')
-double_t = struct.Struct('d')
+uint8_t = struct.Struct('<B')
+uint16_t = struct.Struct('<H')
+int32_t = struct.Struct('<i')
+uint32_t = struct.Struct('<I')
+double_t = struct.Struct('<d')
 
 class RecordReader(object):
-  def __init__(self, buf):
+  def __init__(self, buf, enc='latin-1'):
     self._fp = io.BytesIO(buf)
+    self._enc = enc
 
   def tell(self):
     return self._fp.tell()
@@ -40,11 +37,11 @@ class RecordReader(object):
     buff = self._fp.read(2)
     if len(buff) < 2:
       return None
-    return unit16_t.unpack(buff)[0]
+    return uint16_t.unpack(buff)[0]
 
   def read_byte(self):
     byte = self._fp.read(1)
-    if byte == '':
+    if byte == b'':
       return None
     return uint8_t.unpack(byte)[0]
 
@@ -53,7 +50,7 @@ class RecordReader(object):
     if len(buff) < 4:
       return None
     v = 0.0
-    intval = uint32_t.unpack(buff)[0]
+    intval = int32_t.unpack(buff)[0]
     if intval & 0x02 != 0:
       v = float(intval >> 2)
     else:
@@ -69,14 +66,13 @@ class RecordReader(object):
     return double_t.unpack(buff)[0]
 
   def read_string(self):
-    s = u''
     l = self.read_int()
     if l is None:
       return None
     buff = self.read(l * 2)
     if len(buff) < l * 2:
       return None
-    return buff.decode('latin_1').replace('\x00', '')
+    return buff.decode(self._enc).replace('\x00', '')
 
 
 class BIFF12Reader(object):
@@ -140,7 +136,7 @@ class BIFF12Reader(object):
 
   def read_id(self):
     v = 0
-    for i in xrange(4):
+    for i in range(4):
       byte = self._fp.read(1)
       if byte == '':
         return None
@@ -152,7 +148,7 @@ class BIFF12Reader(object):
 
   def read_len(self):
     v = 0
-    for i in xrange(4):
+    for i in range(4):
       byte = self._fp.read(1)
       if byte == '':
         return None
