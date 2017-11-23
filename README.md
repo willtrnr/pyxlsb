@@ -22,8 +22,9 @@ OpenPyXl) for opening XLSB files. The Workbook object representing the file is
 returned.
 
 ```python
-import pyxlsb
-wb = pyxlsb.open_workbook('workbook.xlsb')
+from pyxlsb import open_workbook
+with open_workbook('Book1.xlsb') as wb:
+    # Do stuff with wb
 ```
 
 The Workbook object exposes a `get_sheet(idx)` method for retrieving a
@@ -31,10 +32,12 @@ Worksheet instance.
 
 ```python
 # Using the sheet index (1-based)
-sheet = wb.get_sheet(1)
+with wb.get_sheet(1) as sheet:
+    # Do stuff with sheet
 
 # Using the sheet name
-sheet = wb.get_sheet('Sheet1')
+with wb.get_sheet('Sheet1') as sheet:
+    # Do stuff with sheet
 ```
 
 Tip: A `sheets` property containing the sheet names is available on the
@@ -43,13 +46,17 @@ Workbook instance.
 The `rows()` method will hand out an iterator to read the worksheet rows.
 
 ```python
+# You can use .rows(sparse=True) to skip empty rows
 for row in sheet.rows():
   print(row)
+# [Cell(r=0, c=0, v='TEXT'), Cell(r=0, c=1, v=42.1337)]
 ```
 
 Do note that dates will appear as floats. You must use the `convert_date(date)`
 method from the `pyxlsb` module to turn them into `datetime` instances.
 
 ```python
-print(pyxlsb.convert_date(41235.45578))
+from pyxlsb import convert_date
+print(convert_date(41235.45578))
+# datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
