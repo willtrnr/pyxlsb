@@ -12,32 +12,32 @@ proc.stdout.close()
 proc.wait()
 
 setup(
-  name='pyxlsb',
-  version='1.0.3',
+   name='pyxlsb',
+   version='1.0.3',
 
-  description='Excel 2007-2010 Binary Workbook (xlsb) parser',
-  long_description=README,
+   description='Excel 2007-2010 Binary Workbook (xlsb) parser',
+   long_description=README,
 
-  author='William Turner',
-  author_email='willtur.will@gmail.com',
+   author='William Turner',
+   author_email='willtur.will@gmail.com',
 
-  url='https://github.com/wwwiiilll/pyxlsb',
+   url='https://github.com/wwwiiilll/pyxlsb',
 
-  license='LGPLv3+',
+   license='LGPLv3+',
 
-  classifiers=[
-    'Development Status :: 5 - Production/Stable',
+   classifiers=[
+      'Development Status :: 5 - Production/Stable',
 
-    'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+      'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
 
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6'
-  ],
+      'Programming Language :: Python :: 2',
+      'Programming Language :: Python :: 2.7',
+      'Programming Language :: Python :: 3',
+      'Programming Language :: Python :: 3.3',
+      'Programming Language :: Python :: 3.4',
+      'Programming Language :: Python :: 3.5',
+      'Programming Language :: Python :: 3.6'
+   ],
 
-  packages=['pyxlsb']
+   packages=['pyxlsb']
 )

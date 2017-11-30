@@ -4,7 +4,9 @@
 *.pyo
 *.rst
 *.sublime-*
+*.swp
 *.xlsb
 build/
 dist/
 venv/
+~*
