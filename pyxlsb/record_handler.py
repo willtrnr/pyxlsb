@@ -1,26 +1,27 @@
-from . import biff12
+from . import records
+from .formula import Formula
 from collections import namedtuple
 
-class Handler(object):
+class RecordHandler(object):
     def __init__(self):
-        super(Handler, self).__init__()
+        super(RecordHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         if reclen > 0:
             reader.skip(reclen)
 
 
-class BasicHandler(Handler):
+class BasicRecordHandler(RecordHandler):
     def __init__(self, name=None):
-        super(BasicHandler, self).__init__()
+        super(BasicRecordHandler, self).__init__()
         self.name = name
 
     def read(self, reader, recid, reclen):
-        super(BasicHandler, self).read(reader, recid, reclen)
+        super(BasicRecordHandler, self).read(reader, recid, reclen)
         return self.name
 
 
-class StringTableHandler(Handler):
+class StringTableHandler(RecordHandler):
     cls = namedtuple('sst', ['count', 'uniqueCount'])
 
     def __init__(self):
@@ -32,7 +33,7 @@ class StringTableHandler(Handler):
         return self.cls(count, unique)
 
 
-class StringInstanceHandler(Handler):
+class StringInstanceHandler(RecordHandler):
     cls = namedtuple('si', ['t'])
 
     def __init__(self):
@@ -44,7 +45,7 @@ class StringInstanceHandler(Handler):
         return self.cls(val)
 
 
-class SheetHandler(Handler):
+class SheetHandler(RecordHandler):
     cls = namedtuple('sheet', ['sheetId', 'rId', 'name'])
 
     def __init__(self):
@@ -58,7 +59,7 @@ class SheetHandler(Handler):
         return self.cls(sheetid, relid, name)
 
 
-class DimensionHandler(Handler):
+class DimensionHandler(RecordHandler):
     cls = namedtuple('dimension', ['r', 'c', 'h', 'w'])
 
     def __init__(self):
@@ -72,7 +73,7 @@ class DimensionHandler(Handler):
         return self.cls(r1, c1, r2 - r1 + 1, c2 - c1 + 1)
 
 
-class ColumnHandler(Handler):
+class ColumnHandler(RecordHandler):
     cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
 
     def __init__(self):
@@ -86,7 +87,7 @@ class ColumnHandler(Handler):
         return self.cls(c1, c2, width, style)
 
 
-class RowHandler(Handler):
+class RowHandler(RecordHandler):
     cls = namedtuple('row', ['r'])
 
     def __init__(self):
@@ -97,7 +98,7 @@ class RowHandler(Handler):
         return self.cls(r)
 
 
-class CellHandler(Handler):
+class CellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
     def __init__(self):
@@ -108,21 +109,21 @@ class CellHandler(Handler):
         style = reader.read_int()
 
         val = None
-        if recid == biff12.NUM:
-            val = reader.read_float()
-        elif recid == biff12.BOOLERR:
+        if recid == records.NUM:
+            val = reader.read_rk()
+        elif recid == records.BOOLERR:
             # TODO Map error values
             val = hex(reader.read_byte())
-        elif recid == biff12.BOOL:
+        elif recid == records.BOOL:
             val = reader.read_byte() != 0
-        elif recid == biff12.FLOAT:
+        elif recid == records.FLOAT:
             val = reader.read_double()
-        elif recid == biff12.STRING:
+        elif recid == records.STRING:
             val = reader.read_int()
 
         return self.cls(col, val, None, style)
 
-class FormulaCellHandler(Handler):
+class FormulaCellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
     def __init__(self):
@@ -133,26 +134,29 @@ class FormulaCellHandler(Handler):
         style = reader.read_int()
 
         val = None
-        if recid == biff12.FORMULA_STRING:
+        if recid == records.FORMULA_STRING:
             val = reader.read_string()
-        elif recid == biff12.FORMULA_FLOAT:
+        elif recid == records.FORMULA_FLOAT:
             val = reader.read_double()
-        elif recid == biff12.FORMULA_BOOL:
+        elif recid == records.FORMULA_BOOL:
             val = reader.read_byte() != 0
-        elif recid == biff12.FORMULA_BOOLERR:
+        elif recid == records.FORMULA_BOOLERR:
             # TODO Map error values
             val = hex(reader.read_byte())
 
         formula = None
-        reader.skip(2) # Skip option flags
-        sz = reader.read_short()
+        # 0x0001 = Recalc always, 0x0002 = Calc on open, 0x0008 = Part of shared
+        grbits = reader.read_short()
+        sz = reader.read_int()
         if sz:
-            formula = reader.read(sz)
+            buf = reader.read(sz)
+            if len(buf) == sz:
+                formula = Formula.parse(buf)
 
         return self.cls(col, val, formula, style)
 
 
-class HyperlinkHandler(Handler):
+class HyperlinkHandler(RecordHandler):
     cls = namedtuple('hyperlink', ['r', 'c', 'h', 'w', 'rId'])
 
     def __init__(self):

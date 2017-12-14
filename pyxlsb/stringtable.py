@@ -1,10 +1,10 @@
-from . import biff12
-from .reader import BIFF12Reader
+from . import records
+from .record_reader import RecordReader
 
 class StringTable(object):
-    def __init__(self, fp):
+    def __init__(self, fp, _debug=False):
         super(StringTable, self).__init__()
-        self._reader = BIFF12Reader(fp=fp)
+        self._reader = RecordReader(fp=fp, _debug=_debug)
         self._strings = list()
         self._parse()
 
@@ -19,9 +19,9 @@ class StringTable(object):
 
     def _parse(self):
         for recid, rec in self._reader:
-            if recid == biff12.SI:
+            if recid == records.SI:
                 self._strings.append(rec.t)
-            elif recid == biff12.SST_END:
+            elif recid == records.SST_END:
                 break
 
     def get_string(self, idx):

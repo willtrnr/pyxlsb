@@ -60,3 +60,19 @@ from pyxlsb import convert_date
 print(convert_date(41235.45578))
 # datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
+
+Limitations
+-----------
+
+Non exhaustive list of things that are currently not supported:
+
+  - Formulas
+    - Parsing (WIP)
+    - Evaluation
+  - Formatting
+  - Rich text cells
+  - Encrypted workbooks
+  - Comments and other annotations
+
+Feel free to open issues or, even better, send PRs for these things and anything
+else I might have missed, I'll try to prioritise what's most needed.
