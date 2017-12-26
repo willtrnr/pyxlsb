@@ -57,25 +57,25 @@ class DataReader(object):
             return None
         return double_t.unpack(buff)[0]
 
-    def read_string(self):
+    def read_string(self, enc=None):
         l = self.read_int()
         if l is None:
             return None
         buff = self.read(l * 2)
         if len(buff) < l * 2:
             return None
-        return buff.decode(self._enc).replace('\x00', '')
+        return buff.decode(enc or self._enc).replace('\x00', '')
 
     def read_rk(self):
         buff = self._fp.read(4)
         if len(buff) < 4:
             return None
-        v = 0.0
+        value = 0.0
         intval = int32_t.unpack(buff)[0]
-        if intval & 0x02 != 0:
-            v = float(intval >> 2)
+        if intval & 0x02 == 0x02:
+            value = float(intval >> 2)
         else:
-            v = double_t.unpack(b'\x00\x00\x00\x00' + uint32_t.pack(intval & 0xFFFFFFFC))[0]
-        if intval & 0x01 != 0:
-            v /= 100
-        return v
+            value = double_t.unpack(b'\x00\x00\x00\x00' + uint32_t.pack(intval & 0xFFFFFFFC))[0]
+        if intval & 0x01 == 0x01:
+            value /= 100
+        return value

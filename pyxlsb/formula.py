@@ -1,5 +1,5 @@
-from .reader import DataReader
-from .token_handler import *
+from .datareader import DataReader
+from .tokenhandlers import *
 from . import tokens
 
 class Formula(object):

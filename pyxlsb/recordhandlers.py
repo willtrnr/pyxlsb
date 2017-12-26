@@ -10,6 +10,9 @@ class RecordHandler(object):
         if reclen > 0:
             reader.skip(reclen)
 
+    def write(self, writer, data):
+        pass
+
 
 class BasicRecordHandler(RecordHandler):
     def __init__(self, name=None):

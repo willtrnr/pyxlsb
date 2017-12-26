@@ -2,7 +2,7 @@ import os
 import sys
 import xml.etree.ElementTree as ElementTree
 from . import records
-from .record_reader import RecordReader
+from .recordreader import RecordReader
 from collections import namedtuple
 
 if sys.version_info > (3,):
@@ -11,18 +11,12 @@ if sys.version_info > (3,):
 Cell = namedtuple('Cell', ['r', 'c', 'v', 'f'])
 
 class Worksheet(object):
-    def __init__(self, fp, rels_fp=None, stringtable=None, _debug=False):
+    def __init__(self, workbook, fp, rels_fp=None, _debug=False):
         super(Worksheet, self).__init__()
+        self.workbook = workbook
         self._reader = RecordReader(fp=fp, _debug=_debug)
         self._rels_fp = rels_fp
         self._rels = ElementTree.parse(rels_fp).getroot() if rels_fp else None
-        self._stringtable = stringtable
-        self._data_offset = 0
-
-        self.dimension = None
-        self.cols = list()
-        self.rels = dict()
-        self.hyperlinks = dict()
 
         self._parse()
 
@@ -36,6 +30,12 @@ class Worksheet(object):
         return self.rows()
 
     def _parse(self):
+        self._data_offset = 0
+        self.dimension = None
+        self.cols = list()
+        self.rels = dict()
+        self.hyperlinks = dict()
+
         if self._rels is not None:
             for el in self._rels:
                 self.rels[el.attrib['Id']] = el.attrib['Target']
@@ -68,11 +68,10 @@ class Worksheet(object):
                         yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
                 row_num = rec.r
                 row = [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
+            elif recid == records.STRING:
+                row[rec.c] = Cell(row_num, rec.c, self.workbook.get_shared_string(rec.v), rec.f)
             elif recid >= records.BLANK and recid <= records.FORMULA_BOOLERR:
-                if recid == records.STRING and self._stringtable is not None:
-                    row[rec.c] = Cell(row_num, rec.c, self._stringtable[rec.v], rec.f)
-                else:
-                    row[rec.c] = Cell(row_num, rec.c, rec.v, rec.f)
+                row[rec.c] = Cell(row_num, rec.c, rec.v, rec.f)
             elif recid == records.SHEETDATA_END:
                 if row is not None:
                     yield row

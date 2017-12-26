@@ -31,7 +31,7 @@ The Workbook object exposes a `get_sheet(idx)` method for retrieving a
 Worksheet instance.
 
 ```python
-# Using the sheet index (1-based)
+# Using the sheet index (1-based to match VBA)
 with wb.get_sheet(1) as sheet:
     # Do stuff with sheet
 
@@ -43,14 +43,20 @@ with wb.get_sheet('Sheet1') as sheet:
 Tip: A `sheets` property containing the sheet names is available on the
 Workbook instance.
 
-The `rows()` method will hand out an iterator to read the worksheet rows.
+The `rows()` method will hand out an iterator to read the worksheet rows. The
+Worksheet object is also directly iterable and is equivalent to calling
+`rows()`.
 
 ```python
-# You can use .rows(sparse=True) to skip empty rows
+# You can use .rows(sparse=True) to skip empty rows and iterate faster
 for row in sheet.rows():
   print(row)
 # [Cell(r=0, c=0, v='TEXT'), Cell(r=0, c=1, v=42.1337)]
 ```
+
+*NOTE*: Iterating the same Worksheet instance multiple times in parallel (nested
+`for`s for instance) will yield unexpected results, retrieve more instances
+using `get_sheet` above.
 
 Do note that dates will appear as floats. You must use the `convert_date(date)`
 method from the `pyxlsb` module to turn them into `datetime` instances.
@@ -61,18 +67,23 @@ print(convert_date(41235.45578))
 # datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
 
+*NOTE*: When the 1904 limitation below will be fixed this function will likely
+move to the workbook object.
+
 Limitations
 -----------
 
 Non exhaustive list of things that are currently not supported:
 
   - Formulas
-    - Parsing (WIP)
+    - Parsing *WIP*
     - Evaluation
   - Formatting
-  - Rich text cells
-  - Encrypted workbooks
+  - Rich text cells (formatting is lost currently)
+  - Encrypted (password protected) workbooks
   - Comments and other annotations
+  - 1904 date system
+  - Writing (*very* far goal)
 
 Feel free to open issues or, even better, send PRs for these things and anything
-else I might have missed, I'll try to prioritise what's most needed.
+else I might have missed, I'll try to prioritize what's most requested.

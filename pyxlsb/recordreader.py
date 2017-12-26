@@ -1,7 +1,7 @@
 import os
 import struct
-from .record_handler import *
-from .reader import DataReader
+from .recordhandlers import *
+from .datareader import DataReader
 
 uint8_t = struct.Struct('<B')
 

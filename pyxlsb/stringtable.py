@@ -1,5 +1,5 @@
 from . import records
-from .record_reader import RecordReader
+from .recordreader import RecordReader
 
 class StringTable(object):
     def __init__(self, fp, _debug=False):

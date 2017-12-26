@@ -1,10 +1,11 @@
 import os
 import sys
 from . import records
-from .record_reader import RecordReader
+from .recordreader import RecordReader
 from .stringtable import StringTable
 from .worksheet import Worksheet
 from tempfile import TemporaryFile
+from zipfile import ZipFile
 
 if sys.version_info > (3,):
     basestring = (str, bytes)
@@ -15,9 +16,6 @@ class Workbook(object):
         self._zf = fp
         self._debug = _debug
 
-        self.sheets = list()
-        self.stringtable = None
-
         self._parse()
 
     def __enter__(self):
@@ -27,6 +25,9 @@ class Workbook(object):
         self.close()
 
     def _parse(self):
+        self.sheets = list()
+        self.stringtable = None
+
         with TemporaryFile() as temp:
             with self._zf.open('xl/workbook.bin', 'r') as zf:
                 temp.write(zf.read())
@@ -38,18 +39,20 @@ class Workbook(object):
                 elif recid == records.SHEETS_END:
                     break
 
+        temp = TemporaryFile()
         try:
-            temp = TemporaryFile()
             with self._zf.open('xl/sharedStrings.bin', 'r') as zf:
                 temp.write(zf.read())
                 temp.seek(0, os.SEEK_SET)
             self.stringtable = StringTable(fp=temp, _debug=self._debug)
         except KeyError:
-            pass
+            self.stringtable = None
+            temp.close()
 
     def get_sheet(self, idx, rels=False):
         if isinstance(idx, basestring):
-            idx = [s.lower() for s in self.sheets].index(idx.lower()) + 1
+            idx = idx.lower()
+            idx = next((n for n, s in enumerate(self.sheets) if s.lower() == idx), -1) + 1
         if idx < 1 or idx > len(self.sheets):
             raise IndexError('sheet index out of range')
 
@@ -66,7 +69,15 @@ class Workbook(object):
         else:
             rels_temp = None
 
-        return Worksheet(fp=temp, rels_fp=rels_temp, stringtable=self.stringtable, _debug=self._debug)
+        return Worksheet(workbook=self, fp=temp, rels_fp=rels_temp, _debug=self._debug)
+
+    def get_shared_string(self, idx):
+        if self.stringtable is not None:
+            return self.stringtable.get_string(idx)
 
     def close(self):
         self._zf.close()
+
+    @classmethod
+    def open(cls, name, _debug=False):
+        return cls(fp=ZipFile(name, 'r'), _debug=_debug)
