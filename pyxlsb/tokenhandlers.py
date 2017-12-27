@@ -19,6 +19,7 @@ class BasicTokenHandler(TokenHandler):
         super(BasicTokenHandler, self).read(reader, tokenid)
         return self.cls(tokenid)
 
+
 class FuncHandler(TokenHandler):
     cls = namedtuple('tFunc', ['tokenid', 'idx'])
 
@@ -28,6 +29,7 @@ class FuncHandler(TokenHandler):
     def read(self, reader, tokenid):
         idx = reader.read_short()
         return self.cls(tokenid, idx)
+
 
 class FuncVarHandler(TokenHandler):
     cls = namedtuple('tFuncVar', ['tokenid', 'args', 'prompt', 'idx', 'is_macro'])
@@ -39,6 +41,7 @@ class FuncVarHandler(TokenHandler):
         args = reader.read_byte()
         idx = reader.read_short()
         return self.cls(tokenid, args & 0x7F, args & 0x80 != 0, idx & 0x7FFFF, idx & 0x8000 != 0)
+
 
 class FuncCeHandler(TokenHandler):
     cls = namedtuple('tFuncCE', ['tokenid', 'args', 'idx'])

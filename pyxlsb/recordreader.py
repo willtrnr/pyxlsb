@@ -45,8 +45,8 @@ class RecordReader(object):
 
     def __init__(self, fp, _debug=False):
         super(RecordReader, self).__init__()
-        self._debug = _debug
         self._fp = fp
+        self._debug = _debug
 
     def __iter__(self):
         return self
@@ -67,28 +67,28 @@ class RecordReader(object):
         self._fp.seek(offset, whence)
 
     def read_id(self):
-        v = 0
+        value = 0
         for i in range(4):
             byte = self._fp.read(1)
-            if byte == '':
+            if not byte:
                 return None
             byte = uint8_t.unpack(byte)[0]
-            v += byte << 8 * i
+            value += byte << 8 * i
             if byte & 0x80 == 0:
                 break
-        return v
+        return value
 
     def read_len(self):
-        v = 0
+        value = 0
         for i in range(4):
             byte = self._fp.read(1)
-            if byte == '':
+            if not byte:
                 return None
             byte = uint8_t.unpack(byte)[0]
-            v += (byte & 0x7F) << (7 * i)
+            value += (byte & 0x7F) << (7 * i)
             if byte & 0x80 == 0:
                 break
-        return v
+        return value
 
     def register_handler(self, recid, handler):
         self.handlers[recid] = handler

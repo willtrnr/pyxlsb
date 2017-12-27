@@ -4,8 +4,8 @@ from .recordreader import RecordReader
 class StringTable(object):
     def __init__(self, fp, _debug=False):
         super(StringTable, self).__init__()
-        self._reader = RecordReader(fp=fp, _debug=_debug)
-        self._strings = list()
+        self._reader = RecordReader(fp, _debug=_debug)
+
         self._parse()
 
     def __enter__(self):
@@ -18,6 +18,7 @@ class StringTable(object):
         return self._strings[key]
 
     def _parse(self):
+        self._strings = list()
         for recid, rec in self._reader:
             if recid == records.SI:
                 self._strings.append(rec.t)

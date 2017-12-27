@@ -4,16 +4,15 @@ from . import records
 from .recordreader import RecordReader
 from .stringtable import StringTable
 from .worksheet import Worksheet
-from tempfile import TemporaryFile
-from zipfile import ZipFile
+from .xlsbpackage import XlsbPackage
 
 if sys.version_info > (3,):
     basestring = (str, bytes)
 
 class Workbook(object):
-    def __init__(self, fp, _debug=False):
+    def __init__(self, package, _debug=False):
         super(Workbook, self).__init__()
-        self._zf = fp
+        self._package = package
         self._debug = _debug
 
         self._parse()
@@ -28,26 +27,18 @@ class Workbook(object):
         self.sheets = list()
         self.stringtable = None
 
-        with TemporaryFile() as temp:
-            with self._zf.open('xl/workbook.bin', 'r') as zf:
-                temp.write(zf.read())
-                temp.seek(0, os.SEEK_SET)
-            reader = RecordReader(fp=temp, _debug=self._debug)
+        with self._package.get_workbook_part() as f:
+            reader = RecordReader(f, _debug=self._debug)
             for recid, rec in reader:
                 if recid == records.SHEET:
                     self.sheets.append(rec.name)
                 elif recid == records.SHEETS_END:
                     break
 
-        temp = TemporaryFile()
         try:
-            with self._zf.open('xl/sharedStrings.bin', 'r') as zf:
-                temp.write(zf.read())
-                temp.seek(0, os.SEEK_SET)
-            self.stringtable = StringTable(fp=temp, _debug=self._debug)
+            self.stringtable = StringTable(fp=self._package.get_sharedstrings_part(), _debug=self._debug)
         except KeyError:
             self.stringtable = None
-            temp.close()
 
     def get_sheet(self, idx, rels=False):
         if isinstance(idx, basestring):
@@ -56,20 +47,9 @@ class Workbook(object):
         if idx < 1 or idx > len(self.sheets):
             raise IndexError('sheet index out of range')
 
-        temp = TemporaryFile()
-        with self._zf.open('xl/worksheets/sheet{}.bin'.format(idx), 'r') as zf:
-            temp.write(zf.read())
-            temp.seek(0, os.SEEK_SET)
-
-        if rels:
-            rels_temp = TemporaryFile()
-            with self._zf.open('xl/worksheets/_rels/sheet{}.bin.rels'.format(idx), 'r') as zf:
-                rels_temp.write(zf.read())
-                rels_temp.seek(0, os.SEEK_SET)
-        else:
-            rels_temp = None
-
-        return Worksheet(workbook=self, fp=temp, rels_fp=rels_temp, _debug=self._debug)
+        fp = self._package.get_worksheet_part(idx)
+        rels_fp = self._package.get_worksheet_rels(idx) if rels else None
+        return Worksheet(self, fp, rels_fp=rels_fp, _debug=self._debug)
 
     def get_shared_string(self, idx):
         if self.stringtable is not None:
@@ -77,7 +57,3 @@ class Workbook(object):
 
     def close(self):
         self._zf.close()
-
-    @classmethod
-    def open(cls, name, _debug=False):
-        return cls(fp=ZipFile(name, 'r'), _debug=_debug)

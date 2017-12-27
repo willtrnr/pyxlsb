@@ -11,8 +11,8 @@ float_t = struct.Struct('<f')
 double_t = struct.Struct('<d')
 
 class DataReader(object):
-    def __init__(self, buf, enc='latin-1'):
-        self._fp = buf if hasattr(buf, 'read') else BytesIO(buf)
+    def __init__(self, fp, enc='latin-1'):
+        self._fp = fp if hasattr(fp, 'read') else BytesIO(fp)
         self._enc = enc
 
     def tell(self):

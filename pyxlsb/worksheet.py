@@ -14,9 +14,8 @@ class Worksheet(object):
     def __init__(self, workbook, fp, rels_fp=None, _debug=False):
         super(Worksheet, self).__init__()
         self.workbook = workbook
-        self._reader = RecordReader(fp=fp, _debug=_debug)
+        self._reader = RecordReader(fp, _debug=_debug)
         self._rels_fp = rels_fp
-        self._rels = ElementTree.parse(rels_fp).getroot() if rels_fp else None
 
         self._parse()
 
@@ -30,14 +29,16 @@ class Worksheet(object):
         return self.rows()
 
     def _parse(self):
-        self._data_offset = 0
         self.dimension = None
         self.cols = list()
         self.rels = dict()
         self.hyperlinks = dict()
+        self._data_offset = 0
 
-        if self._rels is not None:
-            for el in self._rels:
+        if self._rels_fp is not None:
+            self._rels_fp.seek(0, os.SEEK_SET)
+            doc = ElementTree.parse(self._rels_fp).getroot()
+            for el in doc:
                 self.rels[el.attrib['Id']] = el.attrib['Target']
 
         for recid, rec in self._reader:
@@ -47,25 +48,24 @@ class Worksheet(object):
                 self.cols.append(rec)
             elif recid == records.SHEETDATA:
                 self._data_offset = self._reader.tell()
-                if self._rels is None:
+                if self._rels_fp is None:
                     break
-            elif recid == records.HYPERLINK and self._rels is not None:
+            elif recid == records.HYPERLINK and self._rels_fp is not None:
                 for r in xrange(rec.h):
                     for c in xrange(rec.w):
                         self.hyperlinks[rec.r + r, rec.c + c] = rec.rId
 
     def rows(self, sparse=False):
-        self._reader.seek(self._data_offset, os.SEEK_SET)
-        row_num = -1
         row = None
+        row_num = -1
+        self._reader.seek(self._data_offset, os.SEEK_SET)
         for recid, rec in self._reader:
             if recid == records.ROW and rec.r != row_num:
                 if row is not None:
                     yield row
-                if not sparse:
-                    while row_num < rec.r - 1:
-                        row_num += 1
-                        yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
+                while not sparse and row_num < rec.r - 1:
+                    row_num += 1
+                    yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
                 row_num = rec.r
                 row = [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
             elif recid == records.STRING:

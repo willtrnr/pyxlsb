@@ -3,7 +3,6 @@ from .tokenhandlers import *
 from . import tokens
 
 class Formula(object):
-
     def __init__(self, tokens=None):
         super(Formula, self).__init__()
         self._tokens = list(tokens) if tokens else []
