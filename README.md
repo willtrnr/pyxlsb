@@ -2,9 +2,10 @@ pyxlsb
 ======
 
 [![PyPI](https://img.shields.io/pypi/v/pyxlsb.svg)](https://pypi.python.org/pypi/pyxlsb)
+[![Build Status](https://travis-ci.org/wwwiiilll/pyxlsb.svg?branch=master)](https://travis-ci.org/wwwiiilll/pyxlsb)
 
 `pyxlsb` is an Excel 2007-2010 Binary Workbook (xlsb) parser for Python.
-The library is currently extremely limited, but functional enough for basic
+The library is currently limited, but should be functional enough for basic
 data extraction.
 
 Install

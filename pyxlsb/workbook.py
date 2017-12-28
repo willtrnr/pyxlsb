@@ -5,7 +5,7 @@ from .recordreader import RecordReader
 from .stringtable import StringTable
 from .worksheet import Worksheet
 from .xlsbpackage import XlsbPackage
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 if sys.version_info > (3,):
     basestring = (str, bytes)
@@ -59,25 +59,27 @@ class Workbook(object):
         if self.stringtable is not None:
             return self.stringtable.get_string(idx)
 
-    def convert_date(self, date):
-        if not isinstance(date, int) and not isinstance(date, float):
+    def convert_time(self, value):
+        if not isinstance(value, int) and not isinstance(value, float):
             return None
+        return time() + timedelta(seconds=int((value % 1) * 24 * 60 * 60))
 
-        if self.props.date1904:
-            era = datetime(1904, 1, 1, 0, 0, 0)
+    def convert_date(self, value):
+        if not isinstance(value, int) and not isinstance(value, float):
+            return None
+        era = datetime(1904 if self.props.date1904 else 1900, 1, 1)
+        timeoffset = timedelta(seconds=int((value % 1) * 24 * 60 * 60))
+        if int(value) == 0:
+            return era + timeoffset
+        elif not self.props.date1904 and int(value) >= 61:
+            # According to Lotus 1-2-3, there is a Feb 29th 1900,
+            # so we have to remove one day after that date
+            dateoffset = timedelta(days=int(value) - 2)
         else:
-            era = datetime(1900, 1, 1, 0, 0, 0)
-
-        if int(date) == 0:
-            offset = timedelta(seconds=date * 24 * 60 * 60)
-        elif date >= 61:
-            # According to Lotus 1-2-3, Feb 29th 1900 is a real thing, therefore we have to remove one day after that date
-            offset = timedelta(days=int(date) - 2, seconds=int((date % 1) * 24 * 60 * 60))
-        else:
-            # Feb 29th 1900 will show up as Mar 1st 1900 because Python won't handle that date
-            offset = timedelta(days=int(date) - 1, seconds=int((date % 1) * 24 * 60 * 60))
-
-        return era + offset
+            dateoffset = timedelta(days=int(value) - 1)
+        return era + dateoffset + timeoffset
 
     def close(self):
         self._package.close()
+        if self.stringtable is not None:
+            self.stringtable.close()

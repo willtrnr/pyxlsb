@@ -57,15 +57,6 @@ class DataReader(object):
             return None
         return double_t.unpack(buff)[0]
 
-    def read_string(self, enc=None):
-        l = self.read_int()
-        if l is None:
-            return None
-        buff = self.read(l * 2)
-        if len(buff) < l * 2:
-            return None
-        return buff.decode(enc or self._enc).replace('\x00', '')
-
     def read_rk(self):
         buff = self._fp.read(4)
         if len(buff) < 4:
@@ -79,3 +70,12 @@ class DataReader(object):
         if intval & 0x01 == 0x01:
             value /= 100
         return value
+
+    def read_string(self, enc=None):
+        l = self.read_int()
+        if l is None:
+            return None
+        buff = self.read(l * 2)
+        if len(buff) != l * 2:
+            return None
+        return buff.decode(enc or self._enc).replace('\x00', '')
