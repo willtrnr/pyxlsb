@@ -1,6 +1,6 @@
 import os.path
 import unittest
-from unittest.mock import Mock
+from mock import Mock
 from pyxlsb.worksheet import Worksheet
 
 class WorksheetTestCase(unittest.TestCase):

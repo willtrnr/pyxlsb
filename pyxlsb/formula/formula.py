@@ -1,6 +1,6 @@
-from .datareader import DataReader
-from .tokenhandlers import *
 from . import tokens
+from .tokenhandlers import *
+from pyxlsb.datareader import DataReader
 
 class Formula(object):
     def __init__(self, tokens=None):
