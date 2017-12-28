@@ -24,28 +24,28 @@ class BasicRecordHandler(RecordHandler):
         return self.name
 
 
-class StringTableHandler(RecordHandler):
-    cls = namedtuple('sst', ['count', 'uniqueCount'])
+class FileVersionHandler(RecordHandler):
+    cls = namedtuple('fileVersion', ['lastEdited', 'lowestEdited', 'rupBuild'])
 
     def __init__(self):
-        super(StringTableHandler, self).__init__()
+        super(FileVersionHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
-        count = reader.read_int()
-        unique = reader.read_int()
-        return self.cls(count, unique)
+        return self.cls(None, None, None)
 
 
-class StringInstanceHandler(RecordHandler):
-    cls = namedtuple('si', ['t'])
+class WorkbookPrHandler(RecordHandler):
+    cls = namedtuple('workbookPr', ['date1904', 'defaultThemeVersion'])
 
     def __init__(self):
-        super(StringInstanceHandler, self).__init__()
+        super(WorkbookPrHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
-        reader.skip(1)
-        val = reader.read_string()
-        return self.cls(val)
+        bits = reader.read_short() # TODO: This contains the 1904 flag
+        reader.skip(2) # Not sure what this is, other flags probably
+        theme = reader.read_int()
+        reader.skip(4) # Also not sure, more flags?
+        return self.cls(bits & 0x01 == 0x01, theme)
 
 
 class SheetHandler(RecordHandler):
@@ -172,3 +172,27 @@ class HyperlinkHandler(RecordHandler):
         c2 = reader.read_int()
         rId = reader.read_string()
         return self.cls(r1, c1, r2 - r1 + 1, c2 - c1 + 1, rId)
+
+
+class StringTableHandler(RecordHandler):
+    cls = namedtuple('sst', ['count', 'uniqueCount'])
+
+    def __init__(self):
+        super(StringTableHandler, self).__init__()
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        unique = reader.read_int()
+        return self.cls(count, unique)
+
+
+class StringInstanceHandler(RecordHandler):
+    cls = namedtuple('si', ['t'])
+
+    def __init__(self):
+        super(StringInstanceHandler, self).__init__()
+
+    def read(self, reader, recid, reclen):
+        reader.skip(1)
+        val = reader.read_string()
+        return self.cls(val)

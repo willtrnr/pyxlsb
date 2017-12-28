@@ -10,15 +10,13 @@ class RecordReader(object):
 
     handlers = {
         # Workbook part handlers
-        records.WORKBOOK:   BasicRecordHandler('workbook'),
-        records.SHEETS:     BasicRecordHandler('sheets'),
-        records.SHEETS_END: BasicRecordHandler('/sheets'),
-        records.SHEET:      SheetHandler(),
-
-        # SharedStrings part handlers
-        records.SST:     StringTableHandler(),
-        records.SST_END: BasicRecordHandler('/sst'),
-        records.SI:      StringInstanceHandler(),
+        records.WORKBOOK:     BasicRecordHandler('workbook'),
+        records.WORKBOOK_END: BasicRecordHandler('/workbook'),
+        records.FILEVERSION:  FileVersionHandler(),
+        records.WORKBOOKPR:   WorkbookPrHandler(),
+        records.SHEETS:       BasicRecordHandler('sheets'),
+        records.SHEETS_END:   BasicRecordHandler('/sheets'),
+        records.SHEET:        SheetHandler(),
 
         # Worksheet part handlers
         records.WORKSHEET:       BasicRecordHandler('worksheet'),
@@ -40,7 +38,12 @@ class RecordReader(object):
         records.FORMULA_FLOAT:   FormulaCellHandler(),
         records.FORMULA_BOOL:    FormulaCellHandler(),
         records.FORMULA_BOOLERR: FormulaCellHandler(),
-        records.HYPERLINK:       HyperlinkHandler()
+        records.HYPERLINK:       HyperlinkHandler(),
+
+        # SharedStrings part handlers
+        records.SST:     StringTableHandler(),
+        records.SST_END: BasicRecordHandler('/sst'),
+        records.SI:      StringInstanceHandler()
     }
 
     def __init__(self, fp, _debug=False):
