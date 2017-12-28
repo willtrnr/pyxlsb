@@ -1,4 +1,3 @@
-from . import tokens
 from collections import namedtuple
 
 class TokenHandler(object):

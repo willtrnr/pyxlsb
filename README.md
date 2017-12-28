@@ -60,16 +60,15 @@ for row in sheet.rows():
 using `get_sheet` above.
 
 Do note that dates will appear as floats. You must use the `convert_date(date)`
-method from the `pyxlsb` module to turn them into `datetime` instances.
+method from the corresponding Workbook instance to turn them into `datetime`.
 
 ```python
-from pyxlsb import convert_date
-print(convert_date(41235.45578))
+print(wb.convert_date(41235.45578))
 # datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
 
-*NOTE*: When the 1904 limitation below will be fixed this function will likely
-move to the workbook object.
+*NOTE*: Using the `convert_date` in the `pyxlsb` module still works, but is
+deprecated and will be removed.
 
 Limitations
 -----------
@@ -83,7 +82,7 @@ Non exhaustive list of things that are currently not supported:
   - Rich text cells (formatting is lost currently)
   - Encrypted (password protected) workbooks
   - Comments and other annotations
-  - 1904 date system
+  - ~~1904 date system~~ *Done*
   - Writing (*very* far goal)
 
 Feel free to open issues or, even better, send PRs for these things and anything

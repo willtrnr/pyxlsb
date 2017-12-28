@@ -1,11 +1,9 @@
-import os
 import sys
 from . import records
 from .recordreader import RecordReader
 from .stringtable import StringTable
 from .worksheet import Worksheet
-from .xlsbpackage import XlsbPackage
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 
 if sys.version_info > (3,):
     basestring = (str, bytes)
@@ -59,15 +57,10 @@ class Workbook(object):
         if self.stringtable is not None:
             return self.stringtable.get_string(idx)
 
-    def convert_time(self, value):
-        if not isinstance(value, int) and not isinstance(value, float):
-            return None
-        return time() + timedelta(seconds=int((value % 1) * 24 * 60 * 60))
-
     def convert_date(self, value):
         if not isinstance(value, int) and not isinstance(value, float):
             return None
-        era = datetime(1904 if self.props.date1904 else 1900, 1, 1)
+        era = datetime(1904 if self.props.date1904 else 1900, 1, 1, tzinfo=None)
         timeoffset = timedelta(seconds=int((value % 1) * 24 * 60 * 60))
         if int(value) == 0:
             return era + timeoffset
@@ -78,6 +71,11 @@ class Workbook(object):
         else:
             dateoffset = timedelta(days=int(value) - 1)
         return era + dateoffset + timeoffset
+
+    def convert_time(self, value):
+        if not isinstance(value, int) and not isinstance(value, float):
+            return None
+        return (datetime.min + timedelta(seconds=int((value % 1) * 24 * 60 * 60))).time()
 
     def close(self):
         self._package.close()

@@ -1,7 +1,6 @@
 import os
 import struct
 from io import BytesIO
-from . import records
 
 uint8_t = struct.Struct('<B')
 uint16_t = struct.Struct('<H')

@@ -8,6 +8,7 @@ from collections import namedtuple
 if sys.version_info > (3,):
     xrange = range
 
+# TODO: Make a real class of this?
 Cell = namedtuple('Cell', ['r', 'c', 'v', 'f'])
 
 class Worksheet(object):

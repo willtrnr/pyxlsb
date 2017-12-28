@@ -1,5 +1,4 @@
 from .workbook import Workbook
-from .worksheet import Worksheet
 from .xlsbpackage import XlsbPackage
 
 def open_workbook(name, *args, **kwargs):
