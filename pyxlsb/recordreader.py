@@ -43,7 +43,11 @@ class RecordReader(object):
         # SharedStrings part handlers
         records.SST:     StringTableHandler(),
         records.SST_END: BasicRecordHandler('/sst'),
-        records.SI:      StringInstanceHandler()
+        records.SI:      StringInstanceHandler(),
+
+        # Styles part handlers
+        records.STYLESHEET:     BasicRecordHandler('styleSheet'),
+        records.STYLESHEET_END: BasicRecordHandler('/styleSheet')
     }
 
     def __init__(self, fp, _debug=False):

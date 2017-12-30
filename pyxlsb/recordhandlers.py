@@ -77,7 +77,7 @@ class DimensionHandler(RecordHandler):
 
 
 class ColumnHandler(RecordHandler):
-    cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
+    cls = namedtuple('col', ['c1', 'c2', 'width', 'style', 'customWidth'])
 
     def __init__(self):
         super(ColumnHandler, self).__init__()
@@ -87,7 +87,8 @@ class ColumnHandler(RecordHandler):
         c2 = reader.read_int()
         width = reader.read_int() / 256
         style = reader.read_int()
-        return self.cls(c1, c2, width, style)
+        flags = reader.read_short()
+        return self.cls(c1, c2, width, style, flags & 0x0002 == 0x0002)
 
 
 class RowHandler(RecordHandler):

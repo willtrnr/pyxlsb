@@ -78,7 +78,7 @@ Non exhaustive list of things that are currently not supported:
   - Formulas
     - Parsing *WIP*
     - Evaluation
-  - Formatting
+  - Formatting *WIP*
   - Rich text cells (formatting is lost currently)
   - Encrypted (password protected) workbooks
   - Comments and other annotations

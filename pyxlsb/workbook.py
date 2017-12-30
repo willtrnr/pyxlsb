@@ -2,6 +2,7 @@ import sys
 from . import records
 from .recordreader import RecordReader
 from .stringtable import StringTable
+from .style import Styles
 from .worksheet import Worksheet
 from datetime import datetime, timedelta
 
@@ -42,6 +43,11 @@ class Workbook(object):
         except KeyError:
             self.stringtable = None
 
+        try:
+            self.styles = Styles(self._package.get_styles_part(), _debug=self._debug)
+        except KeyError:
+            self.styles = None
+
     def get_sheet(self, idx, rels=False):
         if isinstance(idx, basestring):
             idx = idx.lower()
@@ -81,3 +87,5 @@ class Workbook(object):
         self._package.close()
         if self.stringtable is not None:
             self.stringtable.close()
+        if self.styles is not None:
+            self.styles.close()

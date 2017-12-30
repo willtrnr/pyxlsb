@@ -5,6 +5,7 @@ class StringTable(object):
     def __init__(self, fp, _debug=False):
         super(StringTable, self).__init__()
         self._reader = RecordReader(fp, _debug=_debug)
+        self._debug = _debug
 
         self._parse()
 

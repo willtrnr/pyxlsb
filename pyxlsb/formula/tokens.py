@@ -83,11 +83,11 @@ sizes[AREA] = 14
 sizes[MEM_AREA] = -1 # Variable
 sizes[REF_ERR] = sizes[REF]
 sizes[AREA_ERR] = sizes[AREA]
-sizes[REF_N] = 6
-sizes[AREA_N] = 14
+sizes[REF_N] = sizes[REF]
+sizes[AREA_N] = sizes[AREA]
 sizes[NAME_X] = 6
 sizes[REF_3D] = 8
-sizes[AREA_3D] = 14
+sizes[AREA_3D] = 16
 sizes[REF_ERR_3D] = sizes[REF_3D]
 sizes[AREA_ERR_3D] = sizes[AREA_ERR_3D]
 
