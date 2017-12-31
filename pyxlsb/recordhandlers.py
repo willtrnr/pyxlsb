@@ -3,14 +3,12 @@ from .formula import Formula
 from collections import namedtuple
 
 class RecordHandler(object):
-    def __init__(self):
-        super(RecordHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
         if reclen > 0:
             reader.skip(reclen)
 
     def write(self, writer, data):
+        # TODO Eventually some day
         pass
 
 
@@ -21,52 +19,34 @@ class BasicRecordHandler(RecordHandler):
 
     def read(self, reader, recid, reclen):
         super(BasicRecordHandler, self).read(reader, recid, reclen)
+        reader.skip(reclen)
         return self.name
 
 
-class FileVersionHandler(RecordHandler):
-    cls = namedtuple('fileVersion', ['lastEdited', 'lowestEdited', 'rupBuild'])
-
-    def __init__(self):
-        super(FileVersionHandler, self).__init__()
-
-    def read(self, reader, recid, reclen):
-        return self.cls(None, None, None)
-
-
-class WorkbookPrHandler(RecordHandler):
+class WorkbookPropertiesHandler(RecordHandler):
     cls = namedtuple('workbookPr', ['date1904', 'defaultThemeVersion'])
 
-    def __init__(self):
-        super(WorkbookPrHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
-        bits = reader.read_short() # TODO: This contains the 1904 flag
+        flags = reader.read_short() # TODO: This contains the 1904 flag
         reader.skip(2) # Not sure what this is, other flags probably
         theme = reader.read_int()
         reader.skip(4) # Also not sure, more flags?
-        return self.cls(bits & 0x01 == 0x01, theme)
+        return self.cls(flags & 0x01 == 0x01, theme)
 
 
 class SheetHandler(RecordHandler):
     cls = namedtuple('sheet', ['sheetId', 'rId', 'name'])
 
-    def __init__(self):
-        super(SheetHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
         reader.skip(4)
         sheetid = reader.read_int()
-        relid = reader.read_string()
+        rid = reader.read_string()
         name = reader.read_string()
-        return self.cls(sheetid, relid, name)
+        return self.cls(sheetid, rid, name)
 
 
 class DimensionHandler(RecordHandler):
     cls = namedtuple('dimension', ['r', 'c', 'h', 'w'])
-
-    def __init__(self):
-        super(DimensionHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         r1 = reader.read_int()
@@ -78,9 +58,6 @@ class DimensionHandler(RecordHandler):
 
 class ColumnHandler(RecordHandler):
     cls = namedtuple('col', ['c1', 'c2', 'width', 'style', 'customWidth'])
-
-    def __init__(self):
-        super(ColumnHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         c1 = reader.read_int()
@@ -94,9 +71,6 @@ class ColumnHandler(RecordHandler):
 class RowHandler(RecordHandler):
     cls = namedtuple('row', ['r'])
 
-    def __init__(self):
-        super(RowHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
         r = reader.read_int()
         return self.cls(r)
@@ -104,9 +78,6 @@ class RowHandler(RecordHandler):
 
 class CellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
-
-    def __init__(self):
-        super(CellHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         col = reader.read_int()
@@ -129,9 +100,6 @@ class CellHandler(RecordHandler):
 
 class FormulaCellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
-
-    def __init__(self):
-        super(FormulaCellHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         col = reader.read_int()
@@ -163,23 +131,17 @@ class FormulaCellHandler(RecordHandler):
 class HyperlinkHandler(RecordHandler):
     cls = namedtuple('hyperlink', ['r', 'c', 'h', 'w', 'rId'])
 
-    def __init__(self):
-        super(HyperlinkHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
         r1 = reader.read_int()
         r2 = reader.read_int()
         c1 = reader.read_int()
         c2 = reader.read_int()
-        rId = reader.read_string()
-        return self.cls(r1, c1, r2 - r1 + 1, c2 - c1 + 1, rId)
+        rid = reader.read_string()
+        return self.cls(r1, c1, r2 - r1 + 1, c2 - c1 + 1, rid)
 
 
 class StringTableHandler(RecordHandler):
     cls = namedtuple('sst', ['count', 'uniqueCount'])
-
-    def __init__(self):
-        super(StringTableHandler, self).__init__()
 
     def read(self, reader, recid, reclen):
         count = reader.read_int()
@@ -190,10 +152,110 @@ class StringTableHandler(RecordHandler):
 class StringInstanceHandler(RecordHandler):
     cls = namedtuple('si', ['t'])
 
-    def __init__(self):
-        super(StringInstanceHandler, self).__init__()
-
     def read(self, reader, recid, reclen):
         reader.skip(1)
         val = reader.read_string()
         return self.cls(val)
+
+
+class ColorsHandler(RecordHandler):
+    cls = namedtuple('colors', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class DxfsHandler(RecordHandler):
+    cls = namedtuple('dxfs', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class TableStylesHandler(RecordHandler):
+    cls = namedtuple('tableStyles', ['count', 'defaultTableStyle', 'defaultPivotStyle'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        table = reader.read_string()
+        pivot = reader.read_string()
+        return self.cls(count, table, pivot)
+
+
+class FillsHandler(RecordHandler):
+    cls = namedtuple('fills', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class FontsHandler(RecordHandler):
+    cls = namedtuple('fonts', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class BordersHandler(RecordHandler):
+    cls = namedtuple('borders', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class CellXfsHandler(RecordHandler):
+    cls = namedtuple('cellXfs', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class CellStylesHandler(RecordHandler):
+    cls = namedtuple('cellStyles', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+
+class CellStyleXfsHandler(RecordHandler):
+    cls = namedtuple('cellStyleXfs', ['count'])
+
+    def read(self, reader, recid, reclen):
+        count = reader.read_int()
+        return self.cls(count)
+
+class FontHandler(RecordHandler):
+    cls = namedtuple('font', ['family'])
+
+    def read(self, reader, recid, reclen):
+        reader.skip(21) # TODO
+        family = reader.read_string()
+        return self.cls(family)
+
+class XfHandler(RecordHandler):
+    cls = namedtuple('xf', ['numFmtId', 'fontId', 'fillId', 'borderId', 'xfId'])
+    def read(self, reader, recid, reclen):
+        # TODO: Speculative and seems wrong
+        xf = reader.read_short()
+        if xf == 0xFFFF:
+            xf = None
+        fmtid = reader.read_short()
+        font = reader.read_short()
+        fill = reader.read_short()
+        border = reader.read_short()
+        return self.cls(fmtid, font, fill, border, xf)
+
+class CellStyleHandler(RecordHandler):
+    cls = namedtuple('cellStyle', ['name'])
+
+    def read(self, reader, recid, reclen):
+        reader.skip(8) # TODO
+        name = reader.read_string()
+        return self.cls(name)

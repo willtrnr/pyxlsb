@@ -12,8 +12,7 @@ class RecordReader(object):
         # Workbook part handlers
         records.WORKBOOK:     BasicRecordHandler('workbook'),
         records.WORKBOOK_END: BasicRecordHandler('/workbook'),
-        records.FILEVERSION:  FileVersionHandler(),
-        records.WORKBOOKPR:   WorkbookPrHandler(),
+        records.WORKBOOKPR:   WorkbookPropertiesHandler(),
         records.SHEETS:       BasicRecordHandler('sheets'),
         records.SHEETS_END:   BasicRecordHandler('/sheets'),
         records.SHEET:        SheetHandler(),
@@ -46,8 +45,29 @@ class RecordReader(object):
         records.SI:      StringInstanceHandler(),
 
         # Styles part handlers
-        records.STYLESHEET:     BasicRecordHandler('styleSheet'),
-        records.STYLESHEET_END: BasicRecordHandler('/styleSheet')
+        records.STYLESHEET:       BasicRecordHandler('styleSheet'),
+        records.STYLESHEET_END:   BasicRecordHandler('/styleSheet'),
+        records.COLORS:           ColorsHandler(),
+        records.COLORS_END:       BasicRecordHandler('/colors'),
+        records.DXFS:             DxfsHandler(),
+        records.DXFS_END:         BasicRecordHandler('/dxfs'),
+        records.TABLESTYLES:      TableStylesHandler(),
+        records.TABLESTYLES_END:  BasicRecordHandler('/tableStyles'),
+        records.FILLS:            FillsHandler(),
+        records.FILLS_END:        BasicRecordHandler('/fills'),
+        records.FONTS:            FontsHandler(),
+        records.FONTS_END:        BasicRecordHandler('/fonts'),
+        records.BORDERS:          BordersHandler(),
+        records.BORDERS_END:      BasicRecordHandler('/borders'),
+        records.CELLXFS:          CellXfsHandler(),
+        records.CELLXFS_END:      BasicRecordHandler('/cellXfs'),
+        records.CELLSTYLES:       CellStylesHandler(),
+        records.CELLSTYLES_END:   BasicRecordHandler('/cellStyles'),
+        records.CELLSTYLEXFS:     CellStyleXfsHandler(),
+        records.CELLSTYLEXFS_END: BasicRecordHandler('/cellStyleXfs'),
+        records.FONT:             FontHandler(),
+        records.XF:               XfHandler(),
+        records.CELLSTYLE:        CellStyleHandler()
     }
 
     def __init__(self, fp, _debug=False):

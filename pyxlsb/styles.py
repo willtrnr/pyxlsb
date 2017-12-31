@@ -16,20 +16,23 @@ class Styles(object):
         self.close()
 
     def _parse(self):
-        self._fonts = list()
-        self._fills = list()
-        self._borders = list()
         self._colors = list()
-        self._cell_style_xfs = list()
-        self._cell_xfs = list()
-        self._cell_styles = list()
         self._dxfs = list()
         self._table_styles = list()
+        self._fills = list()
+        self._fonts = list()
+        self._borders = list()
+        self._cell_xfs = list()
+        self._cell_styles = list()
+        self._cell_style_xfs = list()
 
         for recid, reclen in self._reader:
             # TODO
             if recid == records.STYLESHEET_END:
                 break
+
+    def get_style(self, idx):
+        return None
 
     def close(self):
         self._reader.close()

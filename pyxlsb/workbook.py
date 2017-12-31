@@ -2,7 +2,7 @@ import sys
 from . import records
 from .recordreader import RecordReader
 from .stringtable import StringTable
-from .style import Styles
+from .styles import Styles
 from .worksheet import Worksheet
 from datetime import datetime, timedelta
 
