@@ -31,6 +31,14 @@ class DataReaderTestCase(unittest.TestCase):
     def test_read_double(self):
         pass
 
+    def test_read_bool(self):
+        reader = DataReader(b'\x00\x01\x02')
+        self.assertEqual(reader.read_bool(), False)
+        self.assertEqual(reader.read_bool(), True)
+        # Not sure about this case
+        self.assertEqual(reader.read_bool(), False)
+        self.assertEqual(reader.read_bool(), None)
+
     # TODO: Add negative cases
     def test_read_rk(self):
         # RK type 0 IEEE

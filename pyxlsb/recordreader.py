@@ -3,7 +3,7 @@ import struct
 from .recordhandlers import *
 from .datareader import DataReader
 
-uint8_t = struct.Struct('<B')
+_uint8_t = struct.Struct('<B')
 
 class RecordReader(object):
     default_handler = RecordHandler()
@@ -99,7 +99,7 @@ class RecordReader(object):
             byte = self._fp.read(1)
             if not byte:
                 return None
-            byte = uint8_t.unpack(byte)[0]
+            byte = _uint8_t.unpack(byte)[0]
             value += byte << 8 * i
             if byte & 0x80 == 0:
                 break
@@ -111,7 +111,7 @@ class RecordReader(object):
             byte = self._fp.read(1)
             if not byte:
                 return None
-            byte = uint8_t.unpack(byte)[0]
+            byte = _uint8_t.unpack(byte)[0]
             value += (byte & 0x7F) << (7 * i)
             if byte & 0x80 == 0:
                 break

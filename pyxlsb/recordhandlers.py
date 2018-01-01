@@ -83,20 +83,20 @@ class CellHandler(RecordHandler):
         col = reader.read_int()
         style = reader.read_int()
 
-        val = None
+        value = None
         if recid == records.NUM:
-            val = reader.read_rk()
+            value = reader.read_rk()
         elif recid == records.BOOLERR:
             # TODO Map error values
-            val = hex(reader.read_byte())
+            value = hex(reader.read_byte())
         elif recid == records.BOOL:
-            val = reader.read_byte() != 0
+            value = reader.read_bool()
         elif recid == records.FLOAT:
-            val = reader.read_double()
+            value = reader.read_double()
         elif recid == records.STRING:
-            val = reader.read_int()
+            value = reader.read_int()
 
-        return self.cls(col, val, None, style)
+        return self.cls(col, value, None, style)
 
 class FormulaCellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
@@ -105,16 +105,16 @@ class FormulaCellHandler(RecordHandler):
         col = reader.read_int()
         style = reader.read_int()
 
-        val = None
+        value = None
         if recid == records.FORMULA_STRING:
-            val = reader.read_string()
+            value = reader.read_string()
         elif recid == records.FORMULA_FLOAT:
-            val = reader.read_double()
+            value = reader.read_double()
         elif recid == records.FORMULA_BOOL:
-            val = reader.read_byte() != 0
+            value = reader.read_bool()
         elif recid == records.FORMULA_BOOLERR:
             # TODO Map error values
-            val = hex(reader.read_byte())
+            value = hex(reader.read_byte())
 
         formula = None
         # 0x0001 = Recalc always, 0x0002 = Calc on open, 0x0008 = Part of shared
@@ -125,7 +125,7 @@ class FormulaCellHandler(RecordHandler):
             if len(buf) == sz:
                 formula = Formula.parse(buf)
 
-        return self.cls(col, val, formula, style)
+        return self.cls(col, value, formula, style)
 
 
 class HyperlinkHandler(RecordHandler):
@@ -154,8 +154,8 @@ class StringInstanceHandler(RecordHandler):
 
     def read(self, reader, recid, reclen):
         reader.skip(1)
-        val = reader.read_string()
-        return self.cls(val)
+        value = reader.read_string()
+        return self.cls(value)
 
 
 class ColorsHandler(RecordHandler):

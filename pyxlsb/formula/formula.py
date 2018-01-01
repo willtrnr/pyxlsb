@@ -12,7 +12,7 @@ class Formula(object):
 
     @classmethod
     def parse(cls, data):
-        reader = data if hasattr(data, 'read') else DataReader(data)
+        reader = DataReader(data)
         ptgs = []
         while True:
             tokenid = reader.read_byte()
