@@ -4,10 +4,14 @@ if sys.version_info > (3,):
     xrange = range
 
 class BasePtg(object):
+    def __repr__(self):
+        args = list('{}={}'.format(str(k), repr(v)) for k, v in self.__dict__.items())
+        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
+
     def is_classified(self):
         return False
 
-    def stringify(self, ptgs):
+    def stringify(self, tokens):
         return '#TODO{}!'.format(self.ptg)
 
     @classmethod
@@ -48,75 +52,162 @@ class UnknownPtg(BasePtg):
         super(UnknownPtg, self).__init__(*args, **kwargs)
         self.ptg = ptg
 
-    def stringify(self, ptgs):
+    def stringify(self, tokens):
         return '#UNK{}!'.format(self.ptg)
 
     @classmethod
     def parse(cls, reader, ptg):
-        cls(ptg)
+        return cls(ptg)
 
 # Unary operators
 
 class UnaryPlusPtg(BasePtg):
     ptg = 0x12
 
+    def stringify(self, tokens):
+        return '+' + tokens.pop().stringify(tokens)
+
 class UnaryMinusPtg(BasePtg):
     ptg = 0x13
 
+    def stringify(self, tokens):
+        return '-' + tokens.pop().stringify(tokens)
+
 class PercentPtg(BasePtg):
     ptg = 0x14
+
+    def stringify(self, tokens):
+        return tokens.pop().stringify(tokens) + '%'
 
 # Binary operators
 
 class AddPtg(BasePtg):
     ptg = 0x03
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '+' + b
+
 class SubstractPtg(BasePtg):
     ptg = 0x04
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '-' + b
 
 class MultiplyPtg(BasePtg):
     ptg = 0x05
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '*' + b
+
 class DividePtg(BasePtg):
     ptg = 0x06
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '/' + b
 
 class PowerPtg(BasePtg):
     ptg = 0x07
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '^' + b
+
 class ConcatPtg(BasePtg):
     ptg = 0x08
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '&' + b
 
 class LessThanPtg(BasePtg):
     ptg = 0x09
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '<' + b
+
 class LessThanEqualPtg(BasePtg):
     ptg = 0x0A
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '<=' + b
 
 class EqualPtg(BasePtg):
     ptg = 0x0B
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '=' + b
+
 class GreaterThanEqualPtg(BasePtg):
     ptg = 0x0C
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '>=' + b
 
 class GreaterThanPtg(BasePtg):
     ptg = 0x0D
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '>' + b
+
 class NotEqualPtg(BasePtg):
     ptg = 0x0E
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + '<>' + b
 
 class IntersectionPtg(BasePtg):
     ptg = 0x0F
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + ' ' + b
+
 class UnionPtg(BasePtg):
     ptg = 0x10
 
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + ',' + b
+
 class RangePtg(BasePtg):
     ptg = 0x11
+
+    def stringify(self, tokens):
+        b = tokens.pop().stringify(tokens)
+        a = tokens.pop().stringify(tokens)
+        return a + ':' + b
 
 # Operands
 
 class MissingArgPtg(BasePtg):
     ptg = 0x16
+
+    def stringify(self, tokens):
+        return ''
 
 class StringPtg(BasePtg):
     ptg = 0x17
@@ -125,11 +216,14 @@ class StringPtg(BasePtg):
         super(StringPtg, self).__init__(*args, **kwargs)
         self.value = value
 
+    def stringify(self, tokens):
+        return '"{}"'.format(self.value.replace('"', '""'))
+
     @classmethod
     def parse(cls, reader, ptg):
-        size = reader.read_byte()
+        size = reader.read_short()
         value = reader.read_string(size=size)
-        cls(value)
+        return cls(value)
 
 class ErrorPtg(BasePtg):
     ptg = 0x1C
@@ -143,29 +237,35 @@ class ErrorPtg(BasePtg):
         value = reader.read_byte()
         return cls(hex(value))
 
-class BoolPtg(BasePtg):
+class BooleanPtg(BasePtg):
     ptg = 0x1D
 
     def __init__(self, value, *args, **kwargs):
-        super(BoolPtg, self).__init__
+        super(BooleanPtg, self).__init__
         self.value = value
+
+    def stringify(self, tokens):
+        return 'TRUE' if self.value else 'FALSE'
 
     @classmethod
     def parse(cls, reader, ptg):
         value = reader.read_bool()
-        cls(value)
+        return cls(value)
 
-class IntPtg(BasePtg):
+class IntegerPtg(BasePtg):
     ptg = 0x1E
 
     def __init__(self, value, *args, **kwargs):
-        super(IntPtg, self).__init__(*args, **kwargs)
+        super(IntegerPtg, self).__init__(*args, **kwargs)
         self.value = value
+
+    def stringify(self, tokens):
+        return str(self.value)
 
     @classmethod
     def parse(cls, reader, ptg):
         value = reader.read_short()
-        cls(value)
+        return cls(value)
 
 class NumberPtg(BasePtg):
     ptg = 0x1F
@@ -174,10 +274,13 @@ class NumberPtg(BasePtg):
         super(NumberPtg, self).__init__(*args, **kwargs)
         self.value = value
 
+    def stringify(self, tokens):
+        return str(self.value)
+
     @classmethod
     def parse(cls, reader, ptg):
         value = reader.read_double()
-        cls(value)
+        return cls(value)
 
 class ArrayPtg(ClassifiedPtg):
     ptg = 0x20
@@ -187,6 +290,9 @@ class ArrayPtg(ClassifiedPtg):
         self.cols = cols
         self.rows = rows
         self.values = values
+
+    def stringify(self, tokens):
+        return '{TODO}'
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -201,10 +307,10 @@ class ArrayPtg(ClassifiedPtg):
             if flag == 0x01:
                 value = reader.read_double()
             elif flag == 0x02:
-                size = reader.read_byte()
+                size = reader.read_short()
                 value = reader.read_string(size=size)
             values.append(value)
-        cls(cols, rows, values, ptg)
+        return cls(cols, rows, values, ptg)
 
 class NamePtg(ClassifiedPtg):
     ptg = 0x23
@@ -212,6 +318,8 @@ class NamePtg(ClassifiedPtg):
     def __init__(self, index, *args, **kwargs):
         super(NamePtg, self).__init__(*args, **kwargs)
         self.index = index
+
+    # FIXME: We need a workbook to stringify this
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -229,13 +337,19 @@ class ReferencePtg(ClassifiedPtg):
         self.row_rel = row_rel
         self.col_rel = col_rel
 
+    def stringify(self, tokens):
+        # FIXME: Use A1
+        r = ('R[{}]' if self.row_rel else 'R{}').format(self.row + 1)
+        c = ('C[{}]' if self.col_rel else 'C{}').format(self.col + 1)
+        return r + c
+
     @classmethod
     def parse(cls, reader, ptg):
         row = reader.read_int()
         col = reader.read_short()
         row_rel = col & 0x8000 == 0x8000
         col_rel = col & 0x4000 == 0x4000
-        cls(row, col & 0x3FFF, row_rel, col_rel, ptg)
+        return cls(row, col & 0x3FFF, row_rel, col_rel, ptg)
 
 class AreaPtg(ClassifiedPtg):
     ptg = 0x25
@@ -250,6 +364,14 @@ class AreaPtg(ClassifiedPtg):
         self.last_row_rel = last_row_rel
         self.first_col_rel = first_col_rel
         self.last_col_rel = last_col_rel
+
+    def stringify(self, tokens):
+        # FIXME: Use A1
+        r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
+        c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
+        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        return r1 + c1 + ':' + r2 + c2
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -288,7 +410,7 @@ class MemAreaPtg(ClassifiedPtg):
 class MemErrorPtg(ClassifiedPtg):
     ptg = 0x27
 
-    def stringify(self, ptgs):
+    def stringify(self, tokens):
         return '#ERR!'
 
     @classmethod
@@ -302,7 +424,7 @@ class MemErrorPtg(ClassifiedPtg):
 class ReferenceErrorPtg(ClassifiedPtg):
     ptg = 0x2A
 
-    def stringify(self, ptgs):
+    def stringify(self, tokens):
         return '#REF!'
 
     @classmethod
@@ -312,6 +434,9 @@ class ReferenceErrorPtg(ClassifiedPtg):
 
 class AreaErrorPtg(ClassifiedPtg):
     ptg = 0x2B
+
+    def stringify(self, tokens):
+        return '#REF!'
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -327,6 +452,12 @@ class ReferenceNPtg(ClassifiedPtg):
         self.col = col
         self.row_rel = row_rel
         self.col_rel = col_rel
+
+    def stringify(self, tokens):
+        # FIXME: Use A1
+        r = ('R[{}]' if self.row_rel else 'R{}').format(self.row + 1)
+        c = ('C[{}]' if self.col_rel else 'C{}').format(self.col + 1)
+        return r + c
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -349,6 +480,14 @@ class AreaNPtg(ClassifiedPtg):
         self.last_row_rel = last_row_rel
         self.first_col_rel = first_col_rel
         self.last_col_rel = last_col_rel
+
+    def stringify(self, tokens):
+        # FIXME: Use A1
+        r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
+        c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
+        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        return r1 + c1 + ':' + r2 + c2
 
     @classmethod
     def parse(cls, reader, ptg):

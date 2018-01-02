@@ -1,28 +1,20 @@
-from . import tokens
-from .tokenhandlers import *
-from pyxlsb.datareader import DataReader
+from .tokenreader import TokenReader
 
 class Formula(object):
     def __init__(self, tokens=None):
         super(Formula, self).__init__()
-        self._tokens = list(tokens) if tokens else []
+        self._tokens = list(tokens) if tokens else list()
 
     def __repr__(self):
-        return 'Formula(%s)' % ([(hex(t[0]),) + t[1:] for t in self._tokens],)
+        return 'Formula({})'.format(self._tokens)
+
+    def __str__(self):
+        return self.stringify()
+
+    def stringify(self):
+        tokens = self._tokens[:]
+        return tokens.pop().stringify(tokens)
 
     @classmethod
     def parse(cls, data):
-        reader = DataReader(data)
-        ptgs = []
-        while True:
-            tokenid = reader.read_byte()
-            if tokenid is None:
-                break
-            baseid = ((tokenid | 0x20) if tokenid & 0x40 else tokenid) & 0x3F
-            if tokens.sizes[baseid] > 0:
-                token = (tokenid, reader.read(tokens.sizes[baseid]))
-            else:
-                token = (tokenid,)
-            ptgs.append(token)
-        return cls(ptgs)
-
+        return cls(TokenReader(data))

@@ -11,14 +11,43 @@ class TokenReader(object):
         PercentPtg.ptg:    PercentPtg,
 
         # Binary
-        AddPtg.ptg:       AddPtg,
-        SubstractPtg.ptg: SubstractPtg,
-        MultiplyPtg.ptg:  MultiplyPtg,
-        DividePtg.ptg:    DividePtg
+        AddPtg.ptg:              AddPtg,
+        SubstractPtg.ptg:        SubstractPtg,
+        MultiplyPtg.ptg:         MultiplyPtg,
+        DividePtg.ptg:           DividePtg,
+        PowerPtg.ptg:            PowerPtg,
+        ConcatPtg.ptg:           ConcatPtg,
+        LessThanPtg.ptg:         LessThanPtg,
+        LessThanEqualPtg.ptg:    LessThanEqualPtg,
+        EqualPtg.ptg:            EqualPtg,
+        GreaterThanEqualPtg.ptg: GreaterThanEqualPtg,
+        GreaterThanPtg.ptg:      GreaterThanPtg,
+        NotEqualPtg.ptg:         NotEqualPtg,
+        IntersectionPtg.ptg:     IntersectionPtg,
+        UnionPtg.ptg:            UnknownPtg,
+        RangePtg.ptg:            RangePtg,
+
+        # Constants
+        MissingArgPtg.ptg:     MissingArgPtg,
+        StringPtg.ptg:         StringPtg,
+        ErrorPtg.ptg:          ErrorPtg,
+        BooleanPtg.ptg:        BooleanPtg,
+        IntegerPtg.ptg:        IntegerPtg,
+        NumberPtg.ptg:         NumberPtg,
+        ArrayPtg.ptg:          ArrayPtg,
+        NamePtg.ptg:           NamePtg,
+        ReferencePtg.ptg:      ReferencePtg,
+        AreaPtg.ptg:           AreaPtg,
+        MemAreaPtg.ptg:        MemAreaPtg,
+        MemErrorPtg.ptg:       MemErrorPtg,
+        ReferenceErrorPtg.ptg: ReferenceErrorPtg,
+        AreaErrorPtg.ptg:      AreaErrorPtg,
+        ReferenceNPtg.ptg:     ReferenceNPtg,
+        AreaNPtg.ptg:          AreaNPtg
     }
 
     def __init__(self, fp):
-        self._fp = fp
+        self._reader = DataReader(fp)
 
     def __iter__(self):
         return self
@@ -26,19 +55,9 @@ class TokenReader(object):
     def __next__(self):
         return self.next()
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.close()
-
     def next(self):
-        reader = DataReader(self._fp)
-        ptg = reader.read_byte()
+        ptg = self._reader.read_byte()
         if ptg is None:
             raise StopIteration
         base = ((ptg | 0x20) if ptg & 0x40 == 0x40 else ptg) & 0x3F
-        return (self.ptgs.get(base) or self.default_ptg).parse(reader, ptg)
-
-    def close(self):
-        self._fp.close()
+        return (self.ptgs.get(base) or self.default_ptg).parse(self._reader, ptg)
