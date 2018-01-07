@@ -45,4 +45,3 @@ class ClassifiedPtgTestCase(unittest.TestCase):
         self.assertTrue(ClassifiedPtg(0x60).is_array())
         self.assertTrue(ClassifiedPtg(0x70).is_array())
         self.assertTrue(ClassifiedPtg(0x7F).is_array())
-

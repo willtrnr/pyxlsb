@@ -61,13 +61,13 @@ class UnknownPtg(BasePtg):
 
 # Unary operators
 
-class UnaryPlusPtg(BasePtg):
+class UPlusPtg(BasePtg):
     ptg = 0x12
 
     def stringify(self, tokens):
         return '+' + tokens.pop().stringify(tokens)
 
-class UnaryMinusPtg(BasePtg):
+class UMinusPtg(BasePtg):
     ptg = 0x13
 
     def stringify(self, tokens):
@@ -129,7 +129,7 @@ class ConcatPtg(BasePtg):
         a = tokens.pop().stringify(tokens)
         return a + '&' + b
 
-class LessThanPtg(BasePtg):
+class LessPtg(BasePtg):
     ptg = 0x09
 
     def stringify(self, tokens):
@@ -137,7 +137,7 @@ class LessThanPtg(BasePtg):
         a = tokens.pop().stringify(tokens)
         return a + '<' + b
 
-class LessThanEqualPtg(BasePtg):
+class LessEqualPtg(BasePtg):
     ptg = 0x0A
 
     def stringify(self, tokens):
@@ -153,7 +153,7 @@ class EqualPtg(BasePtg):
         a = tokens.pop().stringify(tokens)
         return a + '=' + b
 
-class GreaterThanEqualPtg(BasePtg):
+class GreaterEqualPtg(BasePtg):
     ptg = 0x0C
 
     def stringify(self, tokens):
@@ -161,7 +161,7 @@ class GreaterThanEqualPtg(BasePtg):
         a = tokens.pop().stringify(tokens)
         return a + '>=' + b
 
-class GreaterThanPtg(BasePtg):
+class GreaterPtg(BasePtg):
     ptg = 0x0D
 
     def stringify(self, tokens):
@@ -203,7 +203,7 @@ class RangePtg(BasePtg):
 
 # Operands
 
-class MissingArgPtg(BasePtg):
+class MissArgPtg(BasePtg):
     ptg = 0x16
 
     def stringify(self, tokens):
@@ -327,11 +327,11 @@ class NamePtg(ClassifiedPtg):
         reader.skip(2) # Reserved
         return cls(idx, ptg)
 
-class ReferencePtg(ClassifiedPtg):
+class RefPtg(ClassifiedPtg):
     ptg = 0x24
 
     def __init__(self, row, col, row_rel, col_rel, *args, **kwargs):
-        super(ReferencePtg, self).__init__(*args, **kwargs)
+        super(RefPtg, self).__init__(*args, **kwargs)
         self.row = row
         self.col = col
         self.row_rel = row_rel
@@ -407,7 +407,7 @@ class MemAreaPtg(ClassifiedPtg):
                 rects.append((r1, r2, c1, c2))
         return cls(rects, ptg)
 
-class MemErrorPtg(ClassifiedPtg):
+class MemErrPtg(ClassifiedPtg):
     ptg = 0x27
 
     def stringify(self, tokens):
@@ -421,7 +421,7 @@ class MemErrorPtg(ClassifiedPtg):
         reader.skip(subex_len)
         return cls(ptg)
 
-class ReferenceErrorPtg(ClassifiedPtg):
+class RefErrPtg(ClassifiedPtg):
     ptg = 0x2A
 
     def stringify(self, tokens):
@@ -432,7 +432,7 @@ class ReferenceErrorPtg(ClassifiedPtg):
         reader.skip(6) # Reserved
         return cls(ptg)
 
-class AreaErrorPtg(ClassifiedPtg):
+class AreaErrPtg(ClassifiedPtg):
     ptg = 0x2B
 
     def stringify(self, tokens):
@@ -443,11 +443,11 @@ class AreaErrorPtg(ClassifiedPtg):
         reader.skip(12) # Reserved
         return cls(ptg)
 
-class ReferenceNPtg(ClassifiedPtg):
+class RefNPtg(ClassifiedPtg):
     ptg = 0x2C
 
     def __init__(self, row, col, row_rel, col_rel, *args, **kwargs):
-        super(ReferenceNPtg, self).__init__(*args, **kwargs)
+        super(RefNPtg, self).__init__(*args, **kwargs)
         self.row = row
         self.col = col
         self.row_rel = row_rel
@@ -518,11 +518,11 @@ class NameXPtg(ClassifiedPtg):
         reader.skip(2) # Reserved
         return cls(sheet_idx, name_idx, ptg)
 
-class Reference3dPtg(ClassifiedPtg):
+class Ref3dPtg(ClassifiedPtg):
     ptg = 0x3A
 
     def __init__(self, sheet_idx, row, col, row_rel, col_rel, *args, **kwargs):
-        super(Reference3dPtg, self).__init__(*args, **kwargs)
+        super(Ref3dPtg, self).__init__(*args, **kwargs)
         self.sheet_idx = sheet_idx
         self.row = row
         self.col = col
@@ -570,7 +570,7 @@ class Area3dPtg(ClassifiedPtg):
         c2_rel = c2 & 0x4000 == 0x4000
         return cls(sheet_idx, r1, r2, c1 & 0x3FFF, c2 & 0x3FFF, r1_rel, r2_rel, c1_rel, c2_rel, ptg)
 
-class ReferenceError3dPtg(ClassifiedPtg):
+class RefErr3dPtg(ClassifiedPtg):
     ptg = 0x3C
 
     def stringify(self, tokens):
@@ -581,7 +581,7 @@ class ReferenceError3dPtg(ClassifiedPtg):
         reader.skip(8) # Reserved
         return cls(ptg)
 
-class AreaError3dPtg(ClassifiedPtg):
+class AreaErr3dPtg(ClassifiedPtg):
     ptg = 0x3D
 
     def stringify(self, tokens):
@@ -610,11 +610,11 @@ class ExpPtg(BasePtg):
         col = reader.read_short()
         return cls(row, col)
 
-class TblPtg(BasePtg):
+class TablePtg(BasePtg):
     ptg = 0x02
 
     def __init__(self, row, col, *args, **kwargs):
-        super(TblPtg, self).__init__(*args, **kwargs)
+        super(TablePtg, self).__init__(*args, **kwargs)
         self.row = row
         self.col = col
 
@@ -719,7 +719,7 @@ class MemNoMemNPtg(ClassifiedPtg):
         reader.skip(subex_len)
         return cls(ptg)
 
-# Function operators
+# Func operators
 
 class FuncPtg(ClassifiedPtg):
     ptg = 0x21
