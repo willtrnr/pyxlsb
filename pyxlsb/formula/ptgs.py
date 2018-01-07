@@ -12,7 +12,7 @@ class BasePtg(object):
         return False
 
     def stringify(self, tokens):
-        return '#TODO{}!'.format(self.ptg)
+        return '#PTG{}!'.format(self.ptg)
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -315,9 +315,9 @@ class ArrayPtg(ClassifiedPtg):
 class NamePtg(ClassifiedPtg):
     ptg = 0x23
 
-    def __init__(self, index, *args, **kwargs):
+    def __init__(self, idx, *args, **kwargs):
         super(NamePtg, self).__init__(*args, **kwargs)
-        self.index = index
+        self.idx = idx
 
     # FIXME: We need a workbook to stringify this
 
@@ -440,7 +440,7 @@ class AreaErrorPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(12)
+        reader.skip(12) # Reserved
         return cls(ptg)
 
 class ReferenceNPtg(ClassifiedPtg):
@@ -500,3 +500,260 @@ class AreaNPtg(ClassifiedPtg):
         c1_rel = c1 & 0x4000 == 0x4000
         c2_rel = c2 & 0x4000 == 0x4000
         return cls(r1, r2, c1 & 0x3FFF, c2 & 0x3FFF, r1_rel, r2_rel, c1_rel, c2_rel, ptg)
+
+class NameXPtg(ClassifiedPtg):
+    ptg = 0x39
+
+    def __init__(self, sheet_idx, name_idx, *args, **kwargs):
+        super(NameXPtg, self).__init__(*args, **kwargs)
+        self.sheet_idx = sheet_idx
+        self.name_idx = name_idx
+
+    # FIXME: We need a workbook to stringify this
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        sheet_idx = reader.read_short()
+        name_idx = reader.read_short()
+        reader.skip(2) # Reserved
+        return cls(sheet_idx, name_idx, ptg)
+
+class Reference3dPtg(ClassifiedPtg):
+    ptg = 0x3A
+
+    def __init__(self, sheet_idx, row, col, row_rel, col_rel, *args, **kwargs):
+        super(Reference3dPtg, self).__init__(*args, **kwargs)
+        self.sheet_idx = sheet_idx
+        self.row = row
+        self.col = col
+        self.row_rel = row_rel
+        self.col_rel = col_rel
+
+    # FIXME: We need a workbook to stringify this
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        sheet_idx = reader.read_short()
+        row = reader.read_int()
+        col = reader.read_short()
+        row_rel = col & 0x8000 == 0x8000
+        col_rel = col & 0x4000 == 0x4000
+        return cls(sheet_idx, row, col & 0x3FFF, row_rel, col_rel, ptg)
+
+class Area3dPtg(ClassifiedPtg):
+    ptg = 0x3B
+
+    def __init__(self, sheet_idx, first_row, last_row, first_col, last_col, first_row_rel, last_row_rel, first_col_rel, last_col_rel, *args, **kwargs):
+        super(Area3dPtg, self).__init__(*args, **kwargs)
+        self.sheet_idx = sheet_idx
+        self.first_row = first_row
+        self.last_row = last_row
+        self.first_col = first_col
+        self.last_col = last_col
+        self.first_row_rel = first_row_rel
+        self.last_row_rel = last_row_rel
+        self.first_col_rel = first_col_rel
+        self.last_col_rel = last_col_rel
+
+    # FIXME: We need a workbook to stringify this
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        sheet_idx = reader.read_short()
+        r1 = reader.read_int()
+        r2 = reader.read_int()
+        c1 = reader.read_short()
+        c2 = reader.read_short()
+        r1_rel = c1 & 0x8000 == 0x8000
+        r2_rel = c2 & 0x8000 == 0x8000
+        c1_rel = c1 & 0x4000 == 0x4000
+        c2_rel = c2 & 0x4000 == 0x4000
+        return cls(sheet_idx, r1, r2, c1 & 0x3FFF, c2 & 0x3FFF, r1_rel, r2_rel, c1_rel, c2_rel, ptg)
+
+class ReferenceError3dPtg(ClassifiedPtg):
+    ptg = 0x3C
+
+    def stringify(self, tokens):
+        return '#REF!'
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        reader.skip(8) # Reserved
+        return cls(ptg)
+
+class AreaError3dPtg(ClassifiedPtg):
+    ptg = 0x3D
+
+    def stringify(self, tokens):
+        return '#REF!'
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        reader.skip(14) # Reserved
+        return cls(ptg)
+
+# Control
+
+class ExpPtg(BasePtg):
+    ptg = 0x01
+
+    def __init__(self, row, col, *args, **kwargs):
+        super(ExpPtg, self).__init__(*args, **kwargs)
+        self.row = row
+        self.col = col
+
+    # FIXME: We need a workbook to stringify this
+
+    @classmethod
+    def read(cls, reader, ptg):
+        row = reader.read_int()
+        col = reader.read_short()
+        return cls(row, col)
+
+class TblPtg(BasePtg):
+    ptg = 0x02
+
+    def __init__(self, row, col, *args, **kwargs):
+        super(TblPtg, self).__init__(*args, **kwargs)
+        self.row = row
+        self.col = col
+
+    # FIXME: We need a workbook to stringify this
+
+    @classmethod
+    def read(cls, reader, ptg):
+        row = reader.read_int()
+        col = reader.read_short()
+        return cls(row, col)
+
+class ParenPtg(BasePtg):
+    ptg = 0x15
+
+    def stringify(self, tokens):
+        return '(' + tokens.pop().stringify(tokens) + ')'
+
+class AttrPtg(BasePtg):
+    ptg = 0x19
+
+    def __init__(self, flags, data, *args, **kwargs):
+        super(AttrPtg, self).__init__(*args, **kwargs)
+        self.flags = flags
+        self.data = data
+
+    @property
+    def attr_semi(self):
+        return self.flags & 0x01 == 0x01
+
+    @property
+    def attr_if(self):
+        return self.flags & 0x02 == 0x02
+
+    @property
+    def attr_choose(self):
+        return self.flags & 0x04 == 0x04
+
+    @property
+    def attr_goto(self):
+        return self.flags & 0x08 == 0x08
+
+    @property
+    def attr_sum(self):
+        return self.flags & 0x10 == 0x10
+
+    @property
+    def attr_baxcel(self):
+        return self.flags & 0x20 == 0x20
+
+    @property
+    def attr_space(self):
+        return self.flags & 0x40 == 0x40
+
+    def stringify(self, tokens):
+        # TODO: Handle space stuff
+        return tokens.pop().stringify(tokens)
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        flags = reader.read_byte()
+        data = reader.read_short()
+        return cls(flags, data)
+
+class MemNoMemPtg(ClassifiedPtg):
+    ptg = 0x28
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        reader.skip(4) # Reserved
+        subex_len = reader.read_short()
+        # TODO The "spec" is really vague about this
+        reader.skip(subex_len)
+        return cls(ptg)
+
+class MemFuncPtg(ClassifiedPtg):
+    ptg = 0x29
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        subex_len = reader.read_short()
+        # TODO The "spec" is also really vague about this
+        reader.skip(subex_len)
+        return cls(ptg)
+
+class MemAreaNPtg(ClassifiedPtg):
+    ptg = 0x2E
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        subex_len = reader.read_short()
+        # TODO Same thing, really vague info
+        reader.skip(subex_len)
+        return cls(ptg)
+
+class MemNoMemNPtg(ClassifiedPtg):
+    ptg = 0x2F
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        subex_len = reader.read_short()
+        # TODO Still no idea what this is
+        reader.skip(subex_len)
+        return cls(ptg)
+
+# Function operators
+
+class FuncPtg(ClassifiedPtg):
+    ptg = 0x21
+
+    def __init__(self, idx, *args, **kwargs):
+        super(FuncPtg, self).__init__(*args, **kwargs)
+        self.idx = idx
+
+    # FIXME: We need a workbook to stringify this (most likely)
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        idx = reader.read_short()
+        return cls(idx, ptg)
+
+class FuncVarPtg(ClassifiedPtg):
+    ptg = 0x22
+
+    def __init__(self, idx, argc, prompt, ce, *args, **kwargs):
+        super(FuncVarPtg, self).__init__(*args, **kwargs)
+        self.idx = idx
+        self.argc = argc
+        self.prompt = prompt
+        self.ce = ce
+
+    def stringify(self, tokens):
+        args = list()
+        for i in xrange(self.argc):
+            arg = tokens.pop().stringify(tokens)
+            args.append(arg)
+        return 'VAR_FUNC_{}({})'.format(self.idx, ', '.join(args))
+
+    @classmethod
+    def parse(cls, reader, ptg):
+        argc = reader.read_byte()
+        idx = reader.read_short()
+        return cls(idx & 0x7FFF, argc & 0x7F, argc & 0x80 == 0x80, idx & 0x8000 == 0x8000, ptg)

@@ -5,12 +5,12 @@ class TokenReader(object):
     default_ptg = UnknownPtg
 
     ptgs = {
-        # Unary
+        # Unary operators
         UnaryPlusPtg.ptg:  UnaryPlusPtg,
         UnaryMinusPtg.ptg: UnaryMinusPtg,
         PercentPtg.ptg:    PercentPtg,
 
-        # Binary
+        # Binary operators
         AddPtg.ptg:              AddPtg,
         SubstractPtg.ptg:        SubstractPtg,
         MultiplyPtg.ptg:         MultiplyPtg,
@@ -27,23 +27,42 @@ class TokenReader(object):
         UnionPtg.ptg:            UnknownPtg,
         RangePtg.ptg:            RangePtg,
 
-        # Constants
-        MissingArgPtg.ptg:     MissingArgPtg,
-        StringPtg.ptg:         StringPtg,
-        ErrorPtg.ptg:          ErrorPtg,
-        BooleanPtg.ptg:        BooleanPtg,
-        IntegerPtg.ptg:        IntegerPtg,
-        NumberPtg.ptg:         NumberPtg,
-        ArrayPtg.ptg:          ArrayPtg,
-        NamePtg.ptg:           NamePtg,
-        ReferencePtg.ptg:      ReferencePtg,
-        AreaPtg.ptg:           AreaPtg,
-        MemAreaPtg.ptg:        MemAreaPtg,
-        MemErrorPtg.ptg:       MemErrorPtg,
-        ReferenceErrorPtg.ptg: ReferenceErrorPtg,
-        AreaErrorPtg.ptg:      AreaErrorPtg,
-        ReferenceNPtg.ptg:     ReferenceNPtg,
-        AreaNPtg.ptg:          AreaNPtg
+        # Operands
+        MissingArgPtg.ptg:       MissingArgPtg,
+        StringPtg.ptg:           StringPtg,
+        ErrorPtg.ptg:            ErrorPtg,
+        BooleanPtg.ptg:          BooleanPtg,
+        IntegerPtg.ptg:          IntegerPtg,
+        NumberPtg.ptg:           NumberPtg,
+        ArrayPtg.ptg:            ArrayPtg,
+        NamePtg.ptg:             NamePtg,
+        ReferencePtg.ptg:        ReferencePtg,
+        AreaPtg.ptg:             AreaPtg,
+        MemAreaPtg.ptg:          MemAreaPtg,
+        MemErrorPtg.ptg:         MemErrorPtg,
+        ReferenceErrorPtg.ptg:   ReferenceErrorPtg,
+        AreaErrorPtg.ptg:        AreaErrorPtg,
+        ReferenceNPtg.ptg:       ReferenceNPtg,
+        AreaNPtg.ptg:            AreaNPtg,
+        NameXPtg.ptg:            NameXPtg,
+        Reference3dPtg.ptg:      Reference3dPtg,
+        Area3dPtg.ptg:           Area3dPtg,
+        ReferenceError3dPtg.ptg: ReferenceError3dPtg,
+        AreaError3dPtg.ptg:      AreaError3dPtg,
+
+        # Control
+        ExpPtg.ptg:       ExpPtg,
+        TblPtg.ptg:       TblPtg,
+        ParenPtg.ptg:     ParenPtg,
+        AttrPtg.ptg:      AttrPtg,
+        MemNoMemPtg.ptg:  MemNoMemPtg,
+        MemFuncPtg.ptg:   MemFuncPtg,
+        MemAreaNPtg.ptg:  MemAreaNPtg,
+        MemNoMemNPtg.ptg: MemNoMemNPtg,
+
+        # Function operators
+        FuncPtg.ptg: FuncPtg,
+        FuncVarPtg.ptg: FuncVarPtg
     }
 
     def __init__(self, fp):
