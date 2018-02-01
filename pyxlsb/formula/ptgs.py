@@ -11,7 +11,7 @@ class BasePtg(object):
     def is_classified(self):
         return False
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return '#PTG{}!'.format(self.ptg)
 
     @classmethod
@@ -52,7 +52,7 @@ class UnknownPtg(BasePtg):
         super(UnknownPtg, self).__init__(*args, **kwargs)
         self.ptg = ptg
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return '#UNK{}!'.format(self.ptg)
 
     @classmethod
@@ -64,141 +64,141 @@ class UnknownPtg(BasePtg):
 class UPlusPtg(BasePtg):
     ptg = 0x12
 
-    def stringify(self, tokens):
-        return '+' + tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        return '+' + tokens.pop().stringify(tokens, workbook)
 
 class UMinusPtg(BasePtg):
     ptg = 0x13
 
-    def stringify(self, tokens):
-        return '-' + tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        return '-' + tokens.pop().stringify(tokens, workbook)
 
 class PercentPtg(BasePtg):
     ptg = 0x14
 
-    def stringify(self, tokens):
-        return tokens.pop().stringify(tokens) + '%'
+    def stringify(self, tokens, workbook):
+        return tokens.pop().stringify(tokens, workbook) + '%'
 
 # Binary operators
 
 class AddPtg(BasePtg):
     ptg = 0x03
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '+' + b
 
 class SubstractPtg(BasePtg):
     ptg = 0x04
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '-' + b
 
 class MultiplyPtg(BasePtg):
     ptg = 0x05
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '*' + b
 
 class DividePtg(BasePtg):
     ptg = 0x06
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '/' + b
 
 class PowerPtg(BasePtg):
     ptg = 0x07
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '^' + b
 
 class ConcatPtg(BasePtg):
     ptg = 0x08
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '&' + b
 
 class LessPtg(BasePtg):
     ptg = 0x09
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '<' + b
 
 class LessEqualPtg(BasePtg):
     ptg = 0x0A
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '<=' + b
 
 class EqualPtg(BasePtg):
     ptg = 0x0B
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '=' + b
 
 class GreaterEqualPtg(BasePtg):
     ptg = 0x0C
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '>=' + b
 
 class GreaterPtg(BasePtg):
     ptg = 0x0D
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '>' + b
 
 class NotEqualPtg(BasePtg):
     ptg = 0x0E
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + '<>' + b
 
 class IntersectionPtg(BasePtg):
     ptg = 0x0F
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + ' ' + b
 
 class UnionPtg(BasePtg):
     ptg = 0x10
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + ',' + b
 
 class RangePtg(BasePtg):
     ptg = 0x11
 
-    def stringify(self, tokens):
-        b = tokens.pop().stringify(tokens)
-        a = tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        b = tokens.pop().stringify(tokens, workbook)
+        a = tokens.pop().stringify(tokens, workbook)
         return a + ':' + b
 
 # Operands
@@ -206,7 +206,7 @@ class RangePtg(BasePtg):
 class MissArgPtg(BasePtg):
     ptg = 0x16
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return ''
 
 class StringPtg(BasePtg):
@@ -216,8 +216,8 @@ class StringPtg(BasePtg):
         super(StringPtg, self).__init__(*args, **kwargs)
         self.value = value
 
-    def stringify(self, tokens):
-        return '"{}"'.format(self.value.replace('"', '""'))
+    def stringify(self, tokens, workbook):
+        return '"' + self.value.replace('"', '""') + '"'
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -232,10 +232,28 @@ class ErrorPtg(BasePtg):
         super(ErrorPtg, self).__init__(*args, **kwargs)
         self.value = value
 
+    def stringify(self, tokens, workbook):
+        if self.value == 0x00:
+            return '#NULL!'
+        elif self.value == 0x07:
+            return '#DIV/0!'
+        elif self.value == 0x0F:
+            return '#VALUE!'
+        elif self.value == 0x17:
+            return '#REF!'
+        elif self.value == 0x1D:
+            return '#NAME?'
+        elif self.value == 0x24:
+            return '#NUM!'
+        elif self.value == 0x2A:
+            return '#N/A'
+        else:
+            return '#ERR!'
+
     @classmethod
     def parse(cls, reader, ptg):
         value = reader.read_byte()
-        return cls(hex(value))
+        return cls(value)
 
 class BooleanPtg(BasePtg):
     ptg = 0x1D
@@ -244,7 +262,7 @@ class BooleanPtg(BasePtg):
         super(BooleanPtg, self).__init__
         self.value = value
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return 'TRUE' if self.value else 'FALSE'
 
     @classmethod
@@ -259,7 +277,7 @@ class IntegerPtg(BasePtg):
         super(IntegerPtg, self).__init__(*args, **kwargs)
         self.value = value
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return str(self.value)
 
     @classmethod
@@ -274,7 +292,7 @@ class NumberPtg(BasePtg):
         super(NumberPtg, self).__init__(*args, **kwargs)
         self.value = value
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         return str(self.value)
 
     @classmethod
@@ -290,9 +308,6 @@ class ArrayPtg(ClassifiedPtg):
         self.cols = cols
         self.rows = rows
         self.values = values
-
-    def stringify(self, tokens):
-        return '{TODO}'
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -315,17 +330,18 @@ class ArrayPtg(ClassifiedPtg):
 class NamePtg(ClassifiedPtg):
     ptg = 0x23
 
-    def __init__(self, idx, *args, **kwargs):
+    def __init__(self, idx, reserved, *args, **kwargs):
         super(NamePtg, self).__init__(*args, **kwargs)
         self.idx = idx
+        self._reserved = reserved
 
-    # FIXME: We need a workbook to stringify this
+    # FIXME: We need to parse names to stringify this
 
     @classmethod
     def parse(cls, reader, ptg):
         idx = reader.read_short()
-        reader.skip(2) # Reserved
-        return cls(idx, ptg)
+        res = reader.read(2) # Reserved
+        return cls(idx, res, ptg)
 
 class RefPtg(ClassifiedPtg):
     ptg = 0x24
@@ -337,8 +353,7 @@ class RefPtg(ClassifiedPtg):
         self.row_rel = row_rel
         self.col_rel = col_rel
 
-    def stringify(self, tokens):
-        # FIXME: Use A1
+    def stringify(self, tokens, workbook):
         r = ('R[{}]' if self.row_rel else 'R{}').format(self.row + 1)
         c = ('C[{}]' if self.col_rel else 'C{}').format(self.col + 1)
         return r + c
@@ -365,8 +380,7 @@ class AreaPtg(ClassifiedPtg):
         self.first_col_rel = first_col_rel
         self.last_col_rel = last_col_rel
 
-    def stringify(self, tokens):
-        # FIXME: Use A1
+    def stringify(self, tokens, workbook):
         r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
         c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
         r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
@@ -388,13 +402,14 @@ class AreaPtg(ClassifiedPtg):
 class MemAreaPtg(ClassifiedPtg):
     ptg = 0x26
 
-    def __init__(self, rects, *args, **kwargs):
+    def __init__(self, reserved, rects, *args, **kwargs):
         super(ClassifiedPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
         self.rects = rects
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(4) # Reserved
+        res = reader.read(4) # Reserved
         subex_len = reader.read_short()
         rects = list()
         if subex_len:
@@ -405,43 +420,55 @@ class MemAreaPtg(ClassifiedPtg):
                 c1 = reader.read_short()
                 c2 = reader.read_short()
                 rects.append((r1, r2, c1, c2))
-        return cls(rects, ptg)
+        return cls(res, rects, ptg)
 
 class MemErrPtg(ClassifiedPtg):
     ptg = 0x27
 
-    def stringify(self, tokens):
+    def __init__(self, reserved, subex, *args, **kwargs):
+        super(MemErrPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
+        self._subex = subex
+
+    def stringify(self, tokens, workbook):
         return '#ERR!'
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(4) # Reserved
+        res = reader.read(4) # Reserved
         subex_len = reader.read_short()
-        # TODO: The "spec" is very vague about this
-        reader.skip(subex_len)
-        return cls(ptg)
+        subex = reader.read(subex_len)
+        return cls(res, subex, ptg)
 
 class RefErrPtg(ClassifiedPtg):
     ptg = 0x2A
 
-    def stringify(self, tokens):
+    def __init__(self, reserved, *args, **kwargs):
+        super(RefErrPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
+
+    def stringify(self, tokens, workbook):
         return '#REF!'
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(6) # Reserved
-        return cls(ptg)
+        res = reader.read(6) # Reserved
+        return cls(res, ptg)
 
 class AreaErrPtg(ClassifiedPtg):
     ptg = 0x2B
 
-    def stringify(self, tokens):
+    def __init__(self, reserved, *args, **kwargs):
+        super(AreaErrPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
+
+    def stringify(self, tokens, workbook):
         return '#REF!'
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(12) # Reserved
-        return cls(ptg)
+        res = reader.read(12) # Reserved
+        return cls(res, ptg)
 
 class RefNPtg(ClassifiedPtg):
     ptg = 0x2C
@@ -453,8 +480,7 @@ class RefNPtg(ClassifiedPtg):
         self.row_rel = row_rel
         self.col_rel = col_rel
 
-    def stringify(self, tokens):
-        # FIXME: Use A1
+    def stringify(self, tokens, workbook):
         r = ('R[{}]' if self.row_rel else 'R{}').format(self.row + 1)
         c = ('C[{}]' if self.col_rel else 'C{}').format(self.col + 1)
         return r + c
@@ -481,8 +507,7 @@ class AreaNPtg(ClassifiedPtg):
         self.first_col_rel = first_col_rel
         self.last_col_rel = last_col_rel
 
-    def stringify(self, tokens):
-        # FIXME: Use A1
+    def stringify(self, tokens, workbook):
         r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
         c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
         r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
@@ -504,19 +529,20 @@ class AreaNPtg(ClassifiedPtg):
 class NameXPtg(ClassifiedPtg):
     ptg = 0x39
 
-    def __init__(self, sheet_idx, name_idx, *args, **kwargs):
+    def __init__(self, sheet_idx, name_idx, reserved, *args, **kwargs):
         super(NameXPtg, self).__init__(*args, **kwargs)
         self.sheet_idx = sheet_idx
         self.name_idx = name_idx
+        self._reserved = reserved
 
-    # FIXME: We need a workbook to stringify this
+    # FIXME: We need to parse names to stringify this
 
     @classmethod
     def parse(cls, reader, ptg):
         sheet_idx = reader.read_short()
         name_idx = reader.read_short()
-        reader.skip(2) # Reserved
-        return cls(sheet_idx, name_idx, ptg)
+        res = reader.read(2) # Reserved
+        return cls(sheet_idx, name_idx, res, ptg)
 
 class Ref3dPtg(ClassifiedPtg):
     ptg = 0x3A
@@ -529,7 +555,10 @@ class Ref3dPtg(ClassifiedPtg):
         self.row_rel = row_rel
         self.col_rel = col_rel
 
-    # FIXME: We need a workbook to stringify this
+    def stringify(self, tokens, workbook):
+        r = ('R[{}]' if self.row_rel else 'R{}').format(self.row + 1)
+        c = ('C[{}]' if self.col_rel else 'C{}').format(self.col + 1)
+        return workbook.sheets[self.sheet_idx] + '!' + r + c
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -555,7 +584,12 @@ class Area3dPtg(ClassifiedPtg):
         self.first_col_rel = first_col_rel
         self.last_col_rel = last_col_rel
 
-    # FIXME: We need a workbook to stringify this
+    def stringify(self, tokens, workbook):
+        r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
+        c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
+        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        return workbook.sheets[self.sheet_idx] + '!' + r1 + c1 + ':' + r2 + c2
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -573,24 +607,31 @@ class Area3dPtg(ClassifiedPtg):
 class RefErr3dPtg(ClassifiedPtg):
     ptg = 0x3C
 
-    def stringify(self, tokens):
+    def __init__(self, reserved, *args, **kwargs):
+        super(RefErr3dPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
+
+    def stringify(self, tokens, workbook):
         return '#REF!'
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(8) # Reserved
-        return cls(ptg)
+        res = reader.read(8) # Reserved
+        return cls(res, ptg)
 
 class AreaErr3dPtg(ClassifiedPtg):
     ptg = 0x3D
 
-    def stringify(self, tokens):
+    def __init__(self, reserved, *args, **kwargs):
+        super(AreaErr3dPtg, self).__init__(*args, **kwargs)
+
+    def stringify(self, tokens, workbook):
         return '#REF!'
 
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(14) # Reserved
-        return cls(ptg)
+        res = reader.read(14) # Reserved
+        return cls(res, ptg)
 
 # Control
 
@@ -602,7 +643,7 @@ class ExpPtg(BasePtg):
         self.row = row
         self.col = col
 
-    # FIXME: We need a workbook to stringify this
+    # FIXME: We need a workbook that supports direct cell referencing to stringify this
 
     @classmethod
     def read(cls, reader, ptg):
@@ -618,7 +659,7 @@ class TablePtg(BasePtg):
         self.row = row
         self.col = col
 
-    # FIXME: We need a workbook to stringify this
+    # FIXME: We need a workbook that supports tables to stringify this
 
     @classmethod
     def read(cls, reader, ptg):
@@ -629,8 +670,8 @@ class TablePtg(BasePtg):
 class ParenPtg(BasePtg):
     ptg = 0x15
 
-    def stringify(self, tokens):
-        return '(' + tokens.pop().stringify(tokens) + ')'
+    def stringify(self, tokens, workbook):
+        return '(' + tokens.pop().stringify(tokens, workbook) + ')'
 
 class AttrPtg(BasePtg):
     ptg = 0x19
@@ -668,9 +709,14 @@ class AttrPtg(BasePtg):
     def attr_space(self):
         return self.flags & 0x40 == 0x40
 
-    def stringify(self, tokens):
-        # TODO: Handle space stuff
-        return tokens.pop().stringify(tokens)
+    def stringify(self, tokens, workbook):
+        spaces = ''
+        if self.attr_space:
+            if self.data & 0x00FF == 0x00 or self.data & 0x00FF == 0x06:
+                spaces = ' ' * (self.data >> 1)
+            elif self.data & 0x00FF == 0x01:
+                spaces = '\n' * (self.data >> 1)
+        return spaces + tokens.pop().stringify(tokens, workbook)
 
     @classmethod
     def parse(cls, reader, ptg):
@@ -681,43 +727,56 @@ class AttrPtg(BasePtg):
 class MemNoMemPtg(ClassifiedPtg):
     ptg = 0x28
 
+    def __init__(self, reserved, subex, *args, **kwargs):
+        super(MemNoMemPtg, self).__init__(*args, **kwargs)
+        self._reserved = reserved
+        self._subex = subex
+
     @classmethod
     def parse(cls, reader, ptg):
-        reader.skip(4) # Reserved
+        res = reader.read(4) # Reserved
         subex_len = reader.read_short()
-        # TODO The "spec" is really vague about this
-        reader.skip(subex_len)
-        return cls(ptg)
+        subex = reader.read(subex_len)
+        return cls(res, subex, ptg)
 
 class MemFuncPtg(ClassifiedPtg):
     ptg = 0x29
 
+    def __init__(self, subex, *args, **kwargs):
+        super(MemFuncPtg, self).__init__(*args, **kwargs)
+        self._subex = subex
+
     @classmethod
     def parse(cls, reader, ptg):
         subex_len = reader.read_short()
-        # TODO The "spec" is also really vague about this
-        reader.skip(subex_len)
-        return cls(ptg)
+        subex = reader.read(subex_len)
+        return cls(subex, ptg)
 
 class MemAreaNPtg(ClassifiedPtg):
     ptg = 0x2E
 
+    def __init__(self, subex, *args, **kwargs):
+        super(MemAreaNPtg, self).__init__(*args, **kwargs)
+        self._subex = subex
+
     @classmethod
     def parse(cls, reader, ptg):
         subex_len = reader.read_short()
-        # TODO Same thing, really vague info
-        reader.skip(subex_len)
-        return cls(ptg)
+        subex = reader.skip(subex_len)
+        return cls(subex, ptg)
 
 class MemNoMemNPtg(ClassifiedPtg):
     ptg = 0x2F
 
+    def __init__(self, subex, *args, **kwargs):
+        super(MemNoMemNPtg, self).__init__(*args, **kwargs)
+        self._subex = subex
+
     @classmethod
     def parse(cls, reader, ptg):
         subex_len = reader.read_short()
-        # TODO Still no idea what this is
-        reader.skip(subex_len)
-        return cls(ptg)
+        subex = reader.read(subex_len)
+        return cls(subex, ptg)
 
 # Func operators
 
@@ -745,10 +804,10 @@ class FuncVarPtg(ClassifiedPtg):
         self.prompt = prompt
         self.ce = ce
 
-    def stringify(self, tokens):
+    def stringify(self, tokens, workbook):
         args = list()
         for i in xrange(self.argc):
-            arg = tokens.pop().stringify(tokens)
+            arg = tokens.pop().stringify(tokens, workbook)
             args.append(arg)
         return 'VAR_FUNC_{}({})'.format(self.idx, ', '.join(args))
 

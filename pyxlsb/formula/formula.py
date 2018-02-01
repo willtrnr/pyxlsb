@@ -11,9 +11,9 @@ class Formula(object):
     def __str__(self):
         return self.stringify()
 
-    def stringify(self):
+    def stringify(self, workbook):
         tokens = self._tokens[:]
-        return tokens.pop().stringify(tokens)
+        return tokens.pop().stringify(tokens, workbook)
 
     @classmethod
     def parse(cls, data):
