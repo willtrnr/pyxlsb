@@ -18,6 +18,9 @@ pip install pyxlsb
 Usage
 -----
 
+**WARNING**: Consult the README of the tag corresponding to the version you're
+using, the usage may have changed since the last release.
+
 The module exposes an `open_workbook(name)` method (similar to Xlrd and
 OpenPyXl) for opening XLSB files. The Workbook object representing the file is
 returned.
