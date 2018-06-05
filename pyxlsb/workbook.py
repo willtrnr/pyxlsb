@@ -52,7 +52,7 @@ class Workbook(object):
         if isinstance(idx, basestring):
             idx = idx.lower()
             idx = next((n for n, s in enumerate(self.sheets) if s.lower() == idx), -1) + 1
-        if idx < 1 or idx > len(self.sheets):
+        if idx < 0 or idx > len(self.sheets):
             raise IndexError('sheet index out of range')
 
         fp = self._package.get_worksheet_part(idx)
