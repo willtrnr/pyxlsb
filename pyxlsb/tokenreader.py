@@ -1,5 +1,5 @@
 from .ptgs import *
-from pyxlsb.datareader import DataReader
+from .datareader import DataReader
 
 class TokenReader(object):
     default_ptg = UnknownPtg
