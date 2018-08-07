@@ -11,6 +11,7 @@ _uint32_t = struct.Struct('<I')
 _float_t = struct.Struct('<f')
 _double_t = struct.Struct('<d')
 
+
 class DataReader(object):
     def __init__(self, fp, enc='latin-1'):
         self._fp = fp if hasattr(fp, 'read') else BytesIO(fp)

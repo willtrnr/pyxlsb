@@ -1,8 +1,10 @@
 from .workbook import Workbook
 from .xlsbpackage import XlsbPackage
 
+
 def open_workbook(name, *args, **kwargs):
     return Workbook(XlsbPackage(name), *args, **kwargs)
+
 
 def convert_date(date):
     if not isinstance(date, int) and not isinstance(date, float):

@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 if sys.version_info > (3,):
     basestring = (str, bytes)
 
+
 class Workbook(object):
     def __init__(self, package, _debug=False):
         super(Workbook, self).__init__()

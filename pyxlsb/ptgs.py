@@ -3,6 +3,7 @@ import sys
 if sys.version_info > (3,):
     xrange = range
 
+
 class BasePtg(object):
     def __repr__(self):
         args = list('{}={}'.format(str(k), repr(v)) for k, v in self.__dict__.items())
@@ -59,7 +60,9 @@ class UnknownPtg(BasePtg):
     def parse(cls, reader, ptg):
         return cls(ptg)
 
+
 # Unary operators
+
 
 class UPlusPtg(BasePtg):
     ptg = 0x12
@@ -67,11 +70,13 @@ class UPlusPtg(BasePtg):
     def stringify(self, tokens, workbook):
         return '+' + tokens.pop().stringify(tokens, workbook)
 
+
 class UMinusPtg(BasePtg):
     ptg = 0x13
 
     def stringify(self, tokens, workbook):
         return '-' + tokens.pop().stringify(tokens, workbook)
+
 
 class PercentPtg(BasePtg):
     ptg = 0x14
@@ -79,7 +84,9 @@ class PercentPtg(BasePtg):
     def stringify(self, tokens, workbook):
         return tokens.pop().stringify(tokens, workbook) + '%'
 
+
 # Binary operators
+
 
 class AddPtg(BasePtg):
     ptg = 0x03
@@ -89,6 +96,7 @@ class AddPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '+' + b
 
+
 class SubstractPtg(BasePtg):
     ptg = 0x04
 
@@ -96,6 +104,7 @@ class SubstractPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '-' + b
+
 
 class MultiplyPtg(BasePtg):
     ptg = 0x05
@@ -105,6 +114,7 @@ class MultiplyPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '*' + b
 
+
 class DividePtg(BasePtg):
     ptg = 0x06
 
@@ -112,6 +122,7 @@ class DividePtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '/' + b
+
 
 class PowerPtg(BasePtg):
     ptg = 0x07
@@ -121,6 +132,7 @@ class PowerPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '^' + b
 
+
 class ConcatPtg(BasePtg):
     ptg = 0x08
 
@@ -128,6 +140,7 @@ class ConcatPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '&' + b
+
 
 class LessPtg(BasePtg):
     ptg = 0x09
@@ -137,6 +150,7 @@ class LessPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '<' + b
 
+
 class LessEqualPtg(BasePtg):
     ptg = 0x0A
 
@@ -144,6 +158,7 @@ class LessEqualPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '<=' + b
+
 
 class EqualPtg(BasePtg):
     ptg = 0x0B
@@ -153,6 +168,7 @@ class EqualPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '=' + b
 
+
 class GreaterEqualPtg(BasePtg):
     ptg = 0x0C
 
@@ -160,6 +176,7 @@ class GreaterEqualPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '>=' + b
+
 
 class GreaterPtg(BasePtg):
     ptg = 0x0D
@@ -169,6 +186,7 @@ class GreaterPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + '>' + b
 
+
 class NotEqualPtg(BasePtg):
     ptg = 0x0E
 
@@ -176,6 +194,7 @@ class NotEqualPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + '<>' + b
+
 
 class IntersectionPtg(BasePtg):
     ptg = 0x0F
@@ -185,6 +204,7 @@ class IntersectionPtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + ' ' + b
 
+
 class UnionPtg(BasePtg):
     ptg = 0x10
 
@@ -192,6 +212,7 @@ class UnionPtg(BasePtg):
         b = tokens.pop().stringify(tokens, workbook)
         a = tokens.pop().stringify(tokens, workbook)
         return a + ',' + b
+
 
 class RangePtg(BasePtg):
     ptg = 0x11
@@ -201,13 +222,16 @@ class RangePtg(BasePtg):
         a = tokens.pop().stringify(tokens, workbook)
         return a + ':' + b
 
+
 # Operands
+
 
 class MissArgPtg(BasePtg):
     ptg = 0x16
 
     def stringify(self, tokens, workbook):
         return ''
+
 
 class StringPtg(BasePtg):
     ptg = 0x17
@@ -224,6 +248,7 @@ class StringPtg(BasePtg):
         size = reader.read_short()
         value = reader.read_string(size=size)
         return cls(value)
+
 
 class ErrorPtg(BasePtg):
     ptg = 0x1C
@@ -255,6 +280,7 @@ class ErrorPtg(BasePtg):
         value = reader.read_byte()
         return cls(value)
 
+
 class BooleanPtg(BasePtg):
     ptg = 0x1D
 
@@ -269,6 +295,7 @@ class BooleanPtg(BasePtg):
     def parse(cls, reader, ptg):
         value = reader.read_bool()
         return cls(value)
+
 
 class IntegerPtg(BasePtg):
     ptg = 0x1E
@@ -285,6 +312,7 @@ class IntegerPtg(BasePtg):
         value = reader.read_short()
         return cls(value)
 
+
 class NumberPtg(BasePtg):
     ptg = 0x1F
 
@@ -299,6 +327,7 @@ class NumberPtg(BasePtg):
     def parse(cls, reader, ptg):
         value = reader.read_double()
         return cls(value)
+
 
 class ArrayPtg(ClassifiedPtg):
     ptg = 0x20
@@ -327,6 +356,7 @@ class ArrayPtg(ClassifiedPtg):
             values.append(value)
         return cls(cols, rows, values, ptg)
 
+
 class NamePtg(ClassifiedPtg):
     ptg = 0x23
 
@@ -340,8 +370,9 @@ class NamePtg(ClassifiedPtg):
     @classmethod
     def parse(cls, reader, ptg):
         idx = reader.read_short()
-        res = reader.read(2) # Reserved
+        res = reader.read(2)  # Reserved
         return cls(idx, res, ptg)
+
 
 class RefPtg(ClassifiedPtg):
     ptg = 0x24
@@ -366,6 +397,7 @@ class RefPtg(ClassifiedPtg):
         col_rel = col & 0x4000 == 0x4000
         return cls(row, col & 0x3FFF, row_rel, col_rel, ptg)
 
+
 class AreaPtg(ClassifiedPtg):
     ptg = 0x25
 
@@ -383,8 +415,8 @@ class AreaPtg(ClassifiedPtg):
     def stringify(self, tokens, workbook):
         r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
         c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
-        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
-        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        r2 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c2 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
         return r1 + c1 + ':' + r2 + c2
 
     @classmethod
@@ -399,6 +431,7 @@ class AreaPtg(ClassifiedPtg):
         c2rel = c2 & 0x4000 == 0x4000
         return cls(r1, c1 & 0x3FFF, r2, c2 & 0x3FFF, r1rel, r2rel, c1rel, c2rel, ptg)
 
+
 class MemAreaPtg(ClassifiedPtg):
     ptg = 0x26
 
@@ -409,7 +442,7 @@ class MemAreaPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(4) # Reserved
+        res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         rects = list()
         if subex_len:
@@ -421,6 +454,7 @@ class MemAreaPtg(ClassifiedPtg):
                 c2 = reader.read_short()
                 rects.append((r1, r2, c1, c2))
         return cls(res, rects, ptg)
+
 
 class MemErrPtg(ClassifiedPtg):
     ptg = 0x27
@@ -435,10 +469,11 @@ class MemErrPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(4) # Reserved
+        res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
         return cls(res, subex, ptg)
+
 
 class RefErrPtg(ClassifiedPtg):
     ptg = 0x2A
@@ -452,8 +487,9 @@ class RefErrPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(6) # Reserved
+        res = reader.read(6)  # Reserved
         return cls(res, ptg)
+
 
 class AreaErrPtg(ClassifiedPtg):
     ptg = 0x2B
@@ -467,8 +503,9 @@ class AreaErrPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(12) # Reserved
+        res = reader.read(12)  # Reserved
         return cls(res, ptg)
+
 
 class RefNPtg(ClassifiedPtg):
     ptg = 0x2C
@@ -493,6 +530,7 @@ class RefNPtg(ClassifiedPtg):
         col_rel = col & 0x4000 == 0x4000
         return cls(row, col & 0x3FFF, row_rel, col_rel, ptg)
 
+
 class AreaNPtg(ClassifiedPtg):
     ptg = 0x2D
 
@@ -510,8 +548,8 @@ class AreaNPtg(ClassifiedPtg):
     def stringify(self, tokens, workbook):
         r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
         c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
-        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
-        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        r2 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c2 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
         return r1 + c1 + ':' + r2 + c2
 
     @classmethod
@@ -525,6 +563,7 @@ class AreaNPtg(ClassifiedPtg):
         c1_rel = c1 & 0x4000 == 0x4000
         c2_rel = c2 & 0x4000 == 0x4000
         return cls(r1, r2, c1 & 0x3FFF, c2 & 0x3FFF, r1_rel, r2_rel, c1_rel, c2_rel, ptg)
+
 
 class NameXPtg(ClassifiedPtg):
     ptg = 0x39
@@ -541,8 +580,9 @@ class NameXPtg(ClassifiedPtg):
     def parse(cls, reader, ptg):
         sheet_idx = reader.read_short()
         name_idx = reader.read_short()
-        res = reader.read(2) # Reserved
+        res = reader.read(2)  # Reserved
         return cls(sheet_idx, name_idx, res, ptg)
+
 
 class Ref3dPtg(ClassifiedPtg):
     ptg = 0x3A
@@ -569,6 +609,7 @@ class Ref3dPtg(ClassifiedPtg):
         col_rel = col & 0x4000 == 0x4000
         return cls(sheet_idx, row, col & 0x3FFF, row_rel, col_rel, ptg)
 
+
 class Area3dPtg(ClassifiedPtg):
     ptg = 0x3B
 
@@ -587,8 +628,8 @@ class Area3dPtg(ClassifiedPtg):
     def stringify(self, tokens, workbook):
         r1 = ('R[{}]' if self.first_row_rel else 'R{}').format(self.first_row + 1)
         c1 = ('C[{}]' if self.first_col_rel else 'C{}').format(self.first_col + 1)
-        r1 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
-        c1 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
+        r2 = ('R[{}]' if self.last_row_rel else 'R{}').format(self.last_row + 1)
+        c2 = ('C[{}]' if self.last_col_rel else 'C{}').format(self.last_col + 1)
         return workbook.sheets[self.sheet_idx] + '!' + r1 + c1 + ':' + r2 + c2
 
     @classmethod
@@ -604,6 +645,7 @@ class Area3dPtg(ClassifiedPtg):
         c2_rel = c2 & 0x4000 == 0x4000
         return cls(sheet_idx, r1, r2, c1 & 0x3FFF, c2 & 0x3FFF, r1_rel, r2_rel, c1_rel, c2_rel, ptg)
 
+
 class RefErr3dPtg(ClassifiedPtg):
     ptg = 0x3C
 
@@ -616,8 +658,9 @@ class RefErr3dPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(8) # Reserved
+        res = reader.read(8)  # Reserved
         return cls(res, ptg)
+
 
 class AreaErr3dPtg(ClassifiedPtg):
     ptg = 0x3D
@@ -630,10 +673,12 @@ class AreaErr3dPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(14) # Reserved
+        res = reader.read(14)  # Reserved
         return cls(res, ptg)
 
+
 # Control
+
 
 class ExpPtg(BasePtg):
     ptg = 0x01
@@ -651,6 +696,7 @@ class ExpPtg(BasePtg):
         col = reader.read_short()
         return cls(row, col)
 
+
 class TablePtg(BasePtg):
     ptg = 0x02
 
@@ -667,11 +713,13 @@ class TablePtg(BasePtg):
         col = reader.read_short()
         return cls(row, col)
 
+
 class ParenPtg(BasePtg):
     ptg = 0x15
 
     def stringify(self, tokens, workbook):
         return '(' + tokens.pop().stringify(tokens, workbook) + ')'
+
 
 class AttrPtg(BasePtg):
     ptg = 0x19
@@ -724,6 +772,7 @@ class AttrPtg(BasePtg):
         data = reader.read_short()
         return cls(flags, data)
 
+
 class MemNoMemPtg(ClassifiedPtg):
     ptg = 0x28
 
@@ -734,10 +783,11 @@ class MemNoMemPtg(ClassifiedPtg):
 
     @classmethod
     def parse(cls, reader, ptg):
-        res = reader.read(4) # Reserved
+        res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
         return cls(res, subex, ptg)
+
 
 class MemFuncPtg(ClassifiedPtg):
     ptg = 0x29
@@ -752,6 +802,7 @@ class MemFuncPtg(ClassifiedPtg):
         subex = reader.read(subex_len)
         return cls(subex, ptg)
 
+
 class MemAreaNPtg(ClassifiedPtg):
     ptg = 0x2E
 
@@ -764,6 +815,7 @@ class MemAreaNPtg(ClassifiedPtg):
         subex_len = reader.read_short()
         subex = reader.skip(subex_len)
         return cls(subex, ptg)
+
 
 class MemNoMemNPtg(ClassifiedPtg):
     ptg = 0x2F
@@ -780,6 +832,7 @@ class MemNoMemNPtg(ClassifiedPtg):
 
 # Func operators
 
+
 class FuncPtg(ClassifiedPtg):
     ptg = 0x21
 
@@ -793,6 +846,7 @@ class FuncPtg(ClassifiedPtg):
     def parse(cls, reader, ptg):
         idx = reader.read_short()
         return cls(idx, ptg)
+
 
 class FuncVarPtg(ClassifiedPtg):
     ptg = 0x22

@@ -11,6 +11,7 @@ if sys.version_info > (3,):
 # TODO: Make a real class of this?
 Cell = namedtuple('Cell', ['r', 'c', 'v', 'f'])
 
+
 class Worksheet(object):
     def __init__(self, workbook, fp, rels_fp=None, _debug=False):
         super(Worksheet, self).__init__()

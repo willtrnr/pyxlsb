@@ -1,73 +1,76 @@
+# noqa: F405
 import os
 import struct
-from .recordhandlers import *
+from . import records
+from . import recordhandlers as rh
 from .datareader import DataReader
 
 _uint8_t = struct.Struct('<B')
 
+
 class RecordReader(object):
-    default_handler = RecordHandler()
+    default_handler = rh.RecordHandler()
 
     handlers = {
         # Workbook part handlers
-        records.WORKBOOK:     BasicRecordHandler('workbook'),
-        records.WORKBOOK_END: BasicRecordHandler('/workbook'),
-        records.WORKBOOKPR:   WorkbookPropertiesHandler(),
-        records.SHEETS:       BasicRecordHandler('sheets'),
-        records.SHEETS_END:   BasicRecordHandler('/sheets'),
-        records.SHEET:        SheetHandler(),
+        records.WORKBOOK:     rh.BasicRecordHandler('workbook'),
+        records.WORKBOOK_END: rh.BasicRecordHandler('/workbook'),
+        records.WORKBOOKPR:   rh.WorkbookPropertiesHandler(),
+        records.SHEETS:       rh.BasicRecordHandler('sheets'),
+        records.SHEETS_END:   rh.BasicRecordHandler('/sheets'),
+        records.SHEET:        rh.SheetHandler(),
 
         # Worksheet part handlers
-        records.WORKSHEET:       BasicRecordHandler('worksheet'),
-        records.WORKSHEET_END:   BasicRecordHandler('/worksheet'),
-        records.DIMENSION:       DimensionHandler(),
-        records.SHEETDATA:       BasicRecordHandler('sheetData'),
-        records.SHEETDATA_END:   BasicRecordHandler('/sheetData'),
-        records.COLS:            BasicRecordHandler('cols'),
-        records.COLS_END:        BasicRecordHandler('/cols'),
-        records.COL:             ColumnHandler(),
-        records.ROW:             RowHandler(),
-        records.BLANK:           CellHandler(),
-        records.NUM:             CellHandler(),
-        records.BOOLERR:         CellHandler(),
-        records.BOOL:            CellHandler(),
-        records.FLOAT:           CellHandler(),
-        records.STRING:          CellHandler(),
-        records.FORMULA_STRING:  FormulaCellHandler(),
-        records.FORMULA_FLOAT:   FormulaCellHandler(),
-        records.FORMULA_BOOL:    FormulaCellHandler(),
-        records.FORMULA_BOOLERR: FormulaCellHandler(),
-        records.HYPERLINK:       HyperlinkHandler(),
+        records.WORKSHEET:       rh.BasicRecordHandler('worksheet'),
+        records.WORKSHEET_END:   rh.BasicRecordHandler('/worksheet'),
+        records.DIMENSION:       rh.DimensionHandler(),
+        records.SHEETDATA:       rh.BasicRecordHandler('sheetData'),
+        records.SHEETDATA_END:   rh.BasicRecordHandler('/sheetData'),
+        records.COLS:            rh.BasicRecordHandler('cols'),
+        records.COLS_END:        rh.BasicRecordHandler('/cols'),
+        records.COL:             rh.ColumnHandler(),
+        records.ROW:             rh.RowHandler(),
+        records.BLANK:           rh.CellHandler(),
+        records.NUM:             rh.CellHandler(),
+        records.BOOLERR:         rh.CellHandler(),
+        records.BOOL:            rh.CellHandler(),
+        records.FLOAT:           rh.CellHandler(),
+        records.STRING:          rh.CellHandler(),
+        records.FORMULA_STRING:  rh.FormulaCellHandler(),
+        records.FORMULA_FLOAT:   rh.FormulaCellHandler(),
+        records.FORMULA_BOOL:    rh.FormulaCellHandler(),
+        records.FORMULA_BOOLERR: rh.FormulaCellHandler(),
+        records.HYPERLINK:       rh.HyperlinkHandler(),
 
         # SharedStrings part handlers
-        records.SST:     StringTableHandler(),
-        records.SST_END: BasicRecordHandler('/sst'),
-        records.SI:      StringInstanceHandler(),
+        records.SST:     rh.StringTableHandler(),
+        records.SST_END: rh.BasicRecordHandler('/sst'),
+        records.SI:      rh.StringInstanceHandler(),
 
         # Styles part handlers
-        records.STYLESHEET:       BasicRecordHandler('styleSheet'),
-        records.STYLESHEET_END:   BasicRecordHandler('/styleSheet'),
-        records.COLORS:           ColorsHandler(),
-        records.COLORS_END:       BasicRecordHandler('/colors'),
-        records.DXFS:             DxfsHandler(),
-        records.DXFS_END:         BasicRecordHandler('/dxfs'),
-        records.TABLESTYLES:      TableStylesHandler(),
-        records.TABLESTYLES_END:  BasicRecordHandler('/tableStyles'),
-        records.FILLS:            FillsHandler(),
-        records.FILLS_END:        BasicRecordHandler('/fills'),
-        records.FONTS:            FontsHandler(),
-        records.FONTS_END:        BasicRecordHandler('/fonts'),
-        records.BORDERS:          BordersHandler(),
-        records.BORDERS_END:      BasicRecordHandler('/borders'),
-        records.CELLXFS:          CellXfsHandler(),
-        records.CELLXFS_END:      BasicRecordHandler('/cellXfs'),
-        records.CELLSTYLES:       CellStylesHandler(),
-        records.CELLSTYLES_END:   BasicRecordHandler('/cellStyles'),
-        records.CELLSTYLEXFS:     CellStyleXfsHandler(),
-        records.CELLSTYLEXFS_END: BasicRecordHandler('/cellStyleXfs'),
-        records.FONT:             FontHandler(),
-        records.XF:               XfHandler(),
-        records.CELLSTYLE:        CellStyleHandler()
+        records.STYLESHEET:       rh.BasicRecordHandler('styleSheet'),
+        records.STYLESHEET_END:   rh.BasicRecordHandler('/styleSheet'),
+        records.COLORS:           rh.ColorsHandler(),
+        records.COLORS_END:       rh.BasicRecordHandler('/colors'),
+        records.DXFS:             rh.DxfsHandler(),
+        records.DXFS_END:         rh.BasicRecordHandler('/dxfs'),
+        records.TABLESTYLES:      rh.TableStylesHandler(),
+        records.TABLESTYLES_END:  rh.BasicRecordHandler('/tableStyles'),
+        records.FILLS:            rh.FillsHandler(),
+        records.FILLS_END:        rh.BasicRecordHandler('/fills'),
+        records.FONTS:            rh.FontsHandler(),
+        records.FONTS_END:        rh.BasicRecordHandler('/fonts'),
+        records.BORDERS:          rh.BordersHandler(),
+        records.BORDERS_END:      rh.BasicRecordHandler('/borders'),
+        records.CELLXFS:          rh.CellXfsHandler(),
+        records.CELLXFS_END:      rh.BasicRecordHandler('/cellXfs'),
+        records.CELLSTYLES:       rh.CellStylesHandler(),
+        records.CELLSTYLES_END:   rh.BasicRecordHandler('/cellStyles'),
+        records.CELLSTYLEXFS:     rh.CellStyleXfsHandler(),
+        records.CELLSTYLEXFS_END: rh.BasicRecordHandler('/cellStyleXfs'),
+        records.FONT:             rh.FontHandler(),
+        records.XF:               rh.XfHandler(),
+        records.CELLSTYLE:        rh.CellStyleHandler()
     }
 
     def __init__(self, fp, _debug=False):

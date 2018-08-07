@@ -3,6 +3,7 @@ import shutil
 from tempfile import TemporaryFile
 from zipfile import ZipFile
 
+
 class ZipPackage(object):
     def __init__(self, name):
         self._zf = ZipFile(name, 'r')
@@ -26,6 +27,7 @@ class ZipPackage(object):
 
     def close(self):
         self._zf.close()
+
 
 class XlsbPackage(ZipPackage):
     def get_workbook_part(self):

@@ -1,1 +1,2 @@
+# noqa
 from pyxlsb import *

@@ -5,7 +5,10 @@
 *.rst
 *.sublime-*
 *.swp
+__pycache__/
 build/
 dist/
 venv/
+venv2/
+venv3/
 ~*

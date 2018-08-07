@@ -1,5 +1,6 @@
 import re
 
+
 class CellReference(object):
     _cell_ref_re = re.compile(r'^(\$)?([A-Z]+)(\$)?([0-9]+)$', re.I)
 

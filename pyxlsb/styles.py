@@ -1,6 +1,7 @@
 import pyxlsb.records as records
 from pyxlsb.recordreader import RecordReader
 
+
 class Styles(object):
     def __init__(self, fp, _debug=False):
         super(Styles, self).__init__()

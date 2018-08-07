@@ -1,5 +1,6 @@
 from .tokenreader import TokenReader
 
+
 class Formula(object):
     def __init__(self, tokens=None):
         super(Formula, self).__init__()

@@ -2,6 +2,7 @@ from . import records
 from .formula import Formula
 from collections import namedtuple
 
+
 class RecordHandler(object):
     def read(self, reader, recid, reclen):
         if reclen > 0:
@@ -27,10 +28,10 @@ class WorkbookPropertiesHandler(RecordHandler):
     cls = namedtuple('workbookPr', ['date1904', 'defaultThemeVersion'])
 
     def read(self, reader, recid, reclen):
-        flags = reader.read_short() # TODO: This contains the 1904 flag
-        reader.skip(2) # Not sure what this is, other flags probably
+        flags = reader.read_short()  # TODO: This contains the 1904 flag
+        reader.skip(2)  # Not sure what this is, other flags probably
         theme = reader.read_int()
-        reader.skip(4) # Also not sure, more flags?
+        reader.skip(4)  # Also not sure, more flags?
         return self.cls(flags & 0x01 == 0x01, theme)
 
 
@@ -98,6 +99,7 @@ class CellHandler(RecordHandler):
 
         return self.cls(col, value, None, style)
 
+
 class FormulaCellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
@@ -118,7 +120,7 @@ class FormulaCellHandler(RecordHandler):
 
         formula = None
         # 0x0001 = Recalc always, 0x0002 = Calc on open, 0x0008 = Part of shared
-        grbits = reader.read_short()
+        reader.read_short()  # TODO Handle the flags
         sz = reader.read_int()
         if sz:
             buf = reader.read(sz)
@@ -231,16 +233,19 @@ class CellStyleXfsHandler(RecordHandler):
         count = reader.read_int()
         return self.cls(count)
 
+
 class FontHandler(RecordHandler):
     cls = namedtuple('font', ['family'])
 
     def read(self, reader, recid, reclen):
-        reader.skip(21) # TODO
+        reader.skip(21)  # TODO
         family = reader.read_string()
         return self.cls(family)
 
+
 class XfHandler(RecordHandler):
     cls = namedtuple('xf', ['numFmtId', 'fontId', 'fillId', 'borderId', 'xfId'])
+
     def read(self, reader, recid, reclen):
         # TODO: Speculative and seems wrong
         xf = reader.read_short()
@@ -252,10 +257,11 @@ class XfHandler(RecordHandler):
         border = reader.read_short()
         return self.cls(fmtid, font, fill, border, xf)
 
+
 class CellStyleHandler(RecordHandler):
     cls = namedtuple('cellStyle', ['name'])
 
     def read(self, reader, recid, reclen):
-        reader.skip(8) # TODO
+        reader.skip(8)  # TODO
         name = reader.read_string()
         return self.cls(name)

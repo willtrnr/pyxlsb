@@ -1,68 +1,69 @@
-from .ptgs import *
+from . import ptgs
 from .datareader import DataReader
 
+
 class TokenReader(object):
-    default_ptg = UnknownPtg
+    default_ptg = ptgs.UnknownPtg
 
     ptgs = {
         # Unary operators
-        UPlusPtg.ptg:   UPlusPtg,
-        UMinusPtg.ptg:  UMinusPtg,
-        PercentPtg.ptg: PercentPtg,
+        ptgs.UPlusPtg.ptg:   ptgs.UPlusPtg,
+        ptgs.UMinusPtg.ptg:  ptgs.UMinusPtg,
+        ptgs.PercentPtg.ptg: ptgs.PercentPtg,
 
         # Binary operators
-        AddPtg.ptg:          AddPtg,
-        SubstractPtg.ptg:    SubstractPtg,
-        MultiplyPtg.ptg:     MultiplyPtg,
-        DividePtg.ptg:       DividePtg,
-        PowerPtg.ptg:        PowerPtg,
-        ConcatPtg.ptg:       ConcatPtg,
-        LessPtg.ptg:         LessPtg,
-        LessEqualPtg.ptg:    LessEqualPtg,
-        EqualPtg.ptg:        EqualPtg,
-        GreaterEqualPtg.ptg: GreaterEqualPtg,
-        GreaterPtg.ptg:      GreaterPtg,
-        NotEqualPtg.ptg:     NotEqualPtg,
-        IntersectionPtg.ptg: IntersectionPtg,
-        UnionPtg.ptg:        UnionPtg,
-        RangePtg.ptg:        RangePtg,
+        ptgs.AddPtg.ptg:          ptgs.AddPtg,
+        ptgs.SubstractPtg.ptg:    ptgs.SubstractPtg,
+        ptgs.MultiplyPtg.ptg:     ptgs.MultiplyPtg,
+        ptgs.DividePtg.ptg:       ptgs.DividePtg,
+        ptgs.PowerPtg.ptg:        ptgs.PowerPtg,
+        ptgs.ConcatPtg.ptg:       ptgs.ConcatPtg,
+        ptgs.LessPtg.ptg:         ptgs.LessPtg,
+        ptgs.LessEqualPtg.ptg:    ptgs.LessEqualPtg,
+        ptgs.EqualPtg.ptg:        ptgs.EqualPtg,
+        ptgs.GreaterEqualPtg.ptg: ptgs.GreaterEqualPtg,
+        ptgs.GreaterPtg.ptg:      ptgs.GreaterPtg,
+        ptgs.NotEqualPtg.ptg:     ptgs.NotEqualPtg,
+        ptgs.IntersectionPtg.ptg: ptgs.IntersectionPtg,
+        ptgs.UnionPtg.ptg:        ptgs.UnionPtg,
+        ptgs.RangePtg.ptg:        ptgs.RangePtg,
 
         # Operands
-        MissArgPtg.ptg:   MissArgPtg,
-        StringPtg.ptg:    StringPtg,
-        ErrorPtg.ptg:     ErrorPtg,
-        BooleanPtg.ptg:   BooleanPtg,
-        IntegerPtg.ptg:   IntegerPtg,
-        NumberPtg.ptg:    NumberPtg,
-        ArrayPtg.ptg:     ArrayPtg,
-        NamePtg.ptg:      NamePtg,
-        RefPtg.ptg:       RefPtg,
-        AreaPtg.ptg:      AreaPtg,
-        MemAreaPtg.ptg:   MemAreaPtg,
-        MemErrPtg.ptg:    MemErrPtg,
-        RefErrPtg.ptg:    RefErrPtg,
-        AreaErrPtg.ptg:   AreaErrPtg,
-        RefNPtg.ptg:      RefNPtg,
-        AreaNPtg.ptg:     AreaNPtg,
-        NameXPtg.ptg:     NameXPtg,
-        Ref3dPtg.ptg:     Ref3dPtg,
-        Area3dPtg.ptg:    Area3dPtg,
-        RefErr3dPtg.ptg:  RefErr3dPtg,
-        AreaErr3dPtg.ptg: AreaErr3dPtg,
+        ptgs.MissArgPtg.ptg:   ptgs.MissArgPtg,
+        ptgs.StringPtg.ptg:    ptgs.StringPtg,
+        ptgs.ErrorPtg.ptg:     ptgs.ErrorPtg,
+        ptgs.BooleanPtg.ptg:   ptgs.BooleanPtg,
+        ptgs.IntegerPtg.ptg:   ptgs.IntegerPtg,
+        ptgs.NumberPtg.ptg:    ptgs.NumberPtg,
+        ptgs.ArrayPtg.ptg:     ptgs.ArrayPtg,
+        ptgs.NamePtg.ptg:      ptgs.NamePtg,
+        ptgs.RefPtg.ptg:       ptgs.RefPtg,
+        ptgs.AreaPtg.ptg:      ptgs.AreaPtg,
+        ptgs.MemAreaPtg.ptg:   ptgs.MemAreaPtg,
+        ptgs.MemErrPtg.ptg:    ptgs.MemErrPtg,
+        ptgs.RefErrPtg.ptg:    ptgs.RefErrPtg,
+        ptgs.AreaErrPtg.ptg:   ptgs.AreaErrPtg,
+        ptgs.RefNPtg.ptg:      ptgs.RefNPtg,
+        ptgs.AreaNPtg.ptg:     ptgs.AreaNPtg,
+        ptgs.NameXPtg.ptg:     ptgs.NameXPtg,
+        ptgs.Ref3dPtg.ptg:     ptgs.Ref3dPtg,
+        ptgs.Area3dPtg.ptg:    ptgs.Area3dPtg,
+        ptgs.RefErr3dPtg.ptg:  ptgs.RefErr3dPtg,
+        ptgs.AreaErr3dPtg.ptg: ptgs.AreaErr3dPtg,
 
         # Control
-        ExpPtg.ptg:       ExpPtg,
-        TablePtg.ptg:     TablePtg,
-        ParenPtg.ptg:     ParenPtg,
-        AttrPtg.ptg:      AttrPtg,
-        MemNoMemPtg.ptg:  MemNoMemPtg,
-        MemFuncPtg.ptg:   MemFuncPtg,
-        MemAreaNPtg.ptg:  MemAreaNPtg,
-        MemNoMemNPtg.ptg: MemNoMemNPtg,
+        ptgs.ExpPtg.ptg:       ptgs.ExpPtg,
+        ptgs.TablePtg.ptg:     ptgs.TablePtg,
+        ptgs.ParenPtg.ptg:     ptgs.ParenPtg,
+        ptgs.AttrPtg.ptg:      ptgs.AttrPtg,
+        ptgs.MemNoMemPtg.ptg:  ptgs.MemNoMemPtg,
+        ptgs.MemFuncPtg.ptg:   ptgs.MemFuncPtg,
+        ptgs.MemAreaNPtg.ptg:  ptgs.MemAreaNPtg,
+        ptgs.MemNoMemNPtg.ptg: ptgs.MemNoMemNPtg,
 
         # Func operators
-        FuncPtg.ptg:    FuncPtg,
-        FuncVarPtg.ptg: FuncVarPtg
+        ptgs.FuncPtg.ptg:    ptgs.FuncPtg,
+        ptgs.FuncVarPtg.ptg: ptgs.FuncVarPtg
     }
 
     def __init__(self, fp):
