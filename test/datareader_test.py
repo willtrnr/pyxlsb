@@ -1,6 +1,7 @@
 import unittest
 from pyxlsb.datareader import DataReader
 
+
 class DataReaderTestCase(unittest.TestCase):
     def test_read_byte(self):
         reader = DataReader(b'\x01\x02\xff')
@@ -64,4 +65,9 @@ class DataReaderTestCase(unittest.TestCase):
     def test_read_string(self):
         reader = DataReader(b'\x04\x00\x00\x00T\x00E\x00S\x00T\x00')
         self.assertEqual(reader.read_string(), 'TEST')
+        self.assertEqual(reader.read_string(), None)
+
+    def test_read_string_unicode(self):
+        reader = DataReader(b'\x05\x00\x00\x00\x53\x30\x93\x30\x6B\x30\x61\x30\x6F\x30')
+        self.assertEqual(reader.read_string(), 'こんにちは')
         self.assertEqual(reader.read_string(), None)

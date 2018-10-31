@@ -13,7 +13,7 @@ _double_t = struct.Struct('<d')
 
 
 class DataReader(object):
-    def __init__(self, fp, enc='latin-1'):
+    def __init__(self, fp, enc='utf-16'):
         self._fp = fp if hasattr(fp, 'read') else BytesIO(fp)
         self._enc = enc
 
@@ -86,4 +86,4 @@ class DataReader(object):
         buff = self.read(size * 2)
         if len(buff) != size * 2:
             return None
-        return buff.decode(enc or self._enc).replace('\x00', '')
+        return buff.decode(enc or self._enc)

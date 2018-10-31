@@ -6,8 +6,8 @@ from pyxlsb.xlsbpackage import XlsbPackage
 
 class WorkbookTestCase(unittest.TestCase):
     def setUp(self):
-        self.wb = Workbook(XlsbPackage(os.path.join('test_files', 'Test.xlsb')))
-        self.wb1904 = Workbook(XlsbPackage(os.path.join('test_files', 'Test1904.xlsb')))
+        self.wb = Workbook(XlsbPackage(os.path.join('test_files', 'test.xlsb')))
+        self.wb1904 = Workbook(XlsbPackage(os.path.join('test_files', 'test_1904.xlsb')))
 
     def tearDown(self):
         self.wb.close()
