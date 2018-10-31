@@ -11,7 +11,7 @@ uint32_t = struct.Struct('<I')
 double_t = struct.Struct('<d')
 
 class RecordReader(object):
-  def __init__(self, buf, enc='latin-1'):
+  def __init__(self, buf, enc='utf-16'):
     self._fp = io.BytesIO(buf)
     self._enc = enc
 
@@ -72,7 +72,7 @@ class RecordReader(object):
     buff = self.read(l * 2)
     if len(buff) < l * 2:
       return None
-    return buff.decode(self._enc).replace('\x00', '')
+    return buff.decode(self._enc)
 
 
 class BIFF12Reader(object):
