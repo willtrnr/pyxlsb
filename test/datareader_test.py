@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 from pyxlsb.datareader import DataReader
 
@@ -69,5 +70,5 @@ class DataReaderTestCase(unittest.TestCase):
 
     def test_read_string_unicode(self):
         reader = DataReader(b'\x05\x00\x00\x00\x53\x30\x93\x30\x6B\x30\x61\x30\x6F\x30')
-        self.assertEqual(reader.read_string(), 'こんにちは')
+        self.assertEqual(reader.read_string(), u'こんにちは')
         self.assertEqual(reader.read_string(), None)
