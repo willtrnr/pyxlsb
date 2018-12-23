@@ -2,9 +2,8 @@ from .tokenreader import TokenReader
 
 
 class Formula(object):
-    def __init__(self, tokens=None):
-        super(Formula, self).__init__()
-        self._tokens = list(tokens) if tokens else list()
+    def __init__(self, tokens):
+        self._tokens = list(tokens)
 
     def __repr__(self):
         return 'Formula({})'.format(self._tokens)

@@ -285,7 +285,7 @@ class BooleanPtg(BasePtg):
     ptg = 0x1D
 
     def __init__(self, value, *args, **kwargs):
-        super(BooleanPtg, self).__init__
+        super(BooleanPtg, self).__init__(*args, **kwargs)
         self.value = value
 
     def stringify(self, tokens, workbook):

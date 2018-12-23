@@ -1,14 +1,18 @@
 # noqa: F405
 import os
 import struct
+import sys
 from . import records as r
 from . import recordhandlers as rh
 from .datareader import DataReader
 
+if sys.version_info > (3,):
+    xrange = range
+
 _uint8_t = struct.Struct('<B')
 
 
-class RecordReader(object):
+class RecordReader(DataReader):
     default_handler = rh.RecordHandler()
 
     handlers = [default_handler] * 0x07FF
@@ -73,33 +77,16 @@ class RecordReader(object):
     handlers[r.XF]               = rh.XfHandler()
     handlers[r.CELLSTYLE]        = rh.CellStyleHandler()
 
-    def __init__(self, fp, _debug=False):
-        super(RecordReader, self).__init__()
-        self._fp = fp
-        self._debug = _debug
-
     def __iter__(self):
         return self
 
     def __next__(self):
         return self.next()
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.close()
-
-    def tell(self):
-        return self._fp.tell()
-
-    def seek(self, offset, whence=os.SEEK_SET):
-        self._fp.seek(offset, whence)
-
     def read_id(self):
         value = 0
-        for i in range(4):
-            byte = self._fp.read(1)
+        for i in xrange(4):
+            byte = self.read(1)
             if not byte:
                 return None
             byte = _uint8_t.unpack(byte)[0]
@@ -109,37 +96,31 @@ class RecordReader(object):
         return value
 
     def read_len(self):
-        value = 0
-        for i in range(4):
-            byte = self._fp.read(1)
-            if not byte:
-                return None
-            byte = _uint8_t.unpack(byte)[0]
-            value += (byte & 0x7F) << (7 * i)
-            if byte & 0x80 == 0:
-                break
-        return value
+        return self.read_varint()
 
     def next(self):
-        ret = None
-        while ret is None:
-            if self._debug:
-                pos = self._fp.tell()
+        while True:
             recid = self.read_id()
             if recid is None:
                 raise StopIteration
+
             reclen = self.read_len()
             if reclen is None:
                 raise StopIteration
-            recdata = self._fp.read(reclen)
+
             if recid < len(self.handlers):
                 handler = self.handlers[recid]
             else:
                 handler = self.default_handler
-            ret = handler.read(DataReader(recdata), recid, reclen)
-            if self._debug:
-                print('{:08X}  {:04X}  {:<6} {}\n{}'.format(pos, recid, reclen, ' '.join('{:02X}'.format(b) for b in recdata), ret))
-        return (recid, ret)
 
-    def close(self):
-        self._fp.close()
+            boundary = self.tell() + reclen
+            res = handler.read(self, recid, reclen)
+
+            pos = self.tell()
+            if pos > boundary:
+                raise AssertionError('misbehaving handler ' + str(handler))
+            elif pos < boundary:
+                self.seek(boundary - pos, os.SEEK_CUR)
+
+            if res is not None:
+                return (recid, res)

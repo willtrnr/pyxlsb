@@ -3,11 +3,8 @@ from pyxlsb.recordreader import RecordReader
 
 
 class Styles(object):
-    def __init__(self, fp, _debug=False):
-        super(Styles, self).__init__()
-        self._reader = RecordReader(fp, _debug=_debug)
-        self._debug = _debug
-
+    def __init__(self, fp):
+        self._reader = RecordReader(fp)
         self._parse()
 
     def __enter__(self):

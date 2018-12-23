@@ -23,7 +23,7 @@ class ZipPackage(object):
             return tf
         except KeyError:
             tf.close()
-            raise
+            return None
 
     def close(self):
         self._zf.close()
@@ -43,7 +43,4 @@ class XlsbPackage(ZipPackage):
         return self.get_file('xl/worksheets/sheet{}.bin'.format(idx))
 
     def get_worksheet_rels(self, idx):
-        try:
-            return self.get_file('xl/worksheets/_rels/sheet{}.bin.rels'.format(idx))
-        except KeyError:
-            return None
+        return self.get_file('xl/worksheets/_rels/sheet{}.bin.rels'.format(idx))

@@ -5,14 +5,16 @@ class CellReference(object):
     _cell_ref_re = re.compile(r'^(\$)?([A-Z]+)(\$)?([0-9]+)$', re.I)
 
     def __init__(self, row, col, row_rel=False, col_rel=False):
-        super(CellReference, self).__init__()
         self.row = row
         self.col = col
         self.row_rel = row_rel
         self.col_rel = col_rel
 
     def __eq__(self, other):
-        return self.row == other.row and self.col == other.col and self.row_rel == other.row_rel and self.col_rel == other.col_rel
+        return (self.row == other.row and
+                self.col == other.col and
+                self.row_rel == other.row_rel and
+                self.col_rel == other.col_rel)
 
     def __repr__(self):
         return 'CellReference(row={}, col={}, row_rel={}, col_rel={})'.format(self.row, self.col, self.row_rel, self.col_rel)

@@ -4,6 +4,7 @@ from datetime import datetime, time
 from pyxlsb.workbook import Workbook
 from pyxlsb.xlsbpackage import XlsbPackage
 
+
 class WorkbookTestCase(unittest.TestCase):
     def setUp(self):
         self.wb = Workbook(XlsbPackage(os.path.join('test_files', 'test.xlsb')))

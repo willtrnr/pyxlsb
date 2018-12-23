@@ -5,21 +5,20 @@ from collections import namedtuple
 
 class RecordHandler(object):
     def read(self, reader, recid, reclen):
-        if reclen > 0:
-            reader.skip(reclen)
+        reader.skip(reclen)
 
     def write(self, writer, data):
-        # TODO Eventually some day
-        pass
+        # TODO Eventually, some day
+        writer.write(data)
 
 
 class BasicRecordHandler(RecordHandler):
+    __slots__ = ['name']
+
     def __init__(self, name=None):
-        super(BasicRecordHandler, self).__init__()
         self.name = name
 
     def read(self, reader, recid, reclen):
-        super(BasicRecordHandler, self).read(reader, recid, reclen)
         reader.skip(reclen)
         return self.name
 

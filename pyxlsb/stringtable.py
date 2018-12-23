@@ -1,13 +1,11 @@
+import os
 from . import records
 from .recordreader import RecordReader
 
 
 class StringTable(object):
-    def __init__(self, fp, _debug=False):
-        super(StringTable, self).__init__()
-        self._reader = RecordReader(fp, _debug=_debug)
-        self._debug = _debug
-
+    def __init__(self, fp):
+        self._reader = RecordReader(fp)
         self._parse()
 
     def __enter__(self):
@@ -20,12 +18,14 @@ class StringTable(object):
         return self._strings[key]
 
     def _parse(self):
-        self._strings = list()
+        strings = list()
+        self._reader.seek(0, os.SEEK_SET)
         for recid, rec in self._reader:
             if recid == records.SI:
-                self._strings.append(rec.t)
+                strings.append(rec.t)
             elif recid == records.SST_END:
                 break
+        self._strings = strings
 
     def get_string(self, idx):
         return self._strings[idx]

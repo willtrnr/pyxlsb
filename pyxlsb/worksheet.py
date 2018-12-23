@@ -13,12 +13,11 @@ Cell = namedtuple('Cell', ['r', 'c', 'v', 'f'])
 
 
 class Worksheet(object):
-    def __init__(self, workbook, fp, rels_fp=None, _debug=False):
-        super(Worksheet, self).__init__()
+    def __init__(self, workbook, name, fp, rels_fp=None):
         self.workbook = workbook
-        self._reader = RecordReader(fp, _debug=_debug)
+        self.name = name
+        self._reader = RecordReader(fp)
         self._rels_fp = rels_fp
-
         self._parse()
 
     def __enter__(self):
@@ -37,12 +36,7 @@ class Worksheet(object):
         self.hyperlinks = dict()
         self._data_offset = 0
 
-        if self._rels_fp is not None:
-            self._rels_fp.seek(0, os.SEEK_SET)
-            doc = ElementTree.parse(self._rels_fp).getroot()
-            for el in doc:
-                self.rels[el.attrib['Id']] = el.attrib['Target']
-
+        self._reader.seek(0, os.SEEK_SET)
         for recid, rec in self._reader:
             if recid == records.DIMENSION:
                 self.dimension = rec
@@ -57,7 +51,13 @@ class Worksheet(object):
                     for c in xrange(rec.w):
                         self.hyperlinks[rec.r + r, rec.c + c] = rec.rId
 
-    def rows(self, sparse=False):
+        if self._rels_fp is not None:
+            self._rels_fp.seek(0, os.SEEK_SET)
+            doc = ElementTree.parse(self._rels_fp).getroot()
+            for el in doc:
+                self.rels[el.attrib['Id']] = el.attrib['Target']
+
+    def rows(self, sparse=True):
         row = None
         row_num = -1
         self._reader.seek(self._data_offset, os.SEEK_SET)

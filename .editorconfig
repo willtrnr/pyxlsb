@@ -11,5 +11,8 @@ trim_trailing_whitespace = true
 [*.py]
 indent_size = 4
 
+[*.pyx]
+indent_size = 4
+
 [*.rst]
 max_line_length = 80

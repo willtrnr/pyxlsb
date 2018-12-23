@@ -2,7 +2,7 @@ from . import ptgs
 from .datareader import DataReader
 
 
-class TokenReader(object):
+class TokenReader(DataReader):
     default_ptg = ptgs.UnknownPtg
 
     ptgs = {
@@ -66,9 +66,6 @@ class TokenReader(object):
         ptgs.FuncVarPtg.ptg: ptgs.FuncVarPtg
     }
 
-    def __init__(self, fp):
-        self._reader = DataReader(fp)
-
     def __iter__(self):
         return self
 
@@ -76,8 +73,8 @@ class TokenReader(object):
         return self.next()
 
     def next(self):
-        ptg = self._reader.read_byte()
+        ptg = self.read_byte()
         if ptg is None:
             raise StopIteration
         base = ((ptg | 0x20) if ptg & 0x40 == 0x40 else ptg) & 0x3F
-        return (self.ptgs.get(base) or self.default_ptg).parse(self._reader, ptg)
+        return (self.ptgs.get(base) or self.default_ptg).parse(self, ptg)
