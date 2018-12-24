@@ -68,7 +68,7 @@ class DataReaderTestCase(unittest.TestCase):
         self.assertEqual(reader.read_string(), 'TEST')
         self.assertEqual(reader.read_string(), None)
 
-    def test_read_string_unicode(self):
+    def test_read_string_u(self):
         reader = DataReader(b'\x05\x00\x00\x00\x53\x30\x93\x30\x6B\x30\x61\x30\x6F\x30')
         self.assertEqual(reader.read_string(), u'こんにちは')
         self.assertEqual(reader.read_string(), None)

@@ -4,7 +4,7 @@ from collections import namedtuple
 
 
 class RecordHandler(object):
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(reclen)
 
     def write(self, writer, data):
@@ -18,7 +18,7 @@ class BasicRecordHandler(RecordHandler):
     def __init__(self, name=None):
         self.name = name
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(reclen)
         return self.name
 
@@ -26,7 +26,7 @@ class BasicRecordHandler(RecordHandler):
 class WorkbookPropertiesHandler(RecordHandler):
     cls = namedtuple('workbookPr', ['date1904', 'defaultThemeVersion'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         flags = reader.read_short()  # TODO: This contains the 1904 flag
         reader.skip(2)  # Not sure what this is, other flags probably
         theme = reader.read_int()
@@ -37,7 +37,7 @@ class WorkbookPropertiesHandler(RecordHandler):
 class SheetHandler(RecordHandler):
     cls = namedtuple('sheet', ['sheetId', 'rId', 'name'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(4)
         sheetid = reader.read_int()
         rid = reader.read_string()
@@ -48,7 +48,7 @@ class SheetHandler(RecordHandler):
 class DimensionHandler(RecordHandler):
     cls = namedtuple('dimension', ['r', 'c', 'h', 'w'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         r1 = reader.read_int()
         r2 = reader.read_int()
         c1 = reader.read_int()
@@ -59,7 +59,7 @@ class DimensionHandler(RecordHandler):
 class ColumnHandler(RecordHandler):
     cls = namedtuple('col', ['c1', 'c2', 'width', 'style', 'customWidth'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         c1 = reader.read_int()
         c2 = reader.read_int()
         width = reader.read_int() / 256
@@ -71,7 +71,7 @@ class ColumnHandler(RecordHandler):
 class RowHandler(RecordHandler):
     cls = namedtuple('row', ['r'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         r = reader.read_int()
         return self.cls(r)
 
@@ -79,21 +79,21 @@ class RowHandler(RecordHandler):
 class CellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         col = reader.read_int()
         style = reader.read_int()
 
         value = None
-        if recid == records.NUM:
+        if rectype == records.CELL_RK:
             value = reader.read_rk()
-        elif recid == records.BOOLERR:
+        elif rectype == records.CELL_ERROR:
             # TODO Map error values
             value = hex(reader.read_byte())
-        elif recid == records.BOOL:
+        elif rectype == records.CELL_BOOL:
             value = reader.read_bool()
-        elif recid == records.FLOAT:
+        elif rectype == records.CELL_REAL:
             value = reader.read_double()
-        elif recid == records.STRING:
+        elif rectype == records.CELL_ISST:
             value = reader.read_int()
 
         return self.cls(col, value, None, style)
@@ -102,18 +102,18 @@ class CellHandler(RecordHandler):
 class FormulaCellHandler(RecordHandler):
     cls = namedtuple('c', ['c', 'v', 'f', 'style'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         col = reader.read_int()
         style = reader.read_int()
 
         value = None
-        if recid == records.FORMULA_STRING:
+        if rectype == records.FMLA_STRING:
             value = reader.read_string()
-        elif recid == records.FORMULA_FLOAT:
+        elif rectype == records.FMLA_NUM:
             value = reader.read_double()
-        elif recid == records.FORMULA_BOOL:
+        elif rectype == records.FMLA_BOOL:
             value = reader.read_bool()
-        elif recid == records.FORMULA_BOOLERR:
+        elif rectype == records.FMLA_ERROR:
             # TODO Map error values
             value = hex(reader.read_byte())
 
@@ -132,7 +132,7 @@ class FormulaCellHandler(RecordHandler):
 class HyperlinkHandler(RecordHandler):
     cls = namedtuple('hyperlink', ['r', 'c', 'h', 'w', 'rId'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         r1 = reader.read_int()
         r2 = reader.read_int()
         c1 = reader.read_int()
@@ -144,7 +144,7 @@ class HyperlinkHandler(RecordHandler):
 class StringTableHandler(RecordHandler):
     cls = namedtuple('sst', ['count', 'uniqueCount'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         unique = reader.read_int()
         return self.cls(count, unique)
@@ -153,7 +153,7 @@ class StringTableHandler(RecordHandler):
 class StringInstanceHandler(RecordHandler):
     cls = namedtuple('si', ['t'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(1)
         value = reader.read_string()
         return self.cls(value)
@@ -162,7 +162,7 @@ class StringInstanceHandler(RecordHandler):
 class ColorsHandler(RecordHandler):
     cls = namedtuple('colors', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -170,7 +170,7 @@ class ColorsHandler(RecordHandler):
 class DxfsHandler(RecordHandler):
     cls = namedtuple('dxfs', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -178,7 +178,7 @@ class DxfsHandler(RecordHandler):
 class TableStylesHandler(RecordHandler):
     cls = namedtuple('tableStyles', ['count', 'defaultTableStyle', 'defaultPivotStyle'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         table = reader.read_string()
         pivot = reader.read_string()
@@ -188,7 +188,7 @@ class TableStylesHandler(RecordHandler):
 class FillsHandler(RecordHandler):
     cls = namedtuple('fills', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -196,7 +196,7 @@ class FillsHandler(RecordHandler):
 class FontsHandler(RecordHandler):
     cls = namedtuple('fonts', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -204,7 +204,7 @@ class FontsHandler(RecordHandler):
 class BordersHandler(RecordHandler):
     cls = namedtuple('borders', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -212,7 +212,7 @@ class BordersHandler(RecordHandler):
 class CellXfsHandler(RecordHandler):
     cls = namedtuple('cellXfs', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -220,7 +220,7 @@ class CellXfsHandler(RecordHandler):
 class CellStylesHandler(RecordHandler):
     cls = namedtuple('cellStyles', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -228,7 +228,7 @@ class CellStylesHandler(RecordHandler):
 class CellStyleXfsHandler(RecordHandler):
     cls = namedtuple('cellStyleXfs', ['count'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         count = reader.read_int()
         return self.cls(count)
 
@@ -236,7 +236,7 @@ class CellStyleXfsHandler(RecordHandler):
 class FontHandler(RecordHandler):
     cls = namedtuple('font', ['family'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(21)  # TODO
         family = reader.read_string()
         return self.cls(family)
@@ -245,7 +245,7 @@ class FontHandler(RecordHandler):
 class XfHandler(RecordHandler):
     cls = namedtuple('xf', ['numFmtId', 'fontId', 'fillId', 'borderId', 'xfId'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         # TODO: Speculative and seems wrong
         xf = reader.read_short()
         if xf == 0xFFFF:
@@ -260,7 +260,7 @@ class XfHandler(RecordHandler):
 class CellStyleHandler(RecordHandler):
     cls = namedtuple('cellStyle', ['name'])
 
-    def read(self, reader, recid, reclen):
+    def read(self, reader, rectype, reclen):
         reader.skip(8)  # TODO
         name = reader.read_string()
         return self.cls(name)

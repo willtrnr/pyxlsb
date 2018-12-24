@@ -27,12 +27,12 @@ class Workbook(object):
         self.stringtable = None
 
         with RecordReader(self._pkg.get_workbook_part()) as reader:
-            for recid, rec in reader:
-                if recid == records.WORKBOOKPR:
+            for rectype, rec in reader:
+                if rectype == records.WB_PROP:
                     self.props = rec
-                elif recid == records.SHEET:
+                elif rectype == records.BUNDLE_SH:
                     self.sheets.append(rec.name)
-                elif recid == records.SHEETS_END:
+                elif rectype == records.END_BUNDLE_SHS:
                     break
 
         ssfp = self._pkg.get_sharedstrings_part()

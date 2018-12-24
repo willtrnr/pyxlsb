@@ -24,9 +24,9 @@ class Styles(object):
         self._cell_styles = list()
         self._cell_style_xfs = list()
 
-        for recid, reclen in self._reader:
+        for rectype, reclen in self._reader:
             # TODO
-            if recid == records.STYLESHEET_END:
+            if rectype == records.END_STYLE_SHEET:
                 break
 
     def get_style(self, idx):

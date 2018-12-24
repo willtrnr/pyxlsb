@@ -75,20 +75,6 @@ class DataReader(object):
             return None
         return _double_t.unpack(buff)[0]
 
-    def read_varint(self):
-        value = 0
-        for i in xrange(4):
-            byte = self.read(1)
-            if not byte:
-                return None
-
-            byte = _uint8_t.unpack(byte)[0]
-            value += (byte & 0x7F) << (7 * i)
-            if byte & 0x80 == 0:
-                break
-
-        return value
-
     def read_rk(self):
         buff = self.read(4)
         if len(buff) < 4:

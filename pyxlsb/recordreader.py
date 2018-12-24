@@ -1,6 +1,5 @@
 # noqa: F405
 import os
-import struct
 import sys
 from . import records as r
 from . import recordhandlers as rh
@@ -9,73 +8,74 @@ from .datareader import DataReader
 if sys.version_info > (3,):
     xrange = range
 
-_uint8_t = struct.Struct('<B')
-
 
 class RecordReader(DataReader):
-    default_handler = rh.RecordHandler()
+    _default_handler = rh.RecordHandler()
 
-    handlers = [default_handler] * 0x07FF
+    _handlers = {
+        # Workbook part handlers
+        r.BEGIN_BOOK:       rh.BasicRecordHandler('workbook'),
+        r.END_BOOK:         rh.BasicRecordHandler('/workbook'),
+        r.WB_PROP:          rh.WorkbookPropertiesHandler(),
+        r.BEGIN_BUNDLE_SHS: rh.BasicRecordHandler('sheets'),
+        r.END_BUNDLE_SHS:   rh.BasicRecordHandler('/sheets'),
+        r.BUNDLE_SH:        rh.SheetHandler(),
 
-    # Workbook part handlers
-    handlers[r.WORKBOOK]     = rh.BasicRecordHandler('workbook')
-    handlers[r.WORKBOOK_END] = rh.BasicRecordHandler('/workbook')
-    handlers[r.WORKBOOKPR]   = rh.WorkbookPropertiesHandler()
-    handlers[r.SHEETS]       = rh.BasicRecordHandler('sheets')
-    handlers[r.SHEETS_END]   = rh.BasicRecordHandler('/sheets')
-    handlers[r.SHEET]        = rh.SheetHandler()
+        # Worksheet part handlers
+        r.BEGIN_SHEET:      rh.BasicRecordHandler('worksheet'),
+        r.END_SHEET:        rh.BasicRecordHandler('/worksheet'),
+        r.WS_DIM:           rh.DimensionHandler(),
+        r.BEGIN_COL_INFOS:  rh.BasicRecordHandler('cols'),
+        r.END_COL_INFOS:    rh.BasicRecordHandler('/cols'),
+        r.COL_INFO:         rh.ColumnHandler(),
+        r.BEGIN_SHEET_DATA: rh.BasicRecordHandler('sheetData'),
+        r.END_SHEET_DATA:   rh.BasicRecordHandler('/sheetData'),
+        r.ROW_HDR:          rh.RowHandler(),
+        r.CELL_BLANK:       rh.CellHandler(),
+        r.CELL_RK:          rh.CellHandler(),
+        r.CELL_ERROR:       rh.CellHandler(),
+        r.CELL_BOOL:        rh.CellHandler(),
+        r.CELL_REAL:        rh.CellHandler(),
+        r.CELL_ST:          rh.CellHandler(),
+        r.CELL_ISST:        rh.CellHandler(),
+        r.FMLA_STRING:      rh.FormulaCellHandler(),
+        r.FMLA_NUM:         rh.FormulaCellHandler(),
+        r.FMLA_BOOL:        rh.FormulaCellHandler(),
+        r.FMLA_ERROR:       rh.FormulaCellHandler(),
+        r.H_LINK:           rh.HyperlinkHandler(),
 
-    # Worksheet part handlers
-    handlers[r.WORKSHEET]       = rh.BasicRecordHandler('worksheet')
-    handlers[r.WORKSHEET_END]   = rh.BasicRecordHandler('/worksheet')
-    handlers[r.DIMENSION]       = rh.DimensionHandler()
-    handlers[r.SHEETDATA]       = rh.BasicRecordHandler('sheetData')
-    handlers[r.SHEETDATA_END]   = rh.BasicRecordHandler('/sheetData')
-    handlers[r.COLS]            = rh.BasicRecordHandler('cols')
-    handlers[r.COLS_END]        = rh.BasicRecordHandler('/cols')
-    handlers[r.COL]             = rh.ColumnHandler()
-    handlers[r.ROW]             = rh.RowHandler()
-    handlers[r.BLANK]           = rh.CellHandler()
-    handlers[r.NUM]             = rh.CellHandler()
-    handlers[r.BOOLERR]         = rh.CellHandler()
-    handlers[r.BOOL]            = rh.CellHandler()
-    handlers[r.FLOAT]           = rh.CellHandler()
-    handlers[r.STRING]          = rh.CellHandler()
-    handlers[r.FORMULA_STRING]  = rh.FormulaCellHandler()
-    handlers[r.FORMULA_FLOAT]   = rh.FormulaCellHandler()
-    handlers[r.FORMULA_BOOL]    = rh.FormulaCellHandler()
-    handlers[r.FORMULA_BOOLERR] = rh.FormulaCellHandler()
-    handlers[r.HYPERLINK]       = rh.HyperlinkHandler()
+        # SharedStrings part handlers
+        r.BEGIN_SST: rh.StringTableHandler(),
+        r.END_SST:   rh.BasicRecordHandler('/sst'),
+        r.SST_ITEM:  rh.StringInstanceHandler(),
 
-    # SharedStrings part handlers
-    handlers[r.SST]     = rh.StringTableHandler()
-    handlers[r.SST_END] = rh.BasicRecordHandler('/sst')
-    handlers[r.SI]      = rh.StringInstanceHandler()
-
-    # Styles part handlers
-    handlers[r.STYLESHEET]       = rh.BasicRecordHandler('styleSheet')
-    handlers[r.STYLESHEET_END]   = rh.BasicRecordHandler('/styleSheet')
-    handlers[r.COLORS]           = rh.ColorsHandler()
-    handlers[r.COLORS_END]       = rh.BasicRecordHandler('/colors')
-    handlers[r.DXFS]             = rh.DxfsHandler()
-    handlers[r.DXFS_END]         = rh.BasicRecordHandler('/dxfs')
-    handlers[r.TABLESTYLES]      = rh.TableStylesHandler()
-    handlers[r.TABLESTYLES_END]  = rh.BasicRecordHandler('/tableStyles')
-    handlers[r.FILLS]            = rh.FillsHandler()
-    handlers[r.FILLS_END]        = rh.BasicRecordHandler('/fills')
-    handlers[r.FONTS]            = rh.FontsHandler()
-    handlers[r.FONTS_END]        = rh.BasicRecordHandler('/fonts')
-    handlers[r.BORDERS]          = rh.BordersHandler()
-    handlers[r.BORDERS_END]      = rh.BasicRecordHandler('/borders')
-    handlers[r.CELLXFS]          = rh.CellXfsHandler()
-    handlers[r.CELLXFS_END]      = rh.BasicRecordHandler('/cellXfs')
-    handlers[r.CELLSTYLES]       = rh.CellStylesHandler()
-    handlers[r.CELLSTYLES_END]   = rh.BasicRecordHandler('/cellStyles')
-    handlers[r.CELLSTYLEXFS]     = rh.CellStyleXfsHandler()
-    handlers[r.CELLSTYLEXFS_END] = rh.BasicRecordHandler('/cellStyleXfs')
-    handlers[r.FONT]             = rh.FontHandler()
-    handlers[r.XF]               = rh.XfHandler()
-    handlers[r.CELLSTYLE]        = rh.CellStyleHandler()
+        # Styles part handlers
+        r.BEGIN_STYLE_SHEET:    rh.BasicRecordHandler('styleSheet'),
+        r.END_STYLE_SHEET:      rh.BasicRecordHandler('/styleSheet'),
+        r.BEGIN_COLOR_PALETTE:  rh.ColorsHandler(),
+        r.END_COLOR_PALETTE:    rh.BasicRecordHandler('/colors'),
+        r.BEGIN_DXFS:           rh.DxfsHandler(),
+        r.END_DXFS:             rh.BasicRecordHandler('/dxfs'),
+        r.BEGIN_TABLE_STYLES:   rh.TableStylesHandler(),
+        r.END_TABLE_STYLES:     rh.BasicRecordHandler('/tableStyles'),
+        r.BEGIN_FILLS:          rh.FillsHandler(),
+        r.END_FILLS:            rh.BasicRecordHandler('/fills'),
+        r.FILL:                 rh.BasicRecordHandler('fill'),
+        r.BEGIN_FONTS:          rh.FontsHandler(),
+        r.END_FONTS:            rh.BasicRecordHandler('/fonts'),
+        r.FONT:                 rh.FontHandler(),
+        r.BEGIN_BORDERS:        rh.BordersHandler(),
+        r.END_BORDERS:          rh.BasicRecordHandler('/borders'),
+        r.BORDER:               rh.BasicRecordHandler('border'),
+        r.BEGIN_CELL_XFS:       rh.CellXfsHandler(),
+        r.END_CELL_XFS:         rh.BasicRecordHandler('/cellXfs'),
+        r.XF:                   rh.XfHandler(),
+        r.BEGIN_STYLES:         rh.CellStylesHandler(),
+        r.END_STYLES:           rh.BasicRecordHandler('/cellStyles'),
+        r.STYLE:                rh.CellStyleHandler(),
+        r.BEGIN_CELL_STYLE_XFS: rh.CellStyleXfsHandler(),
+        r.END_CELL_STYLE_XFS:   rh.BasicRecordHandler('/cellStyleXfs')
+    }
 
     def __iter__(self):
         return self
@@ -83,38 +83,42 @@ class RecordReader(DataReader):
     def __next__(self):
         return self.next()
 
-    def read_id(self):
+    def _read_type(self):
+        value = self.read_byte()
+        if value is None:
+            return None
+        if value & 0x80 == 0x80:
+            hi = self.read_byte()
+            if hi is None:
+                return None
+            value = (value & 0x7F) | ((hi & 0x7F) << 7)
+        return value
+
+    def _read_len(self):
         value = 0
         for i in xrange(4):
-            byte = self.read(1)
-            if not byte:
+            byte = self.read_byte()
+            if byte is None:
                 return None
-            byte = _uint8_t.unpack(byte)[0]
-            value += byte << 8 * i
+            value |= (byte & 0x7F) << (7 * i)
             if byte & 0x80 == 0:
                 break
         return value
 
-    def read_len(self):
-        return self.read_varint()
-
     def next(self):
         while True:
-            recid = self.read_id()
-            if recid is None:
+            rectype = self._read_type()
+            if rectype is None:
                 raise StopIteration
 
-            reclen = self.read_len()
+            reclen = self._read_len()
             if reclen is None:
                 raise StopIteration
 
-            if recid < len(self.handlers):
-                handler = self.handlers[recid]
-            else:
-                handler = self.default_handler
+            handler = self._handlers.get(rectype, self._default_handler)
 
             boundary = self.tell() + reclen
-            res = handler.read(self, recid, reclen)
+            res = handler.read(self, rectype, reclen)
 
             pos = self.tell()
             if pos > boundary:
@@ -123,4 +127,4 @@ class RecordReader(DataReader):
                 self.seek(boundary - pos, os.SEEK_CUR)
 
             if res is not None:
-                return (recid, res)
+                return (rectype, res)

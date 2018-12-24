@@ -20,10 +20,10 @@ class StringTable(object):
     def _parse(self):
         strings = list()
         self._reader.seek(0, os.SEEK_SET)
-        for recid, rec in self._reader:
-            if recid == records.SI:
+        for rectype, rec in self._reader:
+            if rectype == records.SST_ITEM:
                 strings.append(rec.t)
-            elif recid == records.SST_END:
+            elif rectype == records.END_SST:
                 break
         self._strings = strings
 

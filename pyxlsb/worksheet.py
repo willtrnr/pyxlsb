@@ -37,16 +37,16 @@ class Worksheet(object):
         self._data_offset = 0
 
         self._reader.seek(0, os.SEEK_SET)
-        for recid, rec in self._reader:
-            if recid == records.DIMENSION:
+        for rectype, rec in self._reader:
+            if rectype == records.WS_DIM:
                 self.dimension = rec
-            elif recid == records.COL:
+            elif rectype == records.COL_INFO:
                 self.cols.append(rec)
-            elif recid == records.SHEETDATA:
+            elif rectype == records.BEGIN_SHEET_DATA:
                 self._data_offset = self._reader.tell()
                 if self._rels_fp is None:
                     break
-            elif recid == records.HYPERLINK and self._rels_fp is not None:
+            elif rectype == records.H_LINK and self._rels_fp is not None:
                 for r in xrange(rec.h):
                     for c in xrange(rec.w):
                         self.hyperlinks[rec.r + r, rec.c + c] = rec.rId
@@ -61,8 +61,8 @@ class Worksheet(object):
         row = None
         row_num = -1
         self._reader.seek(self._data_offset, os.SEEK_SET)
-        for recid, rec in self._reader:
-            if recid == records.ROW and rec.r != row_num:
+        for rectype, rec in self._reader:
+            if rectype == records.ROW_HDR and rec.r != row_num:
                 if row is not None:
                     yield row
                 while not sparse and row_num < rec.r - 1:
@@ -70,11 +70,11 @@ class Worksheet(object):
                     yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
                 row_num = rec.r
                 row = [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
-            elif recid == records.STRING:
+            elif rectype == records.CELL_ISST:
                 row[rec.c] = Cell(row_num, rec.c, self.workbook.get_shared_string(rec.v), rec.f)
-            elif recid >= records.BLANK and recid <= records.FORMULA_BOOLERR:
+            elif rectype >= records.CELL_BLANK and rectype <= records.FMLA_ERROR:
                 row[rec.c] = Cell(row_num, rec.c, rec.v, rec.f)
-            elif recid == records.SHEETDATA_END:
+            elif rectype == records.END_SHEET_DATA:
                 if row is not None:
                     yield row
                 break
