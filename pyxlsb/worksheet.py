@@ -1,15 +1,24 @@
 import os
 import sys
 import xml.etree.ElementTree as ElementTree
-from . import records
+from . import recordtypes as rt
 from .recordreader import RecordReader
-from collections import namedtuple
 
 if sys.version_info > (3,):
     xrange = range
 
-# TODO: Make a real class of this?
-Cell = namedtuple('Cell', ['r', 'c', 'v', 'f'])
+
+class Cell(object):
+    __slots__ = ['r', 'c', 'v', 'f']
+
+    def __init__(self, r, c, v, f):
+        self.r = r
+        self.c = c
+        self.v = v
+        self.f = f
+
+    def __repr__(self):
+        return 'Cell(r={}, c={}, v={}, f={})'.format(self.r, self.c, self.c, self.f)
 
 
 class Worksheet(object):
@@ -38,15 +47,15 @@ class Worksheet(object):
 
         self._reader.seek(0, os.SEEK_SET)
         for rectype, rec in self._reader:
-            if rectype == records.WS_DIM:
+            if rectype == rt.WS_DIM:
                 self.dimension = rec
-            elif rectype == records.COL_INFO:
+            elif rectype == rt.COL_INFO:
                 self.cols.append(rec)
-            elif rectype == records.BEGIN_SHEET_DATA:
+            elif rectype == rt.BEGIN_SHEET_DATA:
                 self._data_offset = self._reader.tell()
                 if self._rels_fp is None:
                     break
-            elif rectype == records.H_LINK and self._rels_fp is not None:
+            elif rectype == rt.H_LINK and self._rels_fp is not None:
                 for r in xrange(rec.h):
                     for c in xrange(rec.w):
                         self.hyperlinks[rec.r + r, rec.c + c] = rec.rId
@@ -62,7 +71,7 @@ class Worksheet(object):
         row_num = -1
         self._reader.seek(self._data_offset, os.SEEK_SET)
         for rectype, rec in self._reader:
-            if rectype == records.ROW_HDR and rec.r != row_num:
+            if rectype == rt.ROW_HDR and rec.r != row_num:
                 if row is not None:
                     yield row
                 while not sparse and row_num < rec.r - 1:
@@ -70,11 +79,11 @@ class Worksheet(object):
                     yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
                 row_num = rec.r
                 row = [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
-            elif rectype == records.CELL_ISST:
+            elif rectype == rt.CELL_ISST:
                 row[rec.c] = Cell(row_num, rec.c, self.workbook.get_shared_string(rec.v), rec.f)
-            elif rectype >= records.CELL_BLANK and rectype <= records.FMLA_ERROR:
+            elif rectype >= rt.CELL_BLANK and rectype <= rt.FMLA_ERROR:
                 row[rec.c] = Cell(row_num, rec.c, rec.v, rec.f)
-            elif rectype == records.END_SHEET_DATA:
+            elif rectype == rt.END_SHEET_DATA:
                 if row is not None:
                     yield row
                 break

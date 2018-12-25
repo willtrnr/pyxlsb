@@ -1,5 +1,5 @@
 import os
-from . import records
+from . import recordtypes as rt
 from .recordreader import RecordReader
 
 
@@ -21,9 +21,9 @@ class StringTable(object):
         strings = list()
         self._reader.seek(0, os.SEEK_SET)
         for rectype, rec in self._reader:
-            if rectype == records.SST_ITEM:
+            if rectype == rt.SST_ITEM:
                 strings.append(rec.t)
-            elif rectype == records.END_SST:
+            elif rectype == rt.END_SST:
                 break
         self._strings = strings
 

@@ -1,5 +1,5 @@
 import sys
-from . import records
+from . import recordtypes as rt
 from .recordreader import RecordReader
 from .stringtable import StringTable
 from .styles import Styles
@@ -28,11 +28,11 @@ class Workbook(object):
 
         with RecordReader(self._pkg.get_workbook_part()) as reader:
             for rectype, rec in reader:
-                if rectype == records.WB_PROP:
+                if rectype == rt.WB_PROP:
                     self.props = rec
-                elif rectype == records.BUNDLE_SH:
+                elif rectype == rt.BUNDLE_SH:
                     self.sheets.append(rec.name)
-                elif rectype == records.END_BUNDLE_SHS:
+                elif rectype == rt.END_BUNDLE_SHS:
                     break
 
         ssfp = self._pkg.get_sharedstrings_part()

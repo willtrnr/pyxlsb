@@ -1,5 +1,5 @@
-import pyxlsb.records as records
-from pyxlsb.recordreader import RecordReader
+from . import recordtypes as rt
+from .recordreader import RecordReader
 
 
 class Styles(object):
@@ -24,9 +24,9 @@ class Styles(object):
         self._cell_styles = list()
         self._cell_style_xfs = list()
 
-        for rectype, reclen in self._reader:
+        for rectype, rec in self._reader:
             # TODO
-            if rectype == records.END_STYLE_SHEET:
+            if rectype == rt.END_STYLE_SHEET:
                 break
 
     def get_style(self, idx):

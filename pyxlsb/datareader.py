@@ -18,7 +18,12 @@ _double_t = struct.Struct('<d')
 
 class DataReader(object):
     def __init__(self, fp, enc='utf-16'):
-        self._fp = fp if hasattr(fp, 'read') else BytesIO(fp)
+        if isinstance(fp, DataReader):
+            self._fp = fp._fp
+        elif hasattr(fp, 'read') and hasattr(fp, 'seek'):
+            self._fp = fp
+        else:
+            self._fp = BytesIO(fp)
         self._enc = enc
 
     def __enter__(self):
