@@ -6,9 +6,7 @@ from io import BytesIO
 if sys.version_info > (3,):
     xrange = range
 
-_int8_t = struct.Struct('<b')
 _uint8_t = struct.Struct('<B')
-_int16_t = struct.Struct('<h')
 _uint16_t = struct.Struct('<H')
 _int32_t = struct.Struct('<i')
 _uint32_t = struct.Struct('<I')
@@ -45,48 +43,48 @@ class DataReader(object):
         return self._fp.read(size)
 
     def read_bool(self):
-        value = self.read(1)
-        if not value:
+        buf = self.read(1)
+        if not buf:
             return None
-        return value == b'\x01'
+        return buf == b'\x01'
 
-    def read_byte(self, signed=False):
-        byte = self.read(1)
-        if not byte:
+    def read_byte(self):
+        buf = self.read(1)
+        if not buf:
             return None
-        return (_int8_t if signed else _uint8_t).unpack(byte)[0]
+        return _uint8_t.unpack(buf)[0]
 
-    def read_short(self, signed=False):
-        buff = self.read(2)
-        if len(buff) < 2:
+    def read_short(self):
+        buf = self.read(2)
+        if len(buf) < 2:
             return None
-        return (_int16_t if signed else _uint16_t).unpack(buff)[0]
+        return _uint16_t.unpack(buf)[0]
 
-    def read_int(self, signed=False):
-        buff = self.read(4)
-        if len(buff) < 4:
+    def read_int(self):
+        buf = self.read(4)
+        if len(buf) < 4:
             return None
-        return (_int32_t if signed else _uint32_t).unpack(buff)[0]
+        return _uint32_t.unpack(buf)[0]
 
     def read_float(self):
-        buff = self.read(4)
-        if len(buff) < 4:
+        buf = self.read(4)
+        if len(buf) < 4:
             return None
-        return _float_t.unpack(buff)[0]
+        return _float_t.unpack(buf)[0]
 
     def read_double(self):
-        buff = self.read(8)
-        if len(buff) < 8:
+        buf = self.read(8)
+        if len(buf) < 8:
             return None
-        return _double_t.unpack(buff)[0]
+        return _double_t.unpack(buf)[0]
 
     def read_rk(self):
-        buff = self.read(4)
-        if len(buff) < 4:
+        buf = self.read(4)
+        if len(buf) < 4:
             return None
 
         value = 0.0
-        intval = _int32_t.unpack(buff)[0]
+        intval = _int32_t.unpack(buf)[0]
         if intval & 0x02 == 0x02:
             value = float(intval >> 2)
         else:
@@ -103,11 +101,11 @@ class DataReader(object):
             if size is None:
                 return None
 
-        buff = self.read(size * 2)
-        if len(buff) != size * 2:
+        buf = self.read(size * 2)
+        if len(buf) != size * 2:
             return None
 
-        return buff.decode(enc or self._enc)
+        return buf.decode(enc or self._enc)
 
     def close(self):
         self._fp.close()
