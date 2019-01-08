@@ -37,8 +37,7 @@ class DataReaderTestCase(unittest.TestCase):
         reader = DataReader(b'\x00\x01\x02')
         self.assertEqual(reader.read_bool(), False)
         self.assertEqual(reader.read_bool(), True)
-        # Not sure about this case
-        self.assertEqual(reader.read_bool(), False)
+        self.assertEqual(reader.read_bool(), True)
         self.assertEqual(reader.read_bool(), None)
 
     # TODO: Add negative cases

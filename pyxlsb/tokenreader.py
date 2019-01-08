@@ -1,11 +1,15 @@
 from . import ptgs
-from .datareader import DataReader
+
+try:
+    from .cdatareader import DataReader
+except ImportError:
+    from .datareader import DataReader
 
 
-class TokenReader(DataReader):
-    default_ptg = ptgs.UnknownPtg
+class TokenReader(object):
+    _default_ptg = ptgs.UnknownPtg
 
-    ptgs = {
+    _ptgs = {
         # Unary operators
         ptgs.UPlusPtg.ptg:   ptgs.UPlusPtg,
         ptgs.UMinusPtg.ptg:  ptgs.UMinusPtg,
@@ -66,6 +70,9 @@ class TokenReader(DataReader):
         ptgs.FuncVarPtg.ptg: ptgs.FuncVarPtg
     }
 
+    def __init__(self, buf):
+        self._reader = DataReader(buf)
+
     def __iter__(self):
         return self
 
@@ -73,8 +80,9 @@ class TokenReader(DataReader):
         return self.next()
 
     def next(self):
-        ptg = self.read_byte()
+        ptg = self._reader.read_byte()
         if ptg is None:
             raise StopIteration
         base = ((ptg | 0x20) if ptg & 0x40 == 0x40 else ptg) & 0x3F
-        return (self.ptgs.get(base) or self.default_ptg).parse(self, ptg)
+        res = self._ptgs.get(base, self._default_ptg).read(self._reader, ptg)
+        return res

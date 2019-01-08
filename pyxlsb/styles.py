@@ -1,10 +1,11 @@
+import os
 from . import recordtypes as rt
 from .recordreader import RecordReader
 
 
 class Styles(object):
     def __init__(self, fp):
-        self._reader = RecordReader(fp)
+        self._fp = fp
         self._parse()
 
     def __enter__(self):
@@ -24,7 +25,8 @@ class Styles(object):
         self._cell_styles = list()
         self._cell_style_xfs = list()
 
-        for rectype, rec in self._reader:
+        self._fp.seek(0, os.SEEK_SET)
+        for rectype, rec in RecordReader(self._fp):
             # TODO
             if rectype == rt.END_STYLE_SHEET:
                 break
@@ -33,4 +35,4 @@ class Styles(object):
         return None
 
     def close(self):
-        self._reader.close()
+        self._fp.close()

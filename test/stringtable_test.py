@@ -1,8 +1,9 @@
 import os.path
-import unittest
+from unittest import TestCase
 from pyxlsb.stringtable import StringTable
 
-class StringTableTestCase(unittest.TestCase):
+
+class StringTableTestCase(TestCase):
     def setUp(self):
         self.stringtable = StringTable(open(os.path.join('test_files', 'parts', 'sharedStrings.bin'), 'rb'))
 

@@ -1,7 +1,9 @@
+*.c
 *.egg-info/
 *.pyc
 *.pyd
 *.pyo
+*.so
 *.sublime-*
 *.swp
 __pycache__/

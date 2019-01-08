@@ -2,6 +2,7 @@ import os
 import sys
 import xml.etree.ElementTree as ElementTree
 from . import recordtypes as rt
+from .formula import Formula
 from .recordreader import RecordReader
 
 if sys.version_info > (3,):
@@ -9,23 +10,35 @@ if sys.version_info > (3,):
 
 
 class Cell(object):
-    __slots__ = ['r', 'c', 'v', 'f']
+    __slots__ = ('r', 'c', 'value', '_formula')
 
-    def __init__(self, r, c, v, f):
+    def __init__(self, r, c, v, f=None):
         self.r = r
         self.c = c
-        self.v = v
-        self.f = f
+        self.value = v
+        self._formula = f
 
     def __repr__(self):
-        return 'Cell(r={}, c={}, v={}, f={})'.format(self.r, self.c, self.c, self.f)
+        return 'Cell(r={}, c={}, v={}, f={})'.format(self.r, self.c, self.value, self._formula)
+
+    @property
+    def v(self):
+        return self.value
+
+    @property
+    def formula(self):
+        if self._formula is None:
+            return None
+        elif not isinstance(self._formula, Formula):
+            self._formula = Formula.parse(self._formula)
+        return self._formula
 
 
 class Worksheet(object):
     def __init__(self, workbook, name, fp, rels_fp=None):
         self.workbook = workbook
         self.name = name
-        self._reader = RecordReader(fp)
+        self._fp = fp
         self._rels_fp = rels_fp
         self._parse()
 
@@ -45,14 +58,14 @@ class Worksheet(object):
         self.hyperlinks = dict()
         self._data_offset = 0
 
-        self._reader.seek(0, os.SEEK_SET)
-        for rectype, rec in self._reader:
+        self._fp.seek(0, os.SEEK_SET)
+        for rectype, rec in RecordReader(self._fp):
             if rectype == rt.WS_DIM:
                 self.dimension = rec
             elif rectype == rt.COL_INFO:
                 self.cols.append(rec)
             elif rectype == rt.BEGIN_SHEET_DATA:
-                self._data_offset = self._reader.tell()
+                self._data_offset = self._fp.tell()
                 if self._rels_fp is None:
                     break
             elif rectype == rt.H_LINK and self._rels_fp is not None:
@@ -62,15 +75,15 @@ class Worksheet(object):
 
         if self._rels_fp is not None:
             self._rels_fp.seek(0, os.SEEK_SET)
-            doc = ElementTree.parse(self._rels_fp).getroot()
-            for el in doc:
+            doc = ElementTree.parse(self._rels_fp)
+            for el in doc.getroot():
                 self.rels[el.attrib['Id']] = el.attrib['Target']
 
     def rows(self, sparse=True):
         row = None
         row_num = -1
-        self._reader.seek(self._data_offset, os.SEEK_SET)
-        for rectype, rec in self._reader:
+        self._fp.seek(self._data_offset, os.SEEK_SET)
+        for rectype, rec in RecordReader(self._fp):
             if rectype == rt.ROW_HDR and rec.r != row_num:
                 if row is not None:
                     yield row
@@ -89,6 +102,6 @@ class Worksheet(object):
                 break
 
     def close(self):
-        self._reader.close()
+        self._fp.close()
         if self._rels_fp is not None:
             self._rels_fp.close()

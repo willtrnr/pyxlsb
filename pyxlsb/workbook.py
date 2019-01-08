@@ -26,8 +26,8 @@ class Workbook(object):
         self.sheets = list()
         self.stringtable = None
 
-        with RecordReader(self._pkg.get_workbook_part()) as reader:
-            for rectype, rec in reader:
+        with self._pkg.get_workbook_part() as f:
+            for rectype, rec in RecordReader(f):
                 if rectype == rt.WB_PROP:
                     self.props = rec
                 elif rectype == rt.BUNDLE_SH:

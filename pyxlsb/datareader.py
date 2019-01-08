@@ -1,10 +1,7 @@
 import os
 import struct
-import sys
 from io import BytesIO
 
-if sys.version_info > (3,):
-    xrange = range
 
 _uint8_t = struct.Struct('<B')
 _uint16_t = struct.Struct('<H')
@@ -15,38 +12,21 @@ _double_t = struct.Struct('<d')
 
 
 class DataReader(object):
-    def __init__(self, fp, enc='utf-16'):
-        if isinstance(fp, DataReader):
-            self._fp = fp._fp
-        elif hasattr(fp, 'read') and hasattr(fp, 'seek'):
-            self._fp = fp
-        else:
-            self._fp = BytesIO(fp)
-        self._enc = enc
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.close()
-
-    def tell(self):
-        return self._fp.tell()
-
-    def seek(self, offset, whence=os.SEEK_SET):
-        self._fp.seek(offset, whence)
+    def __init__(self, buf, enc=None):
+        self._buf = BytesIO(buf)
+        self._enc = enc if enc is not None else 'utf-16'
 
     def skip(self, size):
-        self._fp.seek(size, os.SEEK_CUR)
+        self._buf.seek(size, os.SEEK_CUR)
 
     def read(self, size):
-        return self._fp.read(size)
+        return self._buf.read(size)
 
     def read_bool(self):
         buf = self.read(1)
         if not buf:
             return None
-        return buf == b'\x01'
+        return buf != b'\x00'
 
     def read_byte(self):
         buf = self.read(1)
@@ -101,11 +81,9 @@ class DataReader(object):
             if size is None:
                 return None
 
-        buf = self.read(size * 2)
-        if len(buf) != size * 2:
+        size *= 2
+        buf = self.read(size)
+        if len(buf) != size:
             return None
 
         return buf.decode(enc or self._enc)
-
-    def close(self):
-        self._fp.close()

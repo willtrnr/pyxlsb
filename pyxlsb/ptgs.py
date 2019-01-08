@@ -6,7 +6,7 @@ if sys.version_info > (3,):
 
 class BasePtg(object):
     def __repr__(self):
-        args = list('{}={}'.format(str(k), repr(v)) for k, v in self.__dict__.items())
+        args = ('{}={}'.format(str(k), repr(v)) for k, v in self.__dict__.items())
         return '{}({})'.format(self.__class__.__name__, ', '.join(args))
 
     def is_classified(self):
@@ -16,8 +16,12 @@ class BasePtg(object):
         return '#PTG{}!'.format(self.ptg)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         return cls()
+
+    def write(self, writer):
+        # TODO Eventually, some day
+        pass
 
 
 class ClassifiedPtg(BasePtg):
@@ -42,12 +46,12 @@ class ClassifiedPtg(BasePtg):
         return self.ptg & 0x60 == 0x60
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         return cls(ptg)
 
 
 class UnknownPtg(BasePtg):
-    ptg = 0x00
+    ptg = 0xFF
 
     def __init__(self, ptg, *args, **kwargs):
         super(UnknownPtg, self).__init__(*args, **kwargs)
@@ -57,7 +61,7 @@ class UnknownPtg(BasePtg):
         return '#UNK{}!'.format(self.ptg)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         return cls(ptg)
 
 
@@ -244,7 +248,7 @@ class StringPtg(BasePtg):
         return '"' + self.value.replace('"', '""') + '"'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         size = reader.read_short()
         value = reader.read_string(size=size)
         return cls(value)
@@ -276,7 +280,7 @@ class ErrorPtg(BasePtg):
             return '#ERR!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         value = reader.read_byte()
         return cls(value)
 
@@ -292,7 +296,7 @@ class BooleanPtg(BasePtg):
         return 'TRUE' if self.value else 'FALSE'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         value = reader.read_bool()
         return cls(value)
 
@@ -308,7 +312,7 @@ class IntegerPtg(BasePtg):
         return str(self.value)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         value = reader.read_short()
         return cls(value)
 
@@ -324,7 +328,7 @@ class NumberPtg(BasePtg):
         return str(self.value)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         value = reader.read_double()
         return cls(value)
 
@@ -339,7 +343,7 @@ class ArrayPtg(ClassifiedPtg):
         self.values = values
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         cols = reader.read_byte()
         if cols == 0:
             cols = 256
@@ -365,10 +369,10 @@ class NamePtg(ClassifiedPtg):
         self.idx = idx
         self._reserved = reserved
 
-    # FIXME: We need to parse names to stringify this
+    # FIXME: We need to read names to stringify this
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         idx = reader.read_short()
         res = reader.read(2)  # Reserved
         return cls(idx, res, ptg)
@@ -390,7 +394,7 @@ class RefPtg(ClassifiedPtg):
         return r + c
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         row = reader.read_int()
         col = reader.read_short()
         row_rel = col & 0x8000 == 0x8000
@@ -420,7 +424,7 @@ class AreaPtg(ClassifiedPtg):
         return r1 + c1 + ':' + r2 + c2
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         r1 = reader.read_int()
         r2 = reader.read_int()
         c1 = reader.read_short()
@@ -441,7 +445,7 @@ class MemAreaPtg(ClassifiedPtg):
         self.rects = rects
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         rects = list()
@@ -468,7 +472,7 @@ class MemErrPtg(ClassifiedPtg):
         return '#ERR!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
@@ -486,7 +490,7 @@ class RefErrPtg(ClassifiedPtg):
         return '#REF!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(6)  # Reserved
         return cls(res, ptg)
 
@@ -502,7 +506,7 @@ class AreaErrPtg(ClassifiedPtg):
         return '#REF!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(12)  # Reserved
         return cls(res, ptg)
 
@@ -523,7 +527,7 @@ class RefNPtg(ClassifiedPtg):
         return r + c
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         row = reader.read_int()
         col = reader.read_short()
         row_rel = col & 0x8000 == 0x8000
@@ -553,7 +557,7 @@ class AreaNPtg(ClassifiedPtg):
         return r1 + c1 + ':' + r2 + c2
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         r1 = reader.read_int()
         r2 = reader.read_int()
         c1 = reader.read_short()
@@ -574,10 +578,10 @@ class NameXPtg(ClassifiedPtg):
         self.name_idx = name_idx
         self._reserved = reserved
 
-    # FIXME: We need to parse names to stringify this
+    # FIXME: We need to read names to stringify this
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         sheet_idx = reader.read_short()
         name_idx = reader.read_short()
         res = reader.read(2)  # Reserved
@@ -601,7 +605,7 @@ class Ref3dPtg(ClassifiedPtg):
         return workbook.sheets[self.sheet_idx] + '!' + r + c
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         sheet_idx = reader.read_short()
         row = reader.read_int()
         col = reader.read_short()
@@ -633,7 +637,7 @@ class Area3dPtg(ClassifiedPtg):
         return workbook.sheets[self.sheet_idx] + '!' + r1 + c1 + ':' + r2 + c2
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         sheet_idx = reader.read_short()
         r1 = reader.read_int()
         r2 = reader.read_int()
@@ -657,7 +661,7 @@ class RefErr3dPtg(ClassifiedPtg):
         return '#REF!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(8)  # Reserved
         return cls(res, ptg)
 
@@ -672,7 +676,7 @@ class AreaErr3dPtg(ClassifiedPtg):
         return '#REF!'
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(14)  # Reserved
         return cls(res, ptg)
 
@@ -767,7 +771,7 @@ class AttrPtg(BasePtg):
         return spaces + tokens.pop().stringify(tokens, workbook)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         flags = reader.read_byte()
         data = reader.read_short()
         return cls(flags, data)
@@ -782,7 +786,7 @@ class MemNoMemPtg(ClassifiedPtg):
         self._subex = subex
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
@@ -797,7 +801,7 @@ class MemFuncPtg(ClassifiedPtg):
         self._subex = subex
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
         return cls(subex, ptg)
@@ -811,7 +815,7 @@ class MemAreaNPtg(ClassifiedPtg):
         self._subex = subex
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         subex_len = reader.read_short()
         subex = reader.skip(subex_len)
         return cls(subex, ptg)
@@ -825,7 +829,7 @@ class MemNoMemNPtg(ClassifiedPtg):
         self._subex = subex
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         subex_len = reader.read_short()
         subex = reader.read(subex_len)
         return cls(subex, ptg)
@@ -843,7 +847,7 @@ class FuncPtg(ClassifiedPtg):
     # FIXME: We need a workbook to stringify this (most likely)
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         idx = reader.read_short()
         return cls(idx, ptg)
 
@@ -866,7 +870,7 @@ class FuncVarPtg(ClassifiedPtg):
         return 'VAR_FUNC_{}({})'.format(self.idx, ', '.join(args))
 
     @classmethod
-    def parse(cls, reader, ptg):
+    def read(cls, reader, ptg):
         argc = reader.read_byte()
         idx = reader.read_short()
         return cls(idx & 0x7FFF, argc & 0x7F, argc & 0x80 == 0x80, idx & 0x8000 == 0x8000, ptg)

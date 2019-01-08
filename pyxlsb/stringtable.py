@@ -5,7 +5,7 @@ from .recordreader import RecordReader
 
 class StringTable(object):
     def __init__(self, fp):
-        self._reader = RecordReader(fp)
+        self._fp = fp
         self._parse()
 
     def __enter__(self):
@@ -19,8 +19,8 @@ class StringTable(object):
 
     def _parse(self):
         strings = list()
-        self._reader.seek(0, os.SEEK_SET)
-        for rectype, rec in self._reader:
+        self._fp.seek(0, os.SEEK_SET)
+        for rectype, rec in RecordReader(self._fp):
             if rectype == rt.SST_ITEM:
                 strings.append(rec.t)
             elif rectype == rt.END_SST:
@@ -31,4 +31,4 @@ class StringTable(object):
         return self._strings[idx]
 
     def close(self):
-        self._reader.close()
+        self._fp.close()
