@@ -16,7 +16,7 @@ except:
 
 setup(
   name='pyxlsb',
-  version='1.0.5',
+  version='1.0.6',
 
   description='Excel 2007-2010 Binary Workbook (xlsb) parser',
   long_description=README,
