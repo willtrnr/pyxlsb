@@ -6,10 +6,13 @@ from subprocess import Popen, PIPE
 project_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Use pandoc to convert the Markdown readme to RST for prtty printing on PyPI
-proc = Popen(['pandoc', '--from', 'markdown', '--to', 'rst', '--output', '-', os.path.join(project_dir, 'README.md')], stdout=PIPE)
-README = proc.stdout.read().decode('utf-8')
-proc.stdout.close()
-proc.wait()
+try:
+  proc = Popen(['pandoc', '--from', 'markdown', '--to', 'rst', '--output', '-', os.path.join(project_dir, 'README.md')], stdout=PIPE)
+  README = proc.stdout.read().decode('utf-8')
+  proc.stdout.close()
+  proc.wait()
+except:
+  README = ''
 
 setup(
   name='pyxlsb',
