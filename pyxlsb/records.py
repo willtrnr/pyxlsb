@@ -213,8 +213,6 @@ class FormulaCellRecord(CellRecord):
 class HyperlinkRecord(BaseRecord):
     brt = rt.H_LINK
 
-    cls = namedtuple('hyperlink', ['r', 'c', 'h', 'w', 'rId'])
-
     def __init__(self, r, c, h, w, rId):
         self.r = r
         self.c = c
