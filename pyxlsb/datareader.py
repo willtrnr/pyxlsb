@@ -86,4 +86,4 @@ class DataReader(object):
         if len(buf) != size:
             return None
 
-        return buf.decode(enc or self._enc)
+        return buf.decode(enc or self._enc, errors='replace')
