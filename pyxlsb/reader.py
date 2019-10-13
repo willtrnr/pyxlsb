@@ -72,7 +72,7 @@ class RecordReader(object):
     buff = self.read(l * 2)
     if len(buff) < l * 2:
       return None
-    return buff.decode(self._enc)
+    return buff.decode(self._enc, errors='replace')
 
 
 class BIFF12Reader(object):
