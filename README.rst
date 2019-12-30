@@ -66,7 +66,8 @@ method from the corresponding Workbook instance to turn them into ``datetime``.
 
 .. code:: python
 
-   print(wb.convert_date(41235.45578))
+   from pyxlsb import convert_date
+   print(convert_date(41235.45578))
    # datetime.datetime(2012, 11, 22, 10, 56, 19)
 
 *NOTE*: Using the ``convert_date`` in the ``pyxlsb`` module still works, but is
