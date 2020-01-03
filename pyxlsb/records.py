@@ -170,7 +170,7 @@ class CellRecord(BaseRecord):
         elif rectype == rt.CELL_ISST:
             value = reader.read_int()
         else:
-            raise ValueError('not a cell record: ' + str(rectype))
+            raise ValueError('unknwon cell record type: ' + str(rectype))
 
         res = cls(col, value, None, style)
         res.brt = rectype
@@ -194,7 +194,7 @@ class FormulaCellRecord(CellRecord):
         elif rectype == rt.FMLA_ERROR:
             value = ErrorValue(reader.read_byte())
         else:
-            raise ValueError('not a formula cell record: ' + str(rectype))
+            raise ValueError('unknown formula cell record type: ' + str(rectype))
 
         formula = None
         # 0x0001 = Recalc always, 0x0002 = Calc on open, 0x0008 = Part of shared

@@ -30,18 +30,21 @@ returned.
    with open_workbook('Book1.xlsb') as wb:
        # Do stuff with wb
 
-The Workbook object exposes a ``get_sheet(idx)`` method for retrieving a
-Worksheet instance.
+The Workbook object exposes a ``get_sheet_by_index(idx)`` and
+``get_sheet_by_name(name)`` method to retrieve Worksheet instances.
 
 .. code:: python
 
    # Using the sheet index (0-based, unlike VBA)
-   with wb.get_sheet(0) as sheet:
+   with wb.get_sheet_by_index(0) as sheet:
        # Do stuff with sheet
 
    # Using the sheet name
-   with wb.get_sheet('Sheet1') as sheet:
+   with wb.get_sheet_by_name('Sheet1') as sheet:
        # Do stuff with sheet
+
+*NOTE*: The 1-based ``get_sheet(idx_or_name)`` method still works, but is
+deprecated.
 
 A ``sheets`` property containing the sheet names is available on the Workbook
 instance.
@@ -59,7 +62,7 @@ Worksheet object is also directly iterable and is equivalent to calling
 
 *NOTE*: Iterating the same Worksheet instance multiple times in parallel (nested
 ``for`` for instance) will yield unexpected results, retrieve more instances
-using ``get_sheet`` above.
+instead.
 
 Note that dates will appear as floats. You must use the ``convert_date(date)``
 method from the corresponding Workbook instance to turn them into ``datetime``.
@@ -84,10 +87,11 @@ Converting a workbook to CSV:
 
    with open_workbook('Book1.xlsb') as wb:
        for name in wb.sheets:
-           with wb.get_sheet(name) as sheet, open(name + '.csv', 'w') as f:
-               writer = csv.writer(f)
-               for row in sheet.rows():
-                   writer.writerow([c.v for c in row])
+           with wb.get_sheet_by_name(name) as sheet:
+               with open(name + '.csv', 'w') as f:
+                   writer = csv.writer(f)
+                   for row in sheet.rows():
+                       writer.writerow([c.v for c in row])
 
 Limitations
 -----------
