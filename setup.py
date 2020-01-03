@@ -1,6 +1,7 @@
 import os.path
 from setuptools import setup
 from subprocess import Popen, PIPE
+from pyxlsb import __version__
 
 # Get a handy base dir
 project_dir = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +17,7 @@ except:
 
 setup(
   name='pyxlsb',
-  version='1.0.6',
+  version=__version__,
 
   description='Excel 2007-2010 Binary Workbook (xlsb) parser',
   long_description=README,
