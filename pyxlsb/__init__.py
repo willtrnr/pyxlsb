@@ -1,6 +1,8 @@
 from .workbook import Workbook
 from .xlsbpackage import XlsbPackage
 
+__version__ = '1.1.0'
+
 
 def open_workbook(name, *args, **kwargs):
     return Workbook(XlsbPackage(name), *args, **kwargs)
