@@ -3,7 +3,7 @@ from .reader import BIFF12Reader
 from .workbook import Workbook
 from .worksheet import Worksheet
 
-__version__ = '1.0.6'
+__version__ = '1.0.7'
 
 def open_workbook(name, debug=False):
   from zipfile import ZipFile
