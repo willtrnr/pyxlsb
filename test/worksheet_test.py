@@ -26,7 +26,6 @@ class WorksheetTestCase(unittest.TestCase):
         self.assertEqual(len(rows), 5)
         for rn, r in enumerate(rows):
             # Each row should have as much cells as dim.w
-            self.assertEqual(len(r), 8)
             for cn, c in enumerate(r):
                 # Each cell should have the proper row and cell number
                 self.assertEqual(c.r, rn)

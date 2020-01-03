@@ -2,36 +2,11 @@ import os
 import sys
 import xml.etree.ElementTree as ElementTree
 from . import recordtypes as rt
-from .formula import Formula
+from .row import Row
 from .recordreader import RecordReader
 
 if sys.version_info > (3,):
     xrange = range
-
-
-class Cell(object):
-    __slots__ = ('r', 'c', 'value', '_formula')
-
-    def __init__(self, r, c, v, f=None):
-        self.r = r
-        self.c = c
-        self.value = v
-        self._formula = f
-
-    def __repr__(self):
-        return 'Cell(r={}, c={}, v={}, f={})'.format(self.r, self.c, self.value, self._formula)
-
-    @property
-    def v(self):
-        return self.value
-
-    @property
-    def formula(self):
-        if self._formula is None:
-            return None
-        elif not isinstance(self._formula, Formula):
-            self._formula = Formula.parse(self._formula)
-        return self._formula
 
 
 class Worksheet(object):
@@ -89,13 +64,13 @@ class Worksheet(object):
                     yield row
                 while not sparse and row_num < rec.r - 1:
                     row_num += 1
-                    yield [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
+                    yield Row(self, row_num)
                 row_num = rec.r
-                row = [Cell(row_num, i, None, None) for i in xrange(self.dimension.c + self.dimension.w)]
+                row = Row(self, row_num)
             elif rectype == rt.CELL_ISST:
-                row[rec.c] = Cell(row_num, rec.c, self.workbook.get_shared_string(rec.v), rec.f)
+                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), rec.f)
             elif rectype >= rt.CELL_BLANK and rectype <= rt.FMLA_ERROR:
-                row[rec.c] = Cell(row_num, rec.c, rec.v, rec.f)
+                row._add_cell(rec.c, rec.v, rec.f)
             elif rectype == rt.END_SHEET_DATA:
                 if row is not None:
                     yield row

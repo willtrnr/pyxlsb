@@ -1,4 +1,4 @@
-class CellDeprecated(object):
+class DeprecatedCellMixin(object):
     __slots__ = ()
 
     @property
@@ -17,14 +17,15 @@ class CellDeprecated(object):
     def f(self):
         return self.formula
 
-class Cell(CellDeprecated):
+class Cell(DeprecatedCellMixin):
     __slots__ = ('row', 'col', 'value', 'formula')
 
-    def __init__(self, row, col, value, formula=None):
+    def __init__(self, row, col, value=None, formula=None):
         self.row = row
         self.col = col
         self.value = value
         self.formula = formula
 
     def __repr__(self):
-        return 'Cell(r={}, c={}, v={}, f={})'.format(self.r, self.c, self.value, self._formula)
+        return 'Cell(row={}, col={}, value={}, formula={})' \
+            .format(self.row, self.col, self.value, self.formula)
