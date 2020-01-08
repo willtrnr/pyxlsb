@@ -1,6 +1,5 @@
 from enum import Enum
 from . import recordtypes as rt
-from collections import namedtuple
 
 
 class BaseRecord(object):
@@ -367,6 +366,20 @@ class CellStyleXfsRecord(BaseRecord):
     def read(cls, reader, rectype, reclen):
         count = reader.read_int()
         return cls(count)
+
+
+class FormatRecord(BaseRecord):
+    brt = rt.FMT
+
+    def __init__(self, fmtId, fmtCode):
+        self.fmtId = fmtId
+        self.fmtCode = fmtCode
+
+    @classmethod
+    def read(cls, reader, rectype, reclen):
+        fid = reader.read_short()
+        code = reader.read_string()
+        return cls(fid, code)
 
 
 class FontRecord(BaseRecord):
