@@ -371,15 +371,16 @@ class CellStyleXfsRecord(BaseRecord):
 class FormatRecord(BaseRecord):
     brt = rt.FMT
 
-    def __init__(self, fmtId, fmtCode):
+    def __init__(self, fmtId, fmtCode, dtype=None):
         self.fmtId = fmtId
         self.fmtCode = fmtCode
+        self.dtype = dtype
 
     @classmethod
     def read(cls, reader, rectype, reclen):
         fid = reader.read_short()
         code = reader.read_string()
-        return cls(fid, code)
+        return cls(fid, code, None)
 
 
 class FontRecord(BaseRecord):
