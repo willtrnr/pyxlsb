@@ -1,4 +1,4 @@
-from .conv import convert_value
+from .conv import from_excel_ordinal_to_datetime as convert_to_datetime
 
 class DeprecatedCellMixin(object):
     __slots__ = ()
@@ -17,11 +17,21 @@ class DeprecatedCellMixin(object):
 
     @property
     def value_conv(self):
-        return convert_value(self.value, self.number_format)
+        dtype = self.dtype
+        if dtype == "datetime":
+            return convert_to_datetime(self.value)
+        elif dtype == "string":
+            return str(self.value)
+        else:
+            return self.value
 
     @property
     def number_format(self):
         return self.row_cls.sheet.workbook.styles.get_number_format(self.style_num)
+
+    @property
+    def dtype(self):
+        return self.row_cls.sheet.workbook.styles.get_dtype(self.style_num)
 
     @property
     def f(self):
