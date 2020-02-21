@@ -1,9 +1,11 @@
+from .conv import convert_value
+
 class DeprecatedCellMixin(object):
     __slots__ = ()
 
     @property
     def r(self):
-        return self.row.num
+        return self.row_cls.num
 
     @property
     def c(self):
@@ -14,6 +16,14 @@ class DeprecatedCellMixin(object):
         return self.value
 
     @property
+    def value_conv(self):
+        return convert_value(self.value, self.number_format)
+
+    @property
+    def number_format(self):
+        return self.row_cls.sheet.workbook.styles.get_number_format(self.style_num)
+
+    @property
     def f(self):
         return self.formula
 
@@ -22,18 +32,16 @@ class DeprecatedCellMixin(object):
         return self.style
 
 class Cell(DeprecatedCellMixin):
-    __slots__ = ('row_cls', 'row', 'col', 'value', 'value_conv', 'formula', 'style_num', 'style_fmt')
+    __slots__ = ('row_cls', 'row', 'col', 'value', 'formula', 'style_num')
 
-    def __init__(self, row, col, value=None, value_conv=None, formula=None, style_num=None, style_fmt=None):
-        self.row_cls = row
-        self.row = row.num
+    def __init__(self, row_cls, col, value=None, formula=None, style_num=None):
+        self.row_cls = row_cls
+        self.row = row_cls.num
         self.col = col
         self.value = value
-        self.value_conv = value_conv
         self.formula = formula
         self.style_num = style_num
-        self.style_fmt = style_fmt
 
     def __repr__(self):
-        return 'Cell(row_cls={}, row={}, col={}, value={}, value_conv={}, formula={}, style_num={}, style_fmt={})' \
-            .format(self.row_cls, self.row, self.col, self.value, self.value_conv, self.formula, self.style_num, self.style_fmt)
+        return 'Cell(row_cls={}, row={}, col={}, value={}, formula={}, style_num={})' \
+            .format(self.row_cls, self.row, self.col, self.value, self.formula, self.style_num)
