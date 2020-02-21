@@ -30,6 +30,6 @@ class Row(object):
     def _add_cell(self, col, *args, **kwargs):
         c = Cell(self, col, *args, **kwargs)
         self._cells[col] = c
-        if col > self._cols:
-            self._cols = col
+        if col >= self._cols:
+            self._cols = col + 1
         return c
