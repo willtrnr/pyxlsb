@@ -47,7 +47,6 @@ class Styles(object):
         self._fp = fp
         self._parse()
 
-
     def __enter__(self):
         return self
 
