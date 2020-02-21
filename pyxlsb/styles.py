@@ -2,7 +2,6 @@ import os
 from . import recordtypes as rt
 from .recordreader import RecordReader
 from .records import FormatRecord
-from .conv import detect_dtype
 
 class Styles(object):
 
@@ -47,6 +46,7 @@ class Styles(object):
         self._fp = fp
         self._parse()
 
+
     def __enter__(self):
         return self
 
@@ -74,7 +74,6 @@ class Styles(object):
                 self._xf_record[len(self._xf_record) - 1] = rec
             elif rectype == 44:
                 self._format_record[rec.fmtId] = rec
-                self._format_record[rec.fmtId].dtype = detect_dtype(self._format_record[rec.fmtId].fmtCode)
 
             if rectype == rt.END_STYLE_SHEET:
                 break
@@ -84,14 +83,30 @@ class Styles(object):
 
     def get_number_format(self, idx):
         if idx is None:
-            return FormatRecord(fmtId=-1, fmtCode='General', dtype="")
+            return FormatRecord(fmtId=0, fmtCode='General')
         elif idx in self._xf_record:
             numFmtId = self._xf_record[idx].numFmtId
             if numFmtId in self._format_record:
                 return self._format_record[numFmtId]
             elif numFmtId in self._default_format:
-                return FormatRecord(fmtId=numFmtId, fmtCode=self._default_format[numFmtId]["format"], dtype=self._default_format[numFmtId]["dtype"])
-        return FormatRecord(fmtId=-1, fmtCode='General', dtype="")
+                return FormatRecord(fmtId=numFmtId, fmtCode=self._default_format[numFmtId]["format"])
+        return FormatRecord(fmtId=0, fmtCode='General')
+
+    def get_dtype(self, idx):
+        if idx is None:
+            return ""
+        elif idx in self._xf_record:
+            numFmtId = self._xf_record[idx].numFmtId
+            if numFmtId in self._format_record:
+                for char in ["d", "m", "y", "h", "m", "s"]:
+                    if char in self._format_record[numFmtId].fmtCode:
+                        return "datetime"
+                for char in ["0.00", "0,00", "#.##", "#,##"]:
+                    if char in self._format_record[numFmtId].fmtCode:
+                        return "float64"
+            elif numFmtId in self._default_format:
+                return self._default_format[numFmtId]["dtype"]
+        return ""
 
     def close(self):
         self._fp.close()
