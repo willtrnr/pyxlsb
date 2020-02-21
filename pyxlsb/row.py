@@ -31,5 +31,5 @@ class Row(object):
         c = Cell(self, col, *args, **kwargs)
         self._cells[col] = c
         if col >= self._cols:
-            self._cols = col
+            self._cols = col + 1
         return c
