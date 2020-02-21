@@ -46,9 +46,9 @@ class Workbook(object):
             self.styles = Styles(stylesfp)
 
     def get_sheet(self, idx_or_name, rels=False):
-        if isinstance(idx_or_name, basestring):
+        if isinstance(idx, basestring):
             return self.get_sheet_by_name(idx_or_name, rels=rels)
-        elif isinstance(idx_or_name, int):
+        elif isinstance(value, int):
             return self.get_sheet_by_index(idx_or_name - 1, rels)
         else:
             raise ValueError('string or int expected')
