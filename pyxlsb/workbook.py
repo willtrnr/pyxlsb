@@ -93,7 +93,7 @@ class Workbook(object):
     def convert_time(self, value):
         if not isinstance(value, int) and not isinstance(value, float):
             return None
-        return (datetime.min + timedelta(microseconds=int((value % 1) * MICROSECONDS_IN_DAY)).time()
+        return (datetime.min + timedelta(microseconds=int((value % 1) * MICROSECONDS_IN_DAY))).time()
 
     def close(self):
         self._pkg.close()
