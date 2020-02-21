@@ -1,14 +1,12 @@
 import os
 from . import recordtypes as rt
 from .recordreader import RecordReader
-from .records import XfRecord, FormatRecord
+from .records import FormatRecord
 from .conv import detect_dtype
 
 class Styles(object):
-    def __init__(self, fp):
-        self._fp = fp
-        self._parse()
-        self._default_styles = {0: {'format': 'General', 'dtype': ''},
+
+    _default_format = {0: {'format': 'General', 'dtype': ''},
                                              1: {'format': '0', 'dtype': 'float64'},
                                              2: {'format': '0.00', 'dtype': 'float64'},
                                              3: {'format': '#,##0', 'dtype': 'float64'},
@@ -45,6 +43,11 @@ class Styles(object):
                                              48: {'format': '##0.0E+0', 'dtype': 'float64'},
                                              49: {'format': '@', 'dtype': 'string'}}
 
+    def __init__(self, fp):
+        self._fp = fp
+        self._parse()
+
+
     def __enter__(self):
         return self
 
@@ -62,30 +65,33 @@ class Styles(object):
         self._cell_styles = list()
         self._cell_style_xfs = list()
 
-        self._XfRecord = dict()
-        self._FormatRecord = dict()
+        self._xf_record = dict()
+        self._format_record = dict()
 
         self._fp.seek(0, os.SEEK_SET)
         for rectype, rec in RecordReader(self._fp):
             # TODO
-            if isinstance(rec, XfRecord):
-                self._XfRecord[len(self._XfRecord) - 1] = rec
-            elif isinstance(rec, FormatRecord):
-                self._FormatRecord[rec.fmtId] = rec
-                self._FormatRecord[rec.fmtId].dtype = detect_dtype(self._FormatRecord[rec.fmtId].fmtCode)
+            if rectype == 47:
+                self._xf_record[len(self._xf_record) - 1] = rec
+            elif rectype == 44:
+                self._format_record[rec.fmtId] = rec
+                self._format_record[rec.fmtId].dtype = detect_dtype(self._format_record[rec.fmtId].fmtCode)
 
             if rectype == rt.END_STYLE_SHEET:
                 break
 
     def get_style(self, idx):
+        return None
+
+    def get_number_format(self, idx):
         if idx is None:
             return FormatRecord(fmtId=-1, fmtCode='General', dtype="")
-        elif idx in self._XfRecord:
-            numFmtId = self._XfRecord[idx].numFmtId
-            if numFmtId in self._FormatRecord:
-                return self._FormatRecord[numFmtId]
-            elif numFmtId in self._default_styles:
-                return FormatRecord(fmtId=numFmtId, fmtCode=self._default_styles[numFmtId]["format"], dtype=self._default_styles[numFmtId]["dtype"])
+        elif idx in self._xf_record:
+            numFmtId = self._xf_record[idx].numFmtId
+            if numFmtId in self._format_record:
+                return self._format_record[numFmtId]
+            elif numFmtId in self._default_format:
+                return FormatRecord(fmtId=numFmtId, fmtCode=self._default_format[numFmtId]["format"], dtype=self._default_format[numFmtId]["dtype"])
         return FormatRecord(fmtId=-1, fmtCode='General', dtype="")
 
     def close(self):
