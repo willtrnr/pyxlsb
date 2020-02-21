@@ -4,7 +4,6 @@ import xml.etree.ElementTree as ElementTree
 from . import recordtypes as rt
 from .row import Row
 from .recordreader import RecordReader
-from .conv import convert_value
 
 if sys.version_info > (3,):
     xrange = range
@@ -69,10 +68,9 @@ class Worksheet(object):
                 row_num = rec.r
                 row = Row(self, row_num)
             elif rectype == rt.CELL_ISST:
-                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), self.workbook.get_shared_string(rec.v), rec.f, rec.style, self.workbook.styles.get_style(rec.style))
+                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), rec.f, rec.style)
             elif rectype >= rt.CELL_BLANK and rectype <= rt.FMLA_ERROR:
-                style_fmt = self.workbook.styles.get_style(rec.style)
-                row._add_cell(rec.c, rec.v, convert_value(rec.v, style_fmt.dtype), rec.f, rec.style, style_fmt)
+                row._add_cell(rec.c, rec.v, rec.f, rec.style)
             elif rectype == rt.END_SHEET_DATA:
                 if row is not None:
                     yield row
