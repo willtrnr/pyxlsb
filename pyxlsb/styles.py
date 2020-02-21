@@ -46,7 +46,6 @@ class Styles(object):
         self._fp = fp
         self._parse()
 
-
     def __enter__(self):
         return self
 
@@ -74,8 +73,7 @@ class Styles(object):
                 self._xf_record[len(self._xf_record) - 1] = rec
             elif rectype == 44:
                 self._format_record[rec.fmtId] = rec
-
-            if rectype == rt.END_STYLE_SHEET:
+            elif rectype == rt.END_STYLE_SHEET:
                 break
 
     def get_style(self, idx):
