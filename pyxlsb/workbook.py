@@ -10,6 +10,7 @@ if sys.version_info > (3,):
     basestring = (str, bytes)
 
 SECONDS_IN_DAY = 24 * 60 * 60
+MICROSECONDS_IN_DAY = 24 * 60 * 60 * 1000 * 1000
 
 
 class Workbook(object):
@@ -75,7 +76,7 @@ class Workbook(object):
             return None
 
         era = datetime(1904 if self.props.date1904 else 1900, 1, 1, tzinfo=None)
-        timeoffset = timedelta(seconds=int((value % 1) * SECONDS_IN_DAY))
+        timeoffset = timedelta(microseconds=int((value % 1) * MICROSECONDS_IN_DAY))
 
         if int(value) == 0:
             return era + timeoffset
@@ -92,7 +93,7 @@ class Workbook(object):
     def convert_time(self, value):
         if not isinstance(value, int) and not isinstance(value, float):
             return None
-        return (datetime.min + timedelta(seconds=int((value % 1) * 24 * 60 * 60))).time()
+        return (datetime.min + timedelta(microseconds=int((value % 1) * MICROSECONDS_IN_DAY)).time()
 
     def close(self):
         self._pkg.close()
