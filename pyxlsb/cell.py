@@ -3,7 +3,7 @@ class DeprecatedCellMixin(object):
 
     @property
     def r(self):
-        return self.row_cls.num
+        return self.row.num
 
     @property
     def c(self):
@@ -14,42 +14,37 @@ class DeprecatedCellMixin(object):
         return self.value
 
     @property
-    def value_conv(self):
-        dtype = self.dtype
-        if dtype == "datetime":
-            return self.row_cls.sheet.workbook.convert_date(self.value)
-        elif dtype == "string":
-            return str(self.value)
-        else:
-            return self.value
-
-    @property
-    def number_format(self):
-        return self.row_cls.sheet.workbook.styles.get_number_format(self.style_num)
-
-    @property
-    def dtype(self):
-        return self.row_cls.sheet.workbook.styles.get_dtype(self.style_num)
-
-    @property
     def f(self):
         return self.formula
 
-    @property
-    def s(self):
-        return self.style
-
 class Cell(DeprecatedCellMixin):
-    __slots__ = ('row_cls', 'row', 'col', 'value', 'formula', 'style_num')
+    __slots__ = ('row', 'col', 'value', 'formula', 'style_num')
 
-    def __init__(self, row_cls, col, value=None, formula=None, style_num=None):
-        self.row_cls = row_cls
-        self.row = row_cls.num
+    def __init__(self, row, col, value=None, formula=None, style_num=None):
+        self.row = row
         self.col = col
         self.value = value
         self.formula = formula
         self.style_num = style_num
 
     def __repr__(self):
-        return 'Cell(row_cls={}, row={}, col={}, value={}, formula={}, style_num={})' \
-            .format(self.row_cls, self.row, self.col, self.value, self.formula, self.style_num)
+        return 'Cell(row={}, row_num={}, col={}, value={}, value_conv={}, formula={}, style_num={}, format={})' \
+            .format(self.row, self.row_num, self.col, self.value, self.value_conv, self.formula, self.style_num, self.format)
+
+    @property
+    def row_num(self):
+        return self.row.num
+
+    @property
+    def value_conv(self):
+        dtype = self.row.sheet.workbook.styles.get_dtype(self.style_num)
+        if dtype == "datetime":
+            return self.row.sheet.workbook.convert_date(self.value)
+        elif dtype == "string":
+            return str(self.value)
+        else:
+            return self.value
+
+    @property
+    def format(self):
+        return self.row.sheet.workbook.styles.get_format(self.style_num)
