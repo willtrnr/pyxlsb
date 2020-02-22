@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 if sys.version_info > (3,):
     basestring = (str, bytes)
 
-SECONDS_IN_DAY = 24 * 60 * 60
 MICROSECONDS_IN_DAY = 24 * 60 * 60 * 1000 * 1000
 
 
