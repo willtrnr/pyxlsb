@@ -6,6 +6,7 @@ from .records import FormatRecord
 
 class Styles(object):
 
+    # from https://github.com/jmcnamara/XlsxWriter/blob/master/xlsxwriter/styles.py
     _builtin_formats = {
         0: FormatRecord(fmtId=0, fmtCode='General'),
         1: FormatRecord(fmtId=1, fmtCode='0'),
@@ -83,9 +84,7 @@ class Styles(object):
         return None
 
     def get_format(self, idx):
-        if idx is None:
-            return self._builtin_formats[0]
-        elif idx in self._xf_record:
+        if idx in self._xf_record:
             numFmtId = self._xf_record[idx].numFmtId
             if numFmtId in self._format_record:
                 return self._format_record[numFmtId]
@@ -94,9 +93,7 @@ class Styles(object):
         return self._builtin_formats[0]
 
     def get_dtype(self, idx):
-        if idx is None:
-            return ""
-        elif idx in self._xf_record:
+        if idx in self._xf_record:
             numFmtId = self._xf_record[idx].numFmtId
             if numFmtId in self._format_record:
                 fmtCode = self._format_record[numFmtId].fmtCode
@@ -104,7 +101,7 @@ class Styles(object):
                 fmtCode = self._builtin_formats[numFmtId].fmtCode
             else:
                 return ""
-            for char in ["d", "m", "y", "h", "m", "s"]:
+            for char in ["d", "m", "y", "h", "s"]:
                 if char in fmtCode:
                     return "datetime"
             for char in ["0.00", "0,00", "#.##", "#,##"]:
