@@ -28,8 +28,8 @@ class Cell(DeprecatedCellMixin):
         self.style_num = style_num
 
     def __repr__(self):
-        return 'Cell(row={}, row_num={}, col={}, value={}, value_conv={}, formula={}, style_num={}, format={})' \
-            .format(self.row, self.row_num, self.col, self.value, self.value_conv, self.formula, self.style_num, self.format)
+        return 'Cell(row={}, row_num={}, col={}, value={}, formula={}, style_num={})' \
+            .format(self.row, self.row_num, self.col, self.value, self.formula, self.style_num)
 
     @property
     def row_num(self):
