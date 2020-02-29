@@ -68,13 +68,19 @@ class Styles(object):
         self._cell_style_xfs = list()
 
         self._xf_record = dict()
+        self._xf_record_None = dict()
         self._format_record = dict()
 
         self._fp.seek(0, os.SEEK_SET)
         for rectype, rec in RecordReader(self._fp):
             # TODO
             if rectype == rt.XF:
-                self._xf_record[len(self._xf_record) - 1] = rec
+                if rec.xfId is None:
+                    ids = len(self._xf_record_None)
+                    self._xf_record_None[ids] = rec
+                else:
+                    ids = len(self._xf_record)
+                    self._xf_record[ids] = rec
             elif rectype == rt.FMT:
                 self._format_record[rec.fmtId] = rec
             elif rectype == rt.END_STYLE_SHEET:
