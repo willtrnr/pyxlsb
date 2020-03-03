@@ -68,9 +68,9 @@ class Worksheet(object):
                 row_num = rec.r
                 row = Row(self, row_num)
             elif rectype == rt.CELL_ISST:
-                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), rec.f)
+                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), rec.f, rec.style)
             elif rectype >= rt.CELL_BLANK and rectype <= rt.FMLA_ERROR:
-                row._add_cell(rec.c, rec.v, rec.f)
+                row._add_cell(rec.c, rec.v, rec.f, rec.style)
             elif rectype == rt.END_SHEET_DATA:
                 if row is not None:
                     yield row
