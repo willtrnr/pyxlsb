@@ -1,11 +1,15 @@
 import sys
+import logging
 from io import BytesIO
 from . import records as recs
 from . import recordtypes as rt
+from .util import _hexdump
 from .datareader import DataReader
 
 if sys.version_info > (3,):
     xrange = range
+
+_logger = logging.getLogger(__name__)
 
 
 class RecordReader(object):
@@ -127,9 +131,17 @@ class RecordReader(object):
 
         reclen = self._read_len()
         if reclen is None:
-            raise StopIteration
+            raise RuntimeError('incomplete record with type: {}'.format(rectype))
 
         data = self._fp.read(reclen)
+
+        if _logger.isEnabledFor(logging.DEBUG):
+            _logger.debug('Reading record: %s (%d)\n%s', rt._by_num.get(rectype), rectype,
+                          _hexdump(data))
+
         cls = self._records.get(rectype, self._default_record)
         res = cls.read(DataReader(data, enc=self._enc), rectype, reclen)
+
+        _logger.debug('Read result: %s', res)
+
         return (rectype, res)

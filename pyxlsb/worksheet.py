@@ -10,6 +10,13 @@ if sys.version_info > (3,):
 
 
 class Worksheet(object):
+    """A worksheet.
+
+    Attributes:
+        workbook (Workbook): The containing workbook.
+        name (str): The name of this worksheet.
+    """
+
     def __init__(self, workbook, name, fp, rels_fp=None):
         self.workbook = workbook
         self.name = name
@@ -55,6 +62,14 @@ class Worksheet(object):
                 self.rels[el.attrib['Id']] = el.attrib['Target']
 
     def rows(self, sparse=True):
+        """Get a row iterator to iterate through the cell data.
+
+        Args:
+            sparse (bool, optional): If empty rows should be skipped, defaults to True
+
+        Yields:
+            Row: The rows in this worksheet.
+        """
         row = None
         row_num = -1
         self._fp.seek(self._data_offset, os.SEEK_SET)
@@ -77,6 +92,7 @@ class Worksheet(object):
                 break
 
     def close(self):
+        """Release the resources associated with this worksheet."""
         self._fp.close()
         if self._rels_fp is not None:
             self._rels_fp.close()

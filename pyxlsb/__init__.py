@@ -19,7 +19,7 @@ def open_workbook(name, *args, **kwargs):
         This is typically the entrypoint to start working with an XLSB file:
 
         >>> from pyxlsb import open_workbook
-        >>> with open_workbook('test.xlsb') as wb:
+        >>> with open_workbook('test_files/test.xlsb') as wb:
         ...     print(wb.sheets)
         ...
         ['Test']
@@ -35,6 +35,9 @@ def convert_date(date):
 
     Returns:
         datetime: The corresponding datetime instance or None if invalid.
+
+    .. deprecated:: 1.1.0
+        Will be removed in 1.2.0. Use ``convert_date`` on ``Workbook`` instances instead.
     """
     warnings.warn("convert_date was moved to the Workbook object", DeprecationWarning)
     if not isinstance(date, (int, float)):

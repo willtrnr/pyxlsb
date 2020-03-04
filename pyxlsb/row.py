@@ -6,6 +6,8 @@ if sys.version_info > (3,):
 
 
 class Row(object):
+    """A row in a worksheet."""
+
     __slots__ = ('sheet', 'num', '_cols', '_cells')
 
     def __init__(self, sheet, num):

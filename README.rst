@@ -17,8 +17,7 @@ Install
 Usage
 -----
 
-**WARNING**: Consult the README of the tag corresponding to the version you're
-using, the usage may have changed since the last release.
+Also see the `API reference`_.
 
 The module exposes an ``open_workbook(name)`` method (similar to Xlrd and
 OpenPyXl) for opening XLSB files. The Workbook object representing the file is
@@ -116,3 +115,4 @@ anything else I might have missed, I'll try to prioritize what's most requested.
    :target: https://pypi.python.org/pypi/pyxlsb
 .. |Build Status| image:: https://travis-ci.org/wwwiiilll/pyxlsb.svg?branch=master
    :target: https://travis-ci.org/wwwiiilll/pyxlsb
+.. _API reference: https://wwwiiilll.github.io/pyxlsb/

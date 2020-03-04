@@ -1,4 +1,5 @@
 import sys
+import logging
 import warnings
 from datetime import datetime, timedelta
 from . import recordtypes as rt
@@ -67,6 +68,10 @@ class Workbook(object):
         Raises:
             IndexError: When the index or name is invalid.
             ValueError: For an incompatible index or name type.
+
+        .. deprecated:: 1.1.0
+            Will be removed in 1.2.0. Use either ``get_sheet_by_index`` or ``get_sheet_by_name``
+            instead.
         """
         warnings.warn("get_sheet was replaced with get_sheet_by_name/index", DeprecationWarning)
         if isinstance(idx_or_name, basestring):
@@ -169,7 +174,7 @@ class Workbook(object):
         return (datetime.min + timedelta(microseconds=long((value % 1) * _MICROSECONDS_IN_DAY))).time()
 
     def close(self):
-        """Closes the workbook and associated resources."""
+        """Release the resources associated with this workbook."""
         self._pkg.close()
         if self.stringtable is not None:
             self.stringtable.close()
