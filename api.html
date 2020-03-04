@@ -59,7 +59,7 @@
 <p class="rubric">Examples</p>
 <p>This is typically the entrypoint to start working with an XLSB file:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyxlsb</span> <span class="kn">import</span> <span class="n">open_workbook</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">open_workbook</span><span class="p">(</span><span class="s1">&#39;test.xlsb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wb</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">open_workbook</span><span class="p">(</span><span class="s1">&#39;test_files/test.xlsb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wb</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">wb</span><span class="o">.</span><span class="n">sheets</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">[&#39;Test&#39;]</span>
@@ -82,6 +82,9 @@
 <dd class="field-odd"><p>datetime</p>
 </dd>
 </dl>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Will be removed in 1.2.0. Use <code class="docutils literal notranslate"><span class="pre">convert_date</span></code> on <code class="docutils literal notranslate"><span class="pre">Workbook</span></code> instances instead.</p>
+</div>
 </dd></dl>
 
 </div>
@@ -126,6 +129,10 @@
 </ul>
 </dd>
 </dl>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Will be removed in 1.2.0. Use either <code class="docutils literal notranslate"><span class="pre">get_sheet_by_index</span></code> or <code class="docutils literal notranslate"><span class="pre">get_sheet_by_name</span></code>
+instead.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -228,7 +235,7 @@
 <dl class="method">
 <dt id="pyxlsb.workbook.Workbook.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes the workbook and associated resources.</p>
+<dd><p>Release the resources associated with this workbook.</p>
 </dd></dl>
 
 </dd></dl>
@@ -239,7 +246,50 @@
 <dl class="class">
 <dt id="pyxlsb.worksheet.Worksheet">
 <em class="property">class </em><code class="sig-prename descclassname">pyxlsb.worksheet.</code><code class="sig-name descname">Worksheet</code><span class="sig-paren">(</span><em class="sig-param">workbook</em>, <em class="sig-param">name</em>, <em class="sig-param">fp</em>, <em class="sig-param">rels_fp=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.worksheet.Worksheet" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A worksheet.</p>
+<dl class="attribute">
+<dt id="pyxlsb.worksheet.Worksheet.workbook">
+<code class="sig-name descname">workbook</code><a class="headerlink" href="#pyxlsb.worksheet.Worksheet.workbook" title="Permalink to this definition">¶</a></dt>
+<dd><p>The containing workbook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.workbook.Workbook" title="pyxlsb.workbook.Workbook">Workbook</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyxlsb.worksheet.Worksheet.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#pyxlsb.worksheet.Worksheet.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of this worksheet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.worksheet.Worksheet.rows">
+<code class="sig-name descname">rows</code><span class="sig-paren">(</span><em class="sig-param">sparse=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.worksheet.Worksheet.rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a row iterator to iterate through the cell data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If empty rows should be skipped, defaults to True</p>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>Row</em> – The rows in this worksheet.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.worksheet.Worksheet.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.worksheet.Worksheet.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release the resources associated with this worksheet.</p>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="row">
@@ -247,7 +297,8 @@
 <dl class="class">
 <dt id="pyxlsb.row.Row">
 <em class="property">class </em><code class="sig-prename descclassname">pyxlsb.row.</code><code class="sig-name descname">Row</code><span class="sig-paren">(</span><em class="sig-param">sheet</em>, <em class="sig-param">num</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.row.Row" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A row in a worksheet.</p>
+</dd></dl>
 
 </div>
 <div class="section" id="cell">
@@ -255,7 +306,135 @@
 <dl class="class">
 <dt id="pyxlsb.cell.Cell">
 <em class="property">class </em><code class="sig-prename descclassname">pyxlsb.cell.</code><code class="sig-name descname">Cell</code><span class="sig-paren">(</span><em class="sig-param">row</em>, <em class="sig-param">col</em>, <em class="sig-param">value=None</em>, <em class="sig-param">formula=None</em>, <em class="sig-param">style_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.cell.Cell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A cell in a worksheet.</p>
+<dl class="attribute">
+<dt id="pyxlsb.cell.Cell.row">
+<code class="sig-name descname">row</code><a class="headerlink" href="#pyxlsb.cell.Cell.row" title="Permalink to this definition">¶</a></dt>
+<dd><p>The containing row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.row.Row" title="pyxlsb.row.Row">Row</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyxlsb.cell.Cell.col">
+<code class="sig-name descname">col</code><a class="headerlink" href="#pyxlsb.cell.Cell.col" title="Permalink to this definition">¶</a></dt>
+<dd><p>The column index for this cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyxlsb.cell.Cell.value">
+<code class="sig-name descname">value</code><a class="headerlink" href="#pyxlsb.cell.Cell.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cell value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>mixed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyxlsb.cell.Cell.formula">
+<code class="sig-name descname">formula</code><a class="headerlink" href="#pyxlsb.cell.Cell.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>The formula PTG bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyxlsb.cell.Cell.style_id">
+<code class="sig-name descname">style_id</code><a class="headerlink" href="#pyxlsb.cell.Cell.style_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The style index in the style table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.row_num">
+<em class="property">property </em><code class="sig-name descname">row_num</code><a class="headerlink" href="#pyxlsb.cell.Cell.row_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>The row number of this cell.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.string_value">
+<em class="property">property </em><code class="sig-name descname">string_value</code><a class="headerlink" href="#pyxlsb.cell.Cell.string_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The string value of this cell or None if not a string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.numeric_value">
+<em class="property">property </em><code class="sig-name descname">numeric_value</code><a class="headerlink" href="#pyxlsb.cell.Cell.numeric_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The numeric value of this cell or None if not a number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.bool_value">
+<em class="property">property </em><code class="sig-name descname">bool_value</code><a class="headerlink" href="#pyxlsb.cell.Cell.bool_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The boolean value of this cell or None if not a boolean.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.date_value">
+<em class="property">property </em><code class="sig-name descname">date_value</code><a class="headerlink" href="#pyxlsb.cell.Cell.date_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The date value of this cell or None if not a numeric cell.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.is_date_formatted">
+<em class="property">property </em><code class="sig-name descname">is_date_formatted</code><a class="headerlink" href="#pyxlsb.cell.Cell.is_date_formatted" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this cell is formatted using a date-like format code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.c">
+<em class="property">property </em><code class="sig-name descname">c</code><a class="headerlink" href="#pyxlsb.cell.Cell.c" title="Permalink to this definition">¶</a></dt>
+<dd><p>The column number of this cell.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Use the <code class="docutils literal notranslate"><span class="pre">col</span></code> property instead.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.f">
+<em class="property">property </em><code class="sig-name descname">f</code><a class="headerlink" href="#pyxlsb.cell.Cell.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>The formula of this cell.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Use the <code class="docutils literal notranslate"><span class="pre">formula</span></code> property instead.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.r">
+<em class="property">property </em><code class="sig-name descname">r</code><a class="headerlink" href="#pyxlsb.cell.Cell.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The row number of this cell.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Use the <code class="docutils literal notranslate"><span class="pre">row_num</span></code> property instead.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.cell.Cell.v">
+<em class="property">property </em><code class="sig-name descname">v</code><a class="headerlink" href="#pyxlsb.cell.Cell.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of this cell.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.1.0: </span>Use the <code class="docutils literal notranslate"><span class="pre">value</span></code> or the typed <code class="docutils literal notranslate"><span class="pre">*_value</span></code> properties instead.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 </div>
