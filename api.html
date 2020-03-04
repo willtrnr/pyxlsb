@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>API reference &#8212; pyxlsb 1.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to pyxlsb" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyxlsb"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyxlsb 1.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pyxlsb">
+<span id="top-level-functions"></span><h2>Top-level functions<a class="headerlink" href="#module-pyxlsb" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyxlsb.open_workbook">
+<code class="sig-prename descclassname">pyxlsb.</code><code class="sig-name descname">open_workbook</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.open_workbook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the given workbook file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the XLSB file to open.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The workbook instance for the given file name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.workbook.Workbook" title="pyxlsb.workbook.Workbook">Workbook</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>This is typically the entrypoint to start working with an XLSB file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyxlsb</span> <span class="kn">import</span> <span class="n">open_workbook</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">open_workbook</span><span class="p">(</span><span class="s1">&#39;test.xlsb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wb</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">wb</span><span class="o">.</span><span class="n">sheets</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">[&#39;Test&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyxlsb.convert_date">
+<code class="sig-prename descclassname">pyxlsb.</code><code class="sig-name descname">convert_date</code><span class="sig-paren">(</span><em class="sig-param">date</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.convert_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an Excel date to a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The numeric Excel date value to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The corresponding datetime instance or None if invalid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="workbook">
+<h2>Workbook<a class="headerlink" href="#workbook" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyxlsb.workbook.Workbook">
+<em class="property">class </em><code class="sig-prename descclassname">pyxlsb.workbook.</code><code class="sig-name descname">Workbook</code><span class="sig-paren">(</span><em class="sig-param">pkg</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main Workbook class providing worksheets and other metadata.</p>
+<dl class="attribute">
+<dt id="pyxlsb.workbook.Workbook.sheets">
+<code class="sig-name descname">sheets</code><a class="headerlink" href="#pyxlsb.workbook.Workbook.sheets" title="Permalink to this definition">¶</a></dt>
+<dd><p>The worksheet names in this workbook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.get_sheet">
+<code class="sig-name descname">get_sheet</code><span class="sig-paren">(</span><em class="sig-param">idx_or_name</em>, <em class="sig-param">with_rels=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.get_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a sheet by name or 1-based index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The 1-based index or name of the sheet</p></li>
+<li><p><strong>with_rels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If the relationships should be parsed, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The corresponding worksheet instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.worksheet.Worksheet" title="pyxlsb.worksheet.Worksheet">Worksheet</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.8)"><strong>IndexError</strong></a> – When the index or name is invalid.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – For an incompatible index or name type.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.get_sheet_by_index">
+<code class="sig-name descname">get_sheet_by_index</code><span class="sig-paren">(</span><em class="sig-param">idx</em>, <em class="sig-param">with_rels=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.get_sheet_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a worksheet by index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the sheet.</p></li>
+<li><p><strong>with_rels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If the relationships should be parsed, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The corresponding worksheet instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.worksheet.Worksheet" title="pyxlsb.worksheet.Worksheet">Worksheet</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.8)"><strong>IndexError</strong></a> – When the provided index is out of range.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.get_sheet_by_name">
+<code class="sig-name descname">get_sheet_by_name</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">with_rels=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.get_sheet_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a worksheet by its name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the sheet.</p></li>
+<li><p><strong>with_rels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If the relationships should be parsed, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The corresponding worksheet instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyxlsb.worksheet.Worksheet" title="pyxlsb.worksheet.Worksheet">Worksheet</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.8)"><strong>IndexError</strong></a> – When the provided name is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.get_shared_string">
+<code class="sig-name descname">get_shared_string</code><span class="sig-paren">(</span><em class="sig-param">idx</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.get_shared_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a string in the shared string table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the string in the shared string table.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The string at the index in table table or None if not found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.convert_date">
+<code class="sig-name descname">convert_date</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.convert_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an Excel numeric date value to a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The Excel date value.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The equivalent datetime instance or None when invalid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)">datetime.datetime</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.convert_time">
+<code class="sig-name descname">convert_time</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.convert_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an Excel date fraction time value to a <code class="docutils literal notranslate"><span class="pre">time</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The Excel fractional day value.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The equivalent time instance or None if invalid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.8)">datetime.time</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyxlsb.workbook.Workbook.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.workbook.Workbook.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the workbook and associated resources.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="worksheet">
+<h2>Worksheet<a class="headerlink" href="#worksheet" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyxlsb.worksheet.Worksheet">
+<em class="property">class </em><code class="sig-prename descclassname">pyxlsb.worksheet.</code><code class="sig-name descname">Worksheet</code><span class="sig-paren">(</span><em class="sig-param">workbook</em>, <em class="sig-param">name</em>, <em class="sig-param">fp</em>, <em class="sig-param">rels_fp=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.worksheet.Worksheet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="row">
+<h2>Row<a class="headerlink" href="#row" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyxlsb.row.Row">
+<em class="property">class </em><code class="sig-prename descclassname">pyxlsb.row.</code><code class="sig-name descname">Row</code><span class="sig-paren">(</span><em class="sig-param">sheet</em>, <em class="sig-param">num</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.row.Row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="cell">
+<h2>Cell<a class="headerlink" href="#cell" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyxlsb.cell.Cell">
+<em class="property">class </em><code class="sig-prename descclassname">pyxlsb.cell.</code><code class="sig-name descname">Cell</code><span class="sig-paren">(</span><em class="sig-param">row</em>, <em class="sig-param">col</em>, <em class="sig-param">value=None</em>, <em class="sig-param">formula=None</em>, <em class="sig-param">style_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyxlsb.cell.Cell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API reference</a><ul>
+<li><a class="reference internal" href="#module-pyxlsb">Top-level functions</a></li>
+<li><a class="reference internal" href="#workbook">Workbook</a></li>
+<li><a class="reference internal" href="#worksheet">Worksheet</a></li>
+<li><a class="reference internal" href="#row">Row</a></li>
+<li><a class="reference internal" href="#cell">Cell</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyxlsb</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyxlsb"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyxlsb 1.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, William Turner.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.3.
+    </div>
+  </body>
+</html>
