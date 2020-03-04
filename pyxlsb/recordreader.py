@@ -2,11 +2,7 @@ import sys
 from io import BytesIO
 from . import records as recs
 from . import recordtypes as rt
-
-try:
-    from .cdatareader import DataReader
-except ImportError:
-    from .datareader import DataReader
+from .datareader import DataReader
 
 if sys.version_info > (3,):
     xrange = range

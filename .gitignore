@@ -1,14 +1,13 @@
-*.c
 *.egg-info/
 *.pyc
 *.pyd
 *.pyo
-*.so
 *.sublime-*
 *.swp
 __pycache__/
 build/
 dist/
+docs/_build/
 venv/
 venv2/
 venv3/

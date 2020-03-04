@@ -4,46 +4,58 @@ from .recordreader import RecordReader
 from .records import FormatRecord
 
 
+class Format(object):
+    __slots__ = ('code', 'is_builtin', 'is_date_format')
+
+    def __init__(self, code, is_builtin=False):
+        self.code = code
+        self.is_builtin = is_builtin
+
+        self.is_date_format = False
+        if code is not None:
+            for c in ('y', 'm', 'd', 'h', 's', 'AM', 'PM'):
+                if c in code:
+                    self.is_date_format = True
+                    break
+
+
+    def __repr__(self):
+        return 'Format(code={}, is_builtin={})' \
+            .format(self.code, self.is_builtin)
+
+
 class Styles(object):
 
-    # from https://github.com/jmcnamara/XlsxWriter/blob/master/xlsxwriter/styles.py
+    # See: ISO/IEC29500-1:2016 section 18.8.30
     _builtin_formats = {
-        0: FormatRecord(fmtId=0, fmtCode='General'),
-        1: FormatRecord(fmtId=1, fmtCode='0'),
-        2: FormatRecord(fmtId=2, fmtCode='0.00'),
-        3: FormatRecord(fmtId=3, fmtCode='#,##0'),
-        4: FormatRecord(fmtId=4, fmtCode='#,##0.00'),
-        5: FormatRecord(fmtId=5, fmtCode='($#,##0_);($#,##0)'),
-        6: FormatRecord(fmtId=6, fmtCode='($#,##0_);[Red]($#,##0)'),
-        7: FormatRecord(fmtId=7, fmtCode='($#,##0.00_);($#,##0.00)'),
-        8: FormatRecord(fmtId=8, fmtCode='($#,##0.00_);[Red]($#,##0.00)'),
-        9: FormatRecord(fmtId=9, fmtCode='0%'),
-        10: FormatRecord(fmtId=10, fmtCode='0.00%'),
-        11: FormatRecord(fmtId=11, fmtCode='0.00E+00'),
-        12: FormatRecord(fmtId=12, fmtCode='# ?/?'),
-        13: FormatRecord(fmtId=13, fmtCode='# ??/??'),
-        14: FormatRecord(fmtId=14, fmtCode='m/d/yy'),
-        15: FormatRecord(fmtId=15, fmtCode='d-mmm-yy'),
-        16: FormatRecord(fmtId=16, fmtCode='d-mmm'),
-        17: FormatRecord(fmtId=17, fmtCode='mmm-yy'),
-        18: FormatRecord(fmtId=18, fmtCode='h:mm AM/PM'),
-        19: FormatRecord(fmtId=19, fmtCode='h:mm:ss AM/PM'),
-        20: FormatRecord(fmtId=20, fmtCode='h:mm'),
-        21: FormatRecord(fmtId=21, fmtCode='h:mm:ss'),
-        22: FormatRecord(fmtId=22, fmtCode='m/d/yy h:mm'),
-        37: FormatRecord(fmtId=37, fmtCode='(#,##0_);(#,##0)'),
-        38: FormatRecord(fmtId=38, fmtCode='(#,##0_);[Red](#,##0)'),
-        39: FormatRecord(fmtId=39, fmtCode='(#,##0.00_);(#,##0.00)'),
-        40: FormatRecord(fmtId=40, fmtCode='(#,##0.00_);[Red](#,##0.00)'),
-        41: FormatRecord(fmtId=41, fmtCode='_(* #,##0_);_(* (#,##0);_(* "-"_);_(_)'),
-        42: FormatRecord(fmtId=42, fmtCode='_($* #,##0_);_($* (#,##0);_($* "-"_);_(_)'),
-        43: FormatRecord(fmtId=43, fmtCode='_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(_)'),
-        44: FormatRecord(fmtId=44, fmtCode='_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(_)'),
-        45: FormatRecord(fmtId=45, fmtCode='mm:ss'),
-        46: FormatRecord(fmtId=46, fmtCode='[h]:mm:ss'),
-        47: FormatRecord(fmtId=47, fmtCode='mm:ss.0'),
-        48: FormatRecord(fmtId=48, fmtCode='##0.0E+0'),
-        49: FormatRecord(fmtId=49, fmtCode='@')
+        0: Format(None),
+        1: Format('0'),
+        2: Format('0.00'),
+        3: Format('#,##0'),
+        4: Format('#,##0.00'),
+        9: Format('0%'),
+        10: Format('0.00%'),
+        11: Format('0.00E+00'),
+        12: Format('# ?/?'),
+        13: Format('# ??/??'),
+        14: Format('mm-dd-yy'),
+        15: Format('d-mmm-yy'),
+        16: Format('d-mmm'),
+        17: Format('mmm-yy'),
+        18: Format('h:mm AM/PM'),
+        19: Format('h:mm:ss AM/PM'),
+        20: Format('h:mm'),
+        21: Format('h:mm:ss'),
+        22: Format('m/d/yy h:mm'),
+        37: Format('#,##0;(#,##0)'),
+        38: Format('#,##0;[Red](#,##0)'),
+        39: Format('#,##0.00;(#,##0.00)'),
+        40: Format('#,##0.00;[Red](#,##0.00)'),
+        45: Format('mm:ss'),
+        46: Format('[h]:mm:ss'),
+        47: Format('mmss.0'),
+        48: Format('##0.0E+0'),
+        49: Format('@')
     }
 
     def __init__(self, fp):
@@ -57,63 +69,48 @@ class Styles(object):
         self.close()
 
     def _parse(self):
-        self._colors = list()
-        self._dxfs = list()
-        self._table_styles = list()
-        self._fills = list()
-        self._fonts = list()
-        self._borders = list()
-        self._cell_xfs = list()
-        self._cell_styles = list()
+        self._formats = dict()
         self._cell_style_xfs = list()
-
-        self._xf_record = dict()
-        self._xf_record_None = dict()
-        self._format_record = dict()
+        self._cell_xfs = list()
 
         self._fp.seek(0, os.SEEK_SET)
-        for rectype, rec in RecordReader(self._fp):
-            # TODO
-            if rectype == rt.XF:
-                if rec.xfId is None:
-                    ids = len(self._xf_record_None)
-                    self._xf_record_None[ids] = rec
-                else:
-                    ids = len(self._xf_record)
-                    self._xf_record[ids] = rec
+        reader = RecordReader(self._fp)
+        for rectype, rec in reader:
+            if rectype == rt.BEGIN_CELL_STYLE_XFS:
+                self._cell_style_xfs = [None] * rec.count
+                i = 0
+                for rectype, rec in reader:
+                    if rectype == rt.XF:
+                        self._cell_style_xfs[i] = rec
+                        i += 1
+                    elif rectype == rt.END_CELL_STYLE_XFS:
+                        break
+            elif rectype == rt.BEGIN_CELL_XFS:
+                self._cell_xfs = [None] * rec.count
+                i = 0
+                for rectype, rec in reader:
+                    if rectype == rt.XF:
+                        self._cell_xfs[i] = rec
+                        i += 1
+                    elif rectype == rt.END_CELL_XFS:
+                        break
             elif rectype == rt.FMT:
-                self._format_record[rec.fmtId] = rec
+                self._formats[rec.fmtId] = Format(rec.fmtCode)
             elif rectype == rt.END_STYLE_SHEET:
                 break
 
     def get_style(self, idx):
+        # TODO
         return None
 
-    def get_format(self, idx):
-        if idx in self._xf_record:
-            numFmtId = self._xf_record[idx].numFmtId
-            if numFmtId in self._format_record:
-                return self._format_record[numFmtId]
-            elif numFmtId in self._builtin_formats:
-                return self._builtin_formats[numFmtId]
+    def _get_format(self, idx):
+        if idx in self._cell_xfs:
+            fmt_id = self._cell_xfs[idx].numFmtId
+            if fmt_id in self._formats:
+                return self._formats[fmt_id]
+            elif fmt_id in self._builtin_formats:
+                return self._builtin_formats[fmt_id]
         return self._builtin_formats[0]
-
-    def get_dtype(self, idx):
-        if idx in self._xf_record:
-            numFmtId = self._xf_record[idx].numFmtId
-            if numFmtId in self._format_record:
-                fmtCode = self._format_record[numFmtId].fmtCode
-            elif numFmtId in self._builtin_formats:
-                fmtCode = self._builtin_formats[numFmtId].fmtCode
-            else:
-                return ""
-            for char in ["d", "m", "y", "h", "s"]:
-                if char in fmtCode:
-                    return "datetime"
-            for char in ["0.00", "0,00", "#.##", "#,##"]:
-                if char in fmtCode:
-                    return "float64"
-        return ""
 
     def close(self):
         self._fp.close()

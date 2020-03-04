@@ -1,3 +1,5 @@
+import warnings
+from datetime import datetime, timedelta
 from .workbook import Workbook
 from .xlsbpackage import XlsbPackage
 
@@ -5,14 +7,39 @@ __version__ = '1.1.0'
 
 
 def open_workbook(name, *args, **kwargs):
+    """Opens the given workbook file path.
+
+    Args:
+        name (str): The name of the XLSB file to open.
+
+    Returns:
+        Workbook: The workbook instance for the given file name.
+
+    Examples:
+        This is typically the entrypoint to start working with an XLSB file:
+
+        >>> from pyxlsb import open_workbook
+        >>> with open_workbook('test.xlsb') as wb:
+        ...     print(wb.sheets)
+        ...
+        ['Test']
+    """
     return Workbook(XlsbPackage(name), *args, **kwargs)
 
 
 def convert_date(date):
-    if not isinstance(date, int) and not isinstance(date, float):
+    """Convert an Excel date to a ``datetime`` instance.
+
+    Args:
+        date (int or float): The numeric Excel date value to convert.
+
+    Returns:
+        datetime: The corresponding datetime instance or None if invalid.
+    """
+    warnings.warn("convert_date was moved to the Workbook object", DeprecationWarning)
+    if not isinstance(date, (int, float)):
         return None
 
-    from datetime import datetime, timedelta
     if int(date) == 0:
         return datetime(1900, 1, 1, 0, 0, 0) + timedelta(seconds=date * 24 * 60 * 60)
     elif date >= 61:

@@ -1,3 +1,10 @@
+import sys
+
+if sys.version_info > (3,):
+    basestring = (str, bytes)
+    long = int
+
+
 class DeprecatedCellMixin(object):
     __slots__ = ()
 
@@ -18,33 +25,43 @@ class DeprecatedCellMixin(object):
         return self.formula
 
 class Cell(DeprecatedCellMixin):
-    __slots__ = ('row', 'col', 'value', 'formula', 'style_num')
+    __slots__ = ('row', 'col', 'value', 'formula', 'style_id')
 
-    def __init__(self, row, col, value=None, formula=None, style_num=None):
+    def __init__(self, row, col, value=None, formula=None, style_id=None):
         self.row = row
         self.col = col
         self.value = value
         self.formula = formula
-        self.style_num = style_num
+        self.style_id = style_id
 
     def __repr__(self):
-        return 'Cell(row={}, row_num={}, col={}, value={}, formula={}, style_num={})' \
-            .format(self.row, self.row_num, self.col, self.value, self.formula, self.style_num)
+        return 'Cell(row={}, col={}, value={}, formula={}, style_id={})' \
+            .format(self.row, self.col, self.value, self.formula, self.style_id)
 
     @property
     def row_num(self):
         return self.row.num
 
     @property
-    def value_conv(self):
-        dtype = self.row.sheet.workbook.styles.get_dtype(self.style_num)
-        if dtype == "datetime":
-            return self.row.sheet.workbook.convert_date(self.value)
-        elif dtype == "string":
-            return str(self.value)
-        else:
+    def string_value(self):
+        if isinstance(self.value, basestring):
             return self.value
 
     @property
-    def format(self):
-        return self.row.sheet.workbook.styles.get_format(self.style_num)
+    def date_value(self):
+        return self.row.sheet.workbook.convert_date(self.value)
+
+    @property
+    def numeric_value(self):
+        if isinstance(self.value, (int, long, float)):
+            return self.value
+
+    @property
+    def bool_value(self):
+        if isinstance(self.value, bool):
+            return self.value
+
+    @property
+    def is_date_formatted(self):
+        fmt = self.row.sheet.workbook.styles._get_format(self.style_id)
+        return fmt.is_date_format
