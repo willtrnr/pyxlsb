@@ -39,9 +39,11 @@ setup(
 
     packages=['pyxlsb'],
 
-    install_requires=[
-        'enum34'
-    ],
+    extra_requires={
+        ':python_version < "3.4"': [
+            'enum34'
+        ]
+    },
 
     zip_safe=False
 )

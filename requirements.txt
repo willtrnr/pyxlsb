@@ -1,3 +1,4 @@
-enum34==1.1.6
-mock==3.0.5
-pylint==1.9.5
+enum34; python_version < "3.4"
+mock
+pylint
+sphinx; python_version >= "3.5"
