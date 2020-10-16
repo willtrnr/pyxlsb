@@ -3,17 +3,25 @@ import sys
 import xml.etree.ElementTree as ElementTree
 from . import biff12
 from .reader import BIFF12Reader
+from .writer import BIFF12Writer
+from .handlers import BasicHandler, DimensionHandler
 from collections import namedtuple
 
 if sys.version_info > (3,):
   xrange = range
 
+supported_modes = {'r', 'w'}
+
 Cell = namedtuple('Cell', ['r', 'c', 'v'])
 
 class Worksheet(object):
-  def __init__(self, fp, rels_fp=None, stringtable=None, debug=False):
+  def __init__(self, fp, rels_fp=None, stringtable=None, debug=False, mode='r'):
     super(Worksheet, self).__init__()
-    self._reader = BIFF12Reader(fp=fp, debug=debug)
+    self._mode = mode
+    if self._mode == 'w':
+      self._writer = BIFF12Writer(fp=fp, debug=debug)
+    else:
+      self._reader = BIFF12Reader(fp=fp, debug=debug)
     self._rels_fp = rels_fp
     if not rels_fp is None:
       self._rels = ElementTree.parse(rels_fp).getroot()
@@ -25,7 +33,8 @@ class Worksheet(object):
     self.cols = list()
     self.rels = dict()
     self.hyperlinks = dict()
-    self._parse()
+    if self._mode == 'r':
+      self._parse()
 
   def __enter__(self):
     return self
@@ -34,9 +43,12 @@ class Worksheet(object):
     self.close()
 
   def __iter__(self):
+    if self._mode != 'r':
+      raise NotImplementedError('Not opened for reading')
     return self.rows()
 
   def _parse(self):
+    assert self._mode == 'r', 'Not opened for reading'
     if self._rels is not None:
       for el in self._rels:
         self.rels[el.attrib['Id']] = el.attrib['Target']
@@ -56,6 +68,7 @@ class Worksheet(object):
             self.hyperlinks[item[1].r + r, item[1].c + c] = item[1].rId
 
   def rows(self, sparse=False):
+    assert self._mode == 'r', 'Not opened for reading'
     self._reader.seek(self._data_offset, os.SEEK_SET)
     row_num = -1
     row = None
@@ -79,7 +92,60 @@ class Worksheet(object):
           yield row
         break
 
+  def _auto_writerows(self, rows):
+    # Without metadata at top up-to-date, this fails standalone
+    writer = self._writer
+    for row in rows:
+      writer.write_id(biff12.ROW)
+      for v in row:
+        biff_type, write_func = writer.handlers[type(v)]
+        writer.write_id(biff_type)
+        write_func(writer._writer, v)
+
+  def write_table(self, table_data):
+    writer = self._writer
+
+    # Dimension metadata
+    try:
+      # Handle table_data as something like a pandas.DataFrame or numpy.ndarray
+      num_rows, num_cols = table_data.shape
+    except Exception:
+      num_rows = len(table_data)
+      num_cols = 0
+      for row in table_data:
+        num_cols = max(num_cols, len(row))
+    writer.write_id(biff12.DIMENSION)
+    DimensionHandler.write(writer, num_rows, num_cols)
+
+    # Sheet data
+    writer.write_id(biff12.SHEETDATA)
+    BasicHandler.write(writer)
+    try:
+      # Handle table_data as something like a pandas.DataFrame or numpy.ndarray
+      try:
+        # Handle table_data as something like a pandas.DataFrame
+        writer_handlers = [writer.handlers[dt] for dt in table_data.dtypes]
+      except AttributeError:
+        # Handle table_data as something like a numpy.ndarray
+        writer_handlers = [writer.handlers[table_data.dtype]] * num_cols
+      for row in table_data.iterrows():  # TODO: better/faster than iterrows?
+        for cell, (biff_type, write_func) in zip(row, writer_handlers):
+          writer.write_id(biff_type)
+          write_func(writer._writer, cell)
+    except AttributeError:
+      # Handle table_data as a list of rows (each themselves a list)
+      self._auto_writerows(table_data)
+
+    # Ending metadata
+    writer.write_id(biff12.SHEETDATA_END)
+    BasicHandler.write(writer)
+    writer.write_id(biff12.WORKSHEET_END)
+    BasicHandler.write(writer)
+
   def close(self):
-    self._reader.close()
+    try:
+      self._reader.close()
+    except AttributeError:
+      self._writer.close()
     if self._rels_fp is not None:
       self._rels_fp.close()

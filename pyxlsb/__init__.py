@@ -1,13 +1,14 @@
 from .handlers import Handler
 from .reader import BIFF12Reader
 from .workbook import Workbook
-from .worksheet import Worksheet
+from .worksheet import Worksheet, supported_modes
 
-__version__ = '1.0.7'
+__version__ = '2.0'
 
-def open_workbook(name, debug=False):
+def open_workbook(name, mode='r', debug=False):
   from zipfile import ZipFile
-  zf = ZipFile(name, 'r')
+  assert mode in supported_modes
+  zf = ZipFile(name, mode)
   return Workbook(fp=zf, debug=debug)
 
 def convert_date(date):

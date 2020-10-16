@@ -19,6 +19,12 @@ class BasicHandler(Handler):
     super(BasicHandler, self).read(reader, recid, reclen)
     return self.name
 
+  @staticmethod
+  def write(writer):
+    try:
+      writer._writer.write_len(0)
+    except AttributeError:
+      writer.write_len(0)
 
 class StringTableHandler(Handler):
   cls = namedtuple('sst', ['count', 'uniqueCount'])
@@ -71,6 +77,16 @@ class DimensionHandler(Handler):
     c2 = reader.read_int()
     return self.cls._make([r1, c1, r2 - r1 + 1, c2 - c1 + 1])
 
+  @staticmethod
+  def write(writer, num_rows, num_cols):
+    try:
+      writer = writer._writer
+    except AttributeError:
+      pass
+    writer.write_int(0)         # r1 = 0
+    writer.write_int(num_rows)  # r2 = num_rows
+    writer.write_int(0)         # c1 = 0
+    writer.write_int(num_cols)  # c2 = num_cols
 
 class ColumnHandler(Handler):
   cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
@@ -81,7 +97,7 @@ class ColumnHandler(Handler):
   def read(self, reader, recid, reclen):
     c1 = reader.read_int()
     c2 = reader.read_int()
-    width = reader.read_int() / 256
+    width = reader.read_int() / 256  # TODO: Should be integer division?
     style = reader.read_int()
     return self.cls._make([c1, c2, width, style])
 
