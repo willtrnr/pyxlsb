@@ -81,10 +81,11 @@ class RecordWriter(object):
     def write_len(self, val):
         # TODO: Does not match what RecordReader.read_string does? (Does match RecordReader.read_len)
         for i in range(4):
-            nearlybyte = val & 0x7F
+            nearlybyte = (val >> 7 * i) & 0x7F
             payload = uint8_t.pack(nearlybyte)
             self._fp.write(payload)
-            val = val >> 7
+            if nearlybyte & 0x80 == 0:
+                break
 
 
 class SemiflexibleHandlers(dict):
@@ -138,8 +139,8 @@ class BIFF12Writer(BIFF12Reader):
 
     def __init__(self, fp, debug=False):
         self._debug = debug
-        self._fp = fp
         self._writer = RecordWriter(fp=fp)  # TODO: Move to Worksheet class most likely
+        self._fp = self._writer._fp
 
     def read_id(self):
         raise NotImplemented  # Inherited but not desired
@@ -165,11 +166,23 @@ class BIFF12Writer(BIFF12Reader):
 
     def write_id(self, val):
         # TODO: optional assert val is in allowed values from biff12?
-        payload = uint32_t.pack(val)
-        self._fp.write(payload)
+        _write = self._writer.write
+        for i in range(4):
+            byte = (val >> 8 * i) & 0xFF
+            payload = uint8_t.pack(byte)
+            _write(payload)
+            if byte & 0x80 == 0:
+                break
 
     def write_string(self, str_data):
         self._writer.write_string(str_data)
+
+    def write_bytes(self, bytes_data):
+        assert isinstance(bytes_data, bytes)
+        self._writer.write_len(len(bytes_data))
+        if len(bytes_data):
+            self._writer.write(bytes_data)
+
 
 test_code = '''
 import pyxlsb
@@ -185,4 +198,7 @@ df = pd.DataFrame(
     columns=['colors', 'points', 'temp'] 
 )                                                                       
 ws.write_table(df)
+ws.close()
+wb.close()
+wb = pyxlsb.open_workbook('s.xlsb', debug=True)
 '''
