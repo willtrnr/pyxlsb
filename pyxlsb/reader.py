@@ -138,7 +138,7 @@ class BIFF12Reader(object):
     v = 0
     for i in range(4):
       byte = self._fp.read(1)
-      if byte == '':
+      if len(byte) == 0:
         return None
       byte = uint8_t.unpack(byte)[0]
       v += byte << 8 * i
@@ -150,7 +150,7 @@ class BIFF12Reader(object):
     v = 0
     for i in range(4):
       byte = self._fp.read(1)
-      if byte == '':
+      if len(byte) == 0:
         return None
       byte = uint8_t.unpack(byte)[0]
       v += (byte & 0x7F) << (7 * i)
