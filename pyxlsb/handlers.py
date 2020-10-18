@@ -1,5 +1,6 @@
 from . import biff12
 from collections import namedtuple
+import io
 
 class Handler(object):
   def __init__(self):
@@ -62,6 +63,18 @@ class SheetHandler(Handler):
     relid = reader.read_string()
     name = reader.read_string()
     return self.cls._make([sheetid, relid, name])
+
+  @staticmethod
+  def compose(record_writer_cls, sheetid, relid, sheet_name):
+    buf = io.BytesIO()
+    writer = record_writer_cls(buf)
+    writer.write(b'\x00' * 4)
+    writer.write_int(sheetid, do_write_len=False)
+    #writer.write_int(len(relid), do_write_len=False)
+    #writer.write(relid)
+    writer.write_string(relid)
+    writer.write_string(sheet_name)
+    return buf.getvalue()
 
 
 class DimensionHandler(Handler):

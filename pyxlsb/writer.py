@@ -68,14 +68,14 @@ class RecordWriter(object):
 
     def write_string(self, str_data):
         data = str_data.encode(self._enc, errors='replace')
-        size = len(data)
-        self.write_int(size)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
+        size = len(data) // 2
+        self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
         self._fp.write(data)
 
     def write_obj_str(self, obj):
         data = str(obj).encode(self._enc, errors='replace')
-        size = len(data)
-        self.write_int(size)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
+        size = len(data) // 2
+        self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
         self._fp.write(data)
 
     def write_len(self, val):

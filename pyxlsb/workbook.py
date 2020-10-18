@@ -3,6 +3,7 @@ import sys
 from . import biff12
 from .reader import BIFF12Reader
 from .writer import BIFF12Writer
+from .handlers import SheetHandler
 from .stringtable import StringTable
 from .worksheet import Worksheet, supported_modes
 from tempfile import TemporaryFile
@@ -98,10 +99,13 @@ class Workbook(object):
       writer.write_bytes(b'')
       writer.write_id(biff12.SHEETS)
       writer.write_bytes(b'')
-      for sn in self.sheets:
+      for sheetid, sheet_name in enumerate(self.sheets, start=1):
         writer.write_id(biff12.SHEET)
-        writer.write_string(sn)
+        relid = 'rId{}'.format(sheetid)  # TODO: properly connect up to rel stuff
+        payload = SheetHandler.compose(writer._writer.__class__, sheetid, relid, sheet_name)
+        writer.write_bytes(payload)
       writer.write_id(biff12.SHEETS_END)
+      writer.write_bytes(b'')
 
     sheet_idx = len(self.sheets)
     sheet_zf = self._zf.open('xl/worksheets/sheet{}.bin'.format(sheet_idx), 'w')
