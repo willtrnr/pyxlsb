@@ -101,16 +101,16 @@ class SemiflexibleHandlers(dict):
         if np is not None:
             self.update(
                 {
-                    np.int64: (biff12.NUM, RecordWriter.write_double), # TODO: can support long?
-                    np.int32: (biff12.NUM, RecordWriter.write_int),
-                    np.int16: (biff12.NUM, RecordWriter.write_short),
-                    np.int8: (biff12.NUM, RecordWriter.write_byte),
-                    np.float128: (biff12.FLOAT, RecordWriter.write_double),
-                    np.float64: (biff12.FLOAT, RecordWriter.write_double),
-                    np.float32: (biff12.FLOAT, RecordWriter.write_float),
-                    np.float16: (biff12.FLOAT, RecordWriter.write_float),
-                    np.bool8: (biff12.BOOL, RecordWriter.write_byte),
-                    np.object: (biff12.STRING, RecordWriter.write_obj_str),
+                    np.dtype('int64'): (biff12.FLOAT, RecordWriter.write_double),   # TODO: can support long in NUM?
+                    np.dtype('int32'): (biff12.NUM, RecordWriter.write_int),
+                    np.dtype('int16'): (biff12.NUM, RecordWriter.write_short),      # TODO: write_int? but then is write_short ever used?
+                    np.dtype('int8'): (biff12.NUM, RecordWriter.write_byte),        # TODO: write_int?
+                    np.dtype('float128'): (biff12.FLOAT, RecordWriter.write_double),
+                    np.dtype('float64'): (biff12.FLOAT, RecordWriter.write_double),
+                    np.dtype('float32'): (biff12.FLOAT, RecordWriter.write_float),  # TODO: write_double?
+                    np.dtype('float16'): (biff12.FLOAT, RecordWriter.write_float),  # TODO: write_double?
+                    np.dtype('bool8'): (biff12.BOOL, RecordWriter.write_byte),
+                    np.dtype('object'): (biff12.STRING, RecordWriter.write_obj_str),
                 }
             )
 
