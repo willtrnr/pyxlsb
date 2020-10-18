@@ -94,11 +94,11 @@ class DimensionHandler(Handler):
       writer = writer._writer
     except AttributeError:
       pass
-    writer.write_len(16)                            # Length is always 4 * 4 bytes
-    writer.write_int(0, do_write_len=False)         # r1 = 0
-    writer.write_int(num_rows, do_write_len=False)  # r2 = num_rows
-    writer.write_int(0, do_write_len=False)         # c1 = 0
-    writer.write_int(num_cols, do_write_len=False)  # c2 = num_cols
+    writer.write_len(16)                              # Length is always 4 * 4 bytes
+    writer.write_int(0, do_write_len=False)           # r1 = 0
+    writer.write_int(num_rows-1, do_write_len=False)  # r2 = num_rows - 1
+    writer.write_int(0, do_write_len=False)           # c1 = 0
+    writer.write_int(num_cols-1, do_write_len=False)  # c2 = num_cols - 1
 
 class ColumnHandler(Handler):
   cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
@@ -166,8 +166,22 @@ class CellHandler(Handler):
     return self.cls._make([col, val, None, style])
 
   @staticmethod
-  def write(writer, col_num, style, val):
-    pass #TODO
+  def write(writer, col_num, val, write_val_func, style=0):
+    buf = io.BytesIO()
+    try:
+      writer = writer._writer
+    except AttributeError:
+      pass
+    buf_writer = writer.__class__(buf)
+
+    buf_writer.write_int(col_num)
+    buf_writer.write_int(style)
+    write_val_func(buf_writer, val)
+
+    payload = buf.getvalue()
+    print(f'DBG CellHandler.write: {col_num=} {len(payload)} {payload=}')
+    writer.write_len(len(payload))
+    writer.write(payload)
 
 
 class HyperlinkHandler(Handler):

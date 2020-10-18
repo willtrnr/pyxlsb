@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ElementTree
 from . import biff12
 from .reader import BIFF12Reader
 from .writer import BIFF12Writer
-from .handlers import BasicHandler, DimensionHandler, RowHandler
+from .handlers import BasicHandler, DimensionHandler, RowHandler, CellHandler
 from collections import namedtuple
 
 if sys.version_info > (3,):
@@ -106,11 +106,12 @@ class Worksheet(object):
     writer = self._writer
     for i, row in enumerate(rows):
       self._write_every_row_preformat()
+      writer.write_id(biff12.ROW)
       RowHandler.write(writer, i)
-      for v in row:
+      for j, v in enumerate(row):
         biff_type, write_func = writer.handlers[type(v)]
         writer.write_id(biff_type)
-        write_func(writer._writer, v)
+        CellHandler.write(writer, j, v, write_func)
 
   def write_table(self, table_data):
     writer = self._writer
@@ -161,12 +162,14 @@ class Worksheet(object):
       except AttributeError:
         # Handle table_data as something like a numpy.ndarray
         writer_handlers = [writer.handlers[table_data.dtype]] * num_cols
-      for i, row in enumerate(table_data.iterrows()):  # TODO: better/faster than iterrows?
+      for i, row in enumerate(table_data.itertuples(index=False)):  # TODO: better/faster than itertuples?
+        self._write_every_row_preformat()
+        writer.write_id(biff12.ROW)
         RowHandler.write(writer, i)
-        for cell, (biff_type, write_func) in zip(row, writer_handlers):
-          self._write_every_row_preformat()
+        for j, cell, (biff_type, write_func) in zip(xrange(num_cols), row, writer_handlers):
           writer.write_id(biff_type)
-          write_func(writer._writer, cell)
+          print(f'DBG {biff_type=} {cell=}', end=' ')
+          CellHandler.write(writer, j, cell, write_func)
     except AttributeError:
       # Handle table_data as a list of rows (each themselves a list)
       self._auto_writerows(table_data)
