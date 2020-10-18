@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ElementTree
 from . import biff12
 from .reader import BIFF12Reader
 from .writer import BIFF12Writer
-from .handlers import BasicHandler, DimensionHandler
+from .handlers import BasicHandler, DimensionHandler, RowHandler
 from collections import namedtuple
 
 if sys.version_info > (3,):
@@ -92,11 +92,21 @@ class Worksheet(object):
           yield row
         break
 
+  def _write_every_row_preformat(self):
+    writer = self._writer
+    writer.write_id(0x0025)
+    writer.write_bytes(b'\x01\x00\x02\x0e\x00\x80')
+    writer.write_id(0x0895)
+    writer.write_bytes(b'\x05\x00')
+    writer.write_id(0x0026)
+    BasicHandler.write(writer)
+
   def _auto_writerows(self, rows):
     # Without metadata at top up-to-date, this fails standalone
     writer = self._writer
-    for row in rows:
-      writer.write_id(biff12.ROW)
+    for i, row in enumerate(rows):
+      self._write_every_row_preformat()
+      RowHandler.write(writer, i)
       for v in row:
         biff_type, write_func = writer.handlers[type(v)]
         writer.write_id(biff_type)
@@ -104,6 +114,12 @@ class Worksheet(object):
 
   def write_table(self, table_data):
     writer = self._writer
+
+    # Initial metadata
+    writer.write_id(biff12.WORKSHEET)
+    BasicHandler.write(writer)
+    writer.write_id(biff12.SHEETPR)
+    writer.write_bytes(b'\xc9\x04\x02\x00@\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00')
 
     # Dimension metadata
     try:
@@ -117,6 +133,23 @@ class Worksheet(object):
     writer.write_id(biff12.DIMENSION)
     DimensionHandler.write(writer, num_rows, num_cols)
 
+    # Sheetviews metadata
+    writer.write_id(biff12.SHEETVIEWS)
+    BasicHandler.write(writer)
+    writer.write_id(biff12.SHEETVIEW)
+    writer.write_bytes(b'\x9c\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00@\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    writer.write_id(biff12.SELECTION)
+    writer.write_bytes(b'\x03\x00\x00\x00\x17\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x17\x00\x00\x00\x17\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00')
+    writer.write_id(biff12.SHEETVIEW_END)
+    BasicHandler.write(writer)
+    writer.write_id(biff12.SHEETVIEWS_END)
+    BasicHandler.write(writer)
+
+    # Remaining metadata
+    self._write_every_row_preformat()
+    writer.write_id(biff12.SHEETFORMATPR)
+    writer.write_bytes(b'\xff\xff\xff\xff\x08\x00,\x01\x00\x00\x00\x00')
+
     # Sheet data
     writer.write_id(biff12.SHEETDATA)
     BasicHandler.write(writer)
@@ -128,8 +161,10 @@ class Worksheet(object):
       except AttributeError:
         # Handle table_data as something like a numpy.ndarray
         writer_handlers = [writer.handlers[table_data.dtype]] * num_cols
-      for row in table_data.iterrows():  # TODO: better/faster than iterrows?
+      for i, row in enumerate(table_data.iterrows()):  # TODO: better/faster than iterrows?
+        RowHandler.write(writer, i)
         for cell, (biff_type, write_func) in zip(row, writer_handlers):
+          self._write_every_row_preformat()
           writer.write_id(biff_type)
           write_func(writer._writer, cell)
     except AttributeError:

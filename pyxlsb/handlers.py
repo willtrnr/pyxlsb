@@ -70,8 +70,6 @@ class SheetHandler(Handler):
     writer = record_writer_cls(buf)
     writer.write(b'\x00' * 4)
     writer.write_int(sheetid, do_write_len=False)
-    #writer.write_int(len(relid), do_write_len=False)
-    #writer.write(relid)
     writer.write_string(relid)
     writer.write_string(sheet_name)
     return buf.getvalue()
@@ -96,10 +94,11 @@ class DimensionHandler(Handler):
       writer = writer._writer
     except AttributeError:
       pass
-    writer.write_int(0)         # r1 = 0
-    writer.write_int(num_rows)  # r2 = num_rows
-    writer.write_int(0)         # c1 = 0
-    writer.write_int(num_cols)  # c2 = num_cols
+    writer.write_len(16)                            # Length is always 4 * 4 bytes
+    writer.write_int(0, do_write_len=False)         # r1 = 0
+    writer.write_int(num_rows, do_write_len=False)  # r2 = num_rows
+    writer.write_int(0, do_write_len=False)         # c1 = 0
+    writer.write_int(num_cols, do_write_len=False)  # c2 = num_cols
 
 class ColumnHandler(Handler):
   cls = namedtuple('col', ['c1', 'c2', 'width', 'style'])
@@ -124,6 +123,16 @@ class RowHandler(Handler):
   def read(self, reader, recid, reclen):
     r = reader.read_int()
     return self.cls._make([r])
+
+  @staticmethod
+  def write(writer, row_id):
+    try:
+      writer = writer._writer
+    except AttributeError:
+      pass
+    writer.write_len(25)  # Length is fixed based on fixed length bytestring below
+    writer.write_int(row_id, do_write_len=False)
+    writer.write(b'\x00\x00\x00\x00,\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00')
 
 
 class CellHandler(Handler):
@@ -155,6 +164,10 @@ class CellHandler(Handler):
     elif recid == biff12.FORMULA_BOOLERR:
       val = hex(reader.read_byte())
     return self.cls._make([col, val, None, style])
+
+  @staticmethod
+  def write(writer, col_num, style, val):
+    pass #TODO
 
 
 class HyperlinkHandler(Handler):

@@ -24,25 +24,25 @@ class RecordWriter(object):
     def write(self, data):
         return self._fp.write(data)
 
-    def write_int(self, val, do_write_len=True):
+    def write_int(self, val, do_write_len=False):  # TODO: remove do_write_len option altogether?
         payload = uint32_t.pack(val)
         if do_write_len:
             self.write_len(len(payload))
         self._fp.write(payload)
 
-    def write_short(self, val, do_write_len=True):
+    def write_short(self, val, do_write_len=False):
         payload = uint16_t.pack(val)
         if do_write_len:
             self.write_len(len(payload))
         self._fp.write(payload)
 
-    def write_byte(self, val, do_write_len=True):
+    def write_byte(self, val, do_write_len=False):
         payload = uint8_t.pack(val)
         if do_write_len:
             self.write_len(len(payload))
         self._fp.write(payload)
 
-    def write_float(self, val, do_write_len=True):
+    def write_float(self, val, do_write_len=False):
         payload = struct.Struct('<f').pack(val)
 
         # TODO: finish adjustment per read_float steps below:
@@ -60,7 +60,7 @@ class RecordWriter(object):
             self.write_len(len(payload))
         self._fp.write(payload)
 
-    def write_double(self, val, do_write_len=True):
+    def write_double(self, val, do_write_len=False):
         payload = double_t.pack(val)
         if do_write_len:
             self.write_len(len(payload))
