@@ -34,6 +34,8 @@ class Workbook(object):
       with self._zf.open('xl/workbook.bin', 'r') as zf:
         temp.write(zf.read())
         temp.seek(0, os.SEEK_SET)
+      if self._debug:
+        print('Parsing xl/workbook.bin')
       reader = BIFF12Reader(fp=temp, debug=self._debug)
       for item in reader:
         if item[0] == biff12.SHEET:
@@ -46,6 +48,8 @@ class Workbook(object):
       with self._zf.open('xl/sharedStrings.bin', 'r') as zf:
         temp.write(zf.read())
         temp.seek(0, os.SEEK_SET)
+      if self._debug:
+        print('Parsing xl/sharedStrings.bin')
       self.stringtable = StringTable(fp=temp)
     except KeyError:
       pass
@@ -80,6 +84,20 @@ class Workbook(object):
     self.sheets.append(sheet_name)
     with self._zf.open('xl/workbook.bin', 'w') as workbook_zf:
       writer = BIFF12Writer(fp=workbook_zf, debug=self._debug)
+      writer.write_id(biff12.WORKBOOK)
+      writer.write_bytes(b'')
+      writer.write_id(biff12.FILEVERSION)
+      writer.write_bytes(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00x\x00l\x00\x01\x00\x00\x005\x00\x01\x00\x00\x005\x00\x04\x00\x00\x009\x003\x000\x003\x00')
+      writer.write_id(biff12.WORKBOOKPR)
+      writer.write_bytes(b' \x00\x01\x00B\xe5\x01\x00\x00\x00\x00\x00')
+      writer.write_id(biff12.BOOKVIEWS)
+      writer.write_bytes(b'')
+      writer.write_id(biff12.WORKBOOKVIEW)
+      writer.write_bytes(b'\xe0\x01\x00\x00x\x00\x00\x00\x13\x92\x00\x00#F\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00x')
+      writer.write_id(biff12.BOOKVIEWS_END)
+      writer.write_bytes(b'')
+      writer.write_id(biff12.SHEETS)
+      writer.write_bytes(b'')
       for sn in self.sheets:
         writer.write_id(biff12.SHEET)
         writer.write_string(sn)
