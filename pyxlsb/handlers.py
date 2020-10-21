@@ -50,6 +50,22 @@ class StringInstanceHandler(Handler):
     val = reader.read_string()
     return self.cls._make([val])
 
+  @staticmethod
+  def write(writer, str_val):
+    try:
+      writer = writer._writer
+    except AttributeError:
+      pass
+
+    buf = io.BytesIO()
+    buf_writer = writer.__class__(buf)
+    buf_writer.write_byte(0)
+    buf_writer.write_string(str_val)
+    payload = buf.getvalue()
+
+    print(f'DBG StringInstanceHandler.write: {str_val=} {len(payload)} {payload=}')
+    writer.write_len(len(payload))
+    writer.write(payload)
 
 class SheetHandler(Handler):
   cls = namedtuple('sheet', ['sheetId', 'rId', 'name'])

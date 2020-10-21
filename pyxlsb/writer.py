@@ -67,16 +67,25 @@ class RecordWriter(object):
         self._fp.write(payload)
 
     def write_string(self, str_data):
-        data = str_data.encode(self._enc, errors='replace')
-        size = len(data) // 2
-        self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
-        self._fp.write(data)
+        try:
+            data = str_data.encode(self._enc, errors='replace')
+            size = len(data) // 2
+            self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
+            self._fp.write(data)
+        except AttributeError:
+            # Reference to shared string was passed in instead.
+            self.write_int(val=str_data)
 
     def write_obj_str(self, obj):
-        data = str(obj).encode(self._enc, errors='replace')
-        size = len(data) // 2
-        self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
-        self._fp.write(data)
+        try:
+            assert not isinstance(obj, int)
+            data = str(obj).encode(self._enc, errors='replace')
+            size = len(data) // 2
+            self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
+            self._fp.write(data)
+        except AssertionError:
+            # Reference to shared string was passed in instead.
+            self.write_int(val=obj)
 
     def write_len(self, val):
         # TODO: Does not match what RecordReader.read_string does? (Does match RecordReader.read_len)
@@ -201,4 +210,7 @@ ws.write_table(df)
 ws.close()
 wb.close()
 wb = pyxlsb.open_workbook('s.xlsb', debug=True)
+ws = wb.get_sheet(1)
+for row in ws.rows():
+    print(row)
 '''

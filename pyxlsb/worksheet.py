@@ -110,6 +110,10 @@ class Worksheet(object):
       RowHandler.write(writer, i)
       for j, v in enumerate(row):
         biff_type, write_func = writer.handlers[type(v)]
+        if biff_type == biff12.STRING:
+          v_as_str = str(v)
+          self._stringtable.update([v_as_str])
+          v = self._stringtable._strings.index(v_as_str)  # Write reference to shared string instead.
         writer.write_id(biff_type)
         CellHandler.write(writer, j, v, write_func)
 
@@ -159,16 +163,25 @@ class Worksheet(object):
       try:
         # Handle table_data as something like a pandas.DataFrame
         writer_handlers = [writer.handlers[dt] for dt in table_data.dtypes]
+        for col_name, (biff_type, _write_func) in zip(table_data, writer_handlers):
+          if biff_type == biff12.STRING:
+            self._stringtable.update(table_data[col_name].astype(str))
+        data_iterator = table_data.itertuples(index=False)  # TODO: better/faster than itertuples?
       except AttributeError:
         # Handle table_data as something like a numpy.ndarray
         writer_handlers = [writer.handlers[table_data.dtype]] * num_cols
-      for i, row in enumerate(table_data.itertuples(index=False)):  # TODO: better/faster than itertuples?
+        if writer_handlers[0][0] == biff12.STRING:
+          self._stringtable.update(table_data.reshape((table_data.size,)).astype(str))
+        data_iterator = table_data
+      for i, row in enumerate(data_iterator):
         self._write_every_row_preformat()
         writer.write_id(biff12.ROW)
         RowHandler.write(writer, i)
         for j, cell, (biff_type, write_func) in zip(xrange(num_cols), row, writer_handlers):
           writer.write_id(biff_type)
           print(f'DBG {biff_type=} {cell=}', end=' ')
+          if biff_type == biff12.STRING:
+            cell = self._stringtable._strings.index(str(cell))  # Write reference to shared string instead.
           CellHandler.write(writer, j, cell, write_func)
     except AttributeError:
       # Handle table_data as a list of rows (each themselves a list)

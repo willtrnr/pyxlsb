@@ -22,6 +22,13 @@ class Workbook(object):
     self.stringtable = None
     if self._mode == 'r':
       self._parse()
+    else:
+      try:
+        with self._zf.open('xl/sharedStrings.bin', 'r') as shared_strings_zf:
+          self.stringtable = StringTable(fp=shared_strings_zf, debug=self._debug)
+      except KeyError:
+        # xl/sharedStrings.bin file does not exist yet
+        self.stringtable = StringTable(fp=None, mode='w', debug=self._debug)
 
   def __enter__(self):
     return self
@@ -117,5 +124,11 @@ class Workbook(object):
 
     return sheet
 
+  def _write_shared_strings(self):
+    with self._zf.open('xl/sharedStrings.bin', 'w') as shared_strings_zf:
+      self.stringtable = StringTable(fp=shared_strings_zf, prior_string_table=self.stringtable, mode='w', debug=self._debug)
+      self.stringtable.write_table()
+
   def close(self):
+    self._write_shared_strings()
     self._zf.close()
