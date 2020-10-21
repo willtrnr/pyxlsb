@@ -88,7 +88,7 @@ try:
     a = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9.9]])
     ws.write_table(a)
 finally:
-    ws.close()  # Ensure sheets are closed before writing/closing the workbook.
+    ws.close()  # Ensure sheets are closed before writing any other sheets.
 ws = wb.create_sheet('Sheet2')
 try:
     data = [
