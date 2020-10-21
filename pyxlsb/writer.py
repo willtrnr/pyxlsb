@@ -1,3 +1,19 @@
+'''Support for writing XLSB files.
+
+Detailed notes on creating minimal XLSB files versus conventional contents:
+* xl/workbook.bin must exist and differs for each XLSB
+* xl/sharedStrings.bin must exist and differs for each XLSB
+* xl/worksheets/sheet[0-9]+.bin must exist and differs for each XLSB
+* [Content_Types].xml must exist and be modified to list each sheet[0-9]+.bin
+* xl/_rels/workbook.bin.rels must exist and be modified to list each sheet[0-9]+.bin
+* _rels/.rels must exist but does not need to change
+* docProps/ can be skipped
+* xl/styles.bin can be skipped
+* xl/theme can be skipped
+* xl/worksheets/_rels can be skipped
+* xl/worksheets/binaryIndex[0-9]+.bin can be skipped
+'''
+
 from . import biff12
 from .reader import uint8_t, uint16_t, int32_t, uint32_t, double_t, BIFF12Reader
 import os
@@ -69,6 +85,7 @@ class RecordWriter(object):
     def write_string(self, str_data):
         try:
             data = str_data.encode(self._enc, errors='replace')
+            data = data.lstrip(b'\xff\xfe')
             size = len(data) // 2
             self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
             self._fp.write(data)
@@ -79,10 +96,7 @@ class RecordWriter(object):
     def write_obj_str(self, obj):
         try:
             assert not isinstance(obj, int)
-            data = str(obj).encode(self._enc, errors='replace')
-            size = len(data) // 2
-            self.write_int(size, do_write_len=False)  # TODO: Matches RecordReader.read_string but not RecordReader.read_len?
-            self._fp.write(data)
+            self.write_string(str_data=str(obj))
         except AssertionError:
             # Reference to shared string was passed in instead.
             self.write_int(val=obj)
@@ -158,19 +172,6 @@ class BIFF12Writer(BIFF12Reader):
 
     def next(self):
         raise StopIteration   # Inherited but not desired; TODO: new shared base class
-    #    ret = None
-    #    while ret is None:
-    #      if self._debug:
-    #        pos = self._fp.tell()
-    #      recid = self.read_id()
-    #      reclen = self.read_len()
-    #      if recid is None or reclen is None:
-    #        raise StopIteration
-    #      recdata = self._fp.read(reclen)
-    #      ret = (self.handlers.get(recid) or Handler()).read(RecordReader(recdata), recid, reclen)
-    #      if self._debug:
-    #        print('{:08X}  {:04X}  {:<6} {} {}'.format(pos, recid, reclen, ' '.join('{:02X}'.format(b) for b in recdata), ret))
-    #    return (recid, ret)
 
     def write_id(self, val):
         # TODO: optional assert val is in allowed values from biff12?
@@ -190,26 +191,3 @@ class BIFF12Writer(BIFF12Reader):
         self._writer.write_len(len(bytes_data))
         if len(bytes_data):
             self._writer.write(bytes_data)
-
-
-test_code = '''
-import pyxlsb
-wb = pyxlsb.open_workbook('s.xlsb', 'w')
-ws = wb.create_sheet('blah')
-import pandas as pd
-df = pd.DataFrame( 
-    [ 
-        ['blue', 4, -273.154], 
-        ['azul', 5, -195.79], 
-        ['blau', 6, -78.5], 
-    ], 
-    columns=['colors', 'points', 'temp'] 
-)                                                                       
-ws.write_table(df)
-ws.close()
-wb.close()
-wb = pyxlsb.open_workbook('s.xlsb', debug=True)
-ws = wb.get_sheet(1)
-for row in ws.rows():
-    print(row)
-'''
