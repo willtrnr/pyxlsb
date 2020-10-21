@@ -130,5 +130,6 @@ class Workbook(object):
       self.stringtable.write_table()
 
   def close(self):
-    self._write_shared_strings()
+    if self._mode == 'w':
+      self._write_shared_strings()
     self._zf.close()

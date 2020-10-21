@@ -101,8 +101,8 @@ class SemiflexibleHandlers(dict):
 
     def __init__(self, *args, **kwargs):
         initial_handlers = {
-            int: (biff12.NUM, RecordWriter.write_double),  # TODO: can/should support long?
-            float: (biff12.NUM, RecordWriter.write_double),
+            int: (biff12.FLOAT, RecordWriter.write_double),
+            float: (biff12.FLOAT, RecordWriter.write_double),
             bool: (biff12.BOOL, RecordWriter.write_byte),
             str: (biff12.STRING, RecordWriter.write_string),
         }
