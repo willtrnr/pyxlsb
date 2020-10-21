@@ -60,3 +60,44 @@ from pyxlsb import convert_date
 print(convert_date(41235.45578))
 # datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
+
+Basic support for writing XLSB files is available, enabling the creation of new sheets populated with data from `pandas.DataFrame`, `numpy.ndarray`, or `list`-of-`list` objects.  (The `pandas` and `numpy` packages are purely optional dependencies of `pyxlsb`.)
+
+```python
+from pyxlsb import open_workbook
+import pandas as pd
+with open_workbook('Book2.xlsb', 'w') as wb:
+    with wb.create_sheet('Sheet1') as ws:
+        df = pd.DataFrame(
+            [
+                ['blue', 4, -273.154],
+                ['azul', 5, -195.79],
+                ['blau', 6, -78.5],
+            ],
+            columns=['colors', 'points', 'temp']
+        )
+        ws.write_table(df)
+```
+
+```python
+from pyxlsb import open_workbook
+import numpy as np
+wb = open_workbook('Book3.xlsb', 'w')
+ws = wb.create_sheet('Sheet1')
+try:
+    a = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9.9]])
+    ws.write_table(a)
+finally:
+    ws.close()  # Ensure sheets are closed before writing/closing the workbook.
+ws = wb.create_sheet('Sheet2')
+try:
+    data = [
+        ['blue', 4, -273.154],
+        ['azul', 5, -195.79],
+        ['blau', 6, -78.5],
+    ]
+    ws.write_table(data)
+finally:
+    ws.close()
+wb.close()  # Ensure all sheets are closed before closing the workbook.
+```

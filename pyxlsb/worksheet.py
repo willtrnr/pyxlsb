@@ -179,7 +179,6 @@ class Worksheet(object):
         RowHandler.write(writer, i)
         for j, cell, (biff_type, write_func) in zip(xrange(num_cols), row, writer_handlers):
           writer.write_id(biff_type)
-          print(f'DBG {biff_type=} {cell=}', end=' ')
           if biff_type == biff12.STRING:
             cell = self._stringtable._strings.index(str(cell))  # Write reference to shared string instead.
           CellHandler.write(writer, j, cell, write_func)

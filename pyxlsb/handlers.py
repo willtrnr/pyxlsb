@@ -63,7 +63,6 @@ class StringInstanceHandler(Handler):
     buf_writer.write_string(str_val)
     payload = buf.getvalue()
 
-    print(f'DBG StringInstanceHandler.write: {str_val=} {len(payload)} {payload=}')
     writer.write_len(len(payload))
     writer.write(payload)
 
@@ -183,19 +182,18 @@ class CellHandler(Handler):
 
   @staticmethod
   def write(writer, col_num, val, write_val_func, style=0):
-    buf = io.BytesIO()
     try:
       writer = writer._writer
     except AttributeError:
       pass
-    buf_writer = writer.__class__(buf)
 
+    buf = io.BytesIO()
+    buf_writer = writer.__class__(buf)
     buf_writer.write_int(col_num)
     buf_writer.write_int(style)
     write_val_func(buf_writer, val)
-
     payload = buf.getvalue()
-    print(f'DBG CellHandler.write: {col_num=} {len(payload)} {payload=}')
+
     writer.write_len(len(payload))
     writer.write(payload)
 
