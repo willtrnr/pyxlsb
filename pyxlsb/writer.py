@@ -114,7 +114,6 @@ class SemiflexibleHandlers(dict):
                     np.dtype('int32'): (biff12.NUM, RecordWriter.write_int),
                     np.dtype('int16'): (biff12.NUM, RecordWriter.write_short),      # TODO: write_int? but then is write_short ever used?
                     np.dtype('int8'): (biff12.NUM, RecordWriter.write_byte),        # TODO: write_int?
-                    np.dtype('float128'): (biff12.FLOAT, RecordWriter.write_double),
                     np.dtype('float64'): (biff12.FLOAT, RecordWriter.write_double),
                     np.dtype('float32'): (biff12.FLOAT, RecordWriter.write_float),  # TODO: write_double?
                     np.dtype('float16'): (biff12.FLOAT, RecordWriter.write_float),  # TODO: write_double?
