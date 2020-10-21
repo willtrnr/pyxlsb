@@ -61,6 +61,8 @@ print(convert_date(41235.45578))
 # datetime.datetime(2012, 11, 22, 10, 56, 19)
 ```
 
+#### Writing XLSB
+
 Basic support for writing XLSB files is available, enabling the creation of new sheets populated with data from `pandas.DataFrame`, `numpy.ndarray`, or `list`-of-`list` objects.  (The `pandas` and `numpy` packages are purely optional dependencies of `pyxlsb`.)
 
 ```python
@@ -78,6 +80,8 @@ with open_workbook('Book2.xlsb', 'w') as wb:
         )
         ws.write_table(df)
 ```
+
+Multiple sheets may also be created and written to a workbook.  Use of the `with`-statement is strongly encouraged (see above example) but when it is not employed, care must be taken to only leave one sheet open for writing at a time.
 
 ```python
 from pyxlsb import open_workbook
