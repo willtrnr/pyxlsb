@@ -115,4 +115,4 @@ anything else I might have missed, I'll try to prioritize what's most requested.
    :target: https://pypi.python.org/pypi/pyxlsb
 .. |Build Status| image:: https://travis-ci.org/wwwiiilll/pyxlsb.svg?branch=master
    :target: https://travis-ci.org/wwwiiilll/pyxlsb
-.. _API reference: https://wwwiiilll.github.io/pyxlsb/
+.. _API reference: https://willtrnr.github.io/pyxlsb/
