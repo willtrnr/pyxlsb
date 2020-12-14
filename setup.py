@@ -1,19 +1,12 @@
 import os.path
 from setuptools import setup
-from subprocess import Popen, PIPE
 from pyxlsb import __version__
 
 # Get a handy base dir
 project_dir = os.path.abspath(os.path.dirname(__file__))
 
-# Use pandoc to convert the Markdown readme to RST for prtty printing on PyPI
-try:
-  proc = Popen(['pandoc', '--from', 'markdown', '--to', 'rst', '--output', '-', os.path.join(project_dir, 'README.md')], stdout=PIPE)
-  README = proc.stdout.read().decode('utf-8')
-  proc.stdout.close()
-  proc.wait()
-except:
-  README = ''
+with open(os.path.join(project_dir, 'README.rst')) as f:
+  README = f.read()
 
 setup(
   name='pyxlsb',
@@ -25,7 +18,7 @@ setup(
   author='William Turner',
   author_email='willtur.will@gmail.com',
 
-  url='https://github.com/wwwiiilll/pyxlsb',
+  url='https://github.com/willtrnr/pyxlsb',
 
   license='LGPLv3+',
 
@@ -37,10 +30,11 @@ setup(
     'Programming Language :: Python :: 2',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6'
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9'
   ],
 
   packages=['pyxlsb']

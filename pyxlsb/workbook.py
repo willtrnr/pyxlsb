@@ -1,5 +1,6 @@
 import os
 import sys
+import xml.etree.ElementTree as ET
 from . import biff12
 from .reader import BIFF12Reader
 from .stringtable import StringTable
@@ -14,7 +15,7 @@ class Workbook(object):
     super(Workbook, self).__init__()
     self._zf = fp
     self._debug = debug
-    self.sheets = list()
+    self._sheets = list()
     self.stringtable = None
     self._parse()
 
@@ -24,7 +25,16 @@ class Workbook(object):
   def __exit__(self, type, value, traceback):
     self.close()
 
+  @property
+  def sheets(self):
+      return list(v[0] for v in self._sheets)
+
   def _parse(self):
+    rels = dict()
+    with self._zf.open('xl/_rels/workbook.bin.rels', 'r') as zf:
+      for el in ET.parse(zf).getroot():
+        rels[el.attrib['Id']] = el.attrib['Target']
+
     with TemporaryFile() as temp:
       with self._zf.open('xl/workbook.bin', 'r') as zf:
         temp.write(zf.read())
@@ -32,7 +42,7 @@ class Workbook(object):
       reader = BIFF12Reader(fp=temp, debug=self._debug)
       for item in reader:
         if item[0] == biff12.SHEET:
-          self.sheets.append(item[1].name)
+          self._sheets.append((item[1].name, rels[item[1].rId]))
         elif item[0] == biff12.SHEETS_END:
           break
 
@@ -47,18 +57,20 @@ class Workbook(object):
 
   def get_sheet(self, idx, rels=False):
     if isinstance(idx, basestring):
-      idx = [s.lower() for s in self.sheets].index(idx.lower()) + 1
-    if idx < 1 or idx > len(self.sheets):
+      idx = [s.lower() for s, _ in self._sheets].index(idx.lower()) + 1
+    if idx < 1 or idx > len(self._sheets):
       raise IndexError('sheet index out of range')
 
+    target = self._sheets[idx - 1][1].split('/')
+
     temp = TemporaryFile()
-    with self._zf.open('xl/worksheets/sheet{}.bin'.format(idx), 'r') as zf:
+    with self._zf.open('xl/{}/{}'.format(target[0], target[-1]), 'r') as zf:
       temp.write(zf.read())
       temp.seek(0, os.SEEK_SET)
 
     if rels:
       rels_temp = TemporaryFile()
-      with self._zf.open('xl/worksheets/_rels/sheet{}.bin.rels'.format(idx), 'r') as zf:
+      with self._zf.open('xl/{}/_rels/{}.rels'.format(target[0], target[-1]), 'r') as zf:
         rels_temp.write(zf.read())
         rels_temp.seek(0, os.SEEK_SET)
     else:

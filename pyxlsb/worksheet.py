@@ -1,6 +1,6 @@
 import os
 import sys
-import xml.etree.ElementTree as ElementTree
+import xml.etree.ElementTree as ET
 from . import biff12
 from .reader import BIFF12Reader
 from collections import namedtuple
@@ -16,7 +16,7 @@ class Worksheet(object):
     self._reader = BIFF12Reader(fp=fp, debug=debug)
     self._rels_fp = rels_fp
     if not rels_fp is None:
-      self._rels = ElementTree.parse(rels_fp).getroot()
+      self._rels = ET.parse(rels_fp).getroot()
     else:
       self._rels = None
     self._stringtable = stringtable

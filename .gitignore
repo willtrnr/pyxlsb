@@ -2,7 +2,6 @@
 *.pyc
 *.pyd
 *.pyo
-*.rst
 *.sublime-*
 *.xlsb
 build/
