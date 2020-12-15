@@ -9,10 +9,12 @@ class WorkbookTestCase(unittest.TestCase):
     def setUp(self):
         self.wb = Workbook(XlsbPackage(os.path.join('test_files', 'test.xlsb')))
         self.wb1904 = Workbook(XlsbPackage(os.path.join('test_files', 'test_1904.xlsb')))
+        self.wb_chart = Workbook(XlsbPackage(os.path.join('test_files', 'test_chart_sheet.xlsb')))
 
     def tearDown(self):
         self.wb.close()
         self.wb1904.close()
+        self.wb_chart.close()
 
     def test_props(self):
         self.assertNotEqual(self.wb.props, None)
@@ -24,6 +26,7 @@ class WorkbookTestCase(unittest.TestCase):
 
     def test_sheets(self):
         self.assertEqual(self.wb.sheets, ['Test'])
+        self.assertEqual(self.wb_chart.sheets, ['Sheet1', 'Chart1', 'Sheet3'])
 
     def test_convert_date(self):
         # Both 0 and 1 are the same date, only 0 is used for time only values

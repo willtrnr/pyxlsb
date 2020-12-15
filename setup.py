@@ -18,7 +18,7 @@ setup(
     author='William Turner',
     author_email='willtur.will@gmail.com',
 
-    url='https://github.com/wwwiiilll/pyxlsb',
+    url='https://github.com/willtrnr/pyxlsb',
 
     license='MIT',
 
@@ -34,6 +34,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 
     packages=['pyxlsb'],

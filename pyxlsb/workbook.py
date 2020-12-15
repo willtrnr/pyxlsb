@@ -1,6 +1,7 @@
 import sys
 import logging
 import warnings
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from . import recordtypes as rt
 from .recordreader import RecordReader
@@ -18,8 +19,8 @@ _MICROSECONDS_IN_DAY = 24 * 60 * 60 * 1000 * 1000
 class Workbook(object):
     """The main Workbook class providing worksheets and other metadata.
 
-    Attributes:
-        sheets (list(str)): The worksheet names in this workbook.
+    Args:
+        pkg (WorkbookPackage): The package driver backing this workbook.
     """
 
     def __init__(self, pkg):
@@ -34,16 +35,21 @@ class Workbook(object):
 
     def _parse(self):
         self.props = None
-        self.sheets = list()
         self.stringtable = None
         self.styles = None
+        self._sheets = list()
+
+        rels = dict()
+        with self._pkg.get_workbook_rels() as f:
+            for el in ET.parse(f).getroot():
+                rels[el.attrib['Id']] = el.attrib['Target']
 
         with self._pkg.get_workbook_part() as f:
             for rectype, rec in RecordReader(f):
                 if rectype == rt.WB_PROP:
                     self.props = rec
                 elif rectype == rt.BUNDLE_SH:
-                    self.sheets.append(rec.name)
+                    self._sheets.append((rec.name, rels[rec.rId]))
                 elif rectype == rt.END_BUNDLE_SHS:
                     break
 
@@ -55,12 +61,17 @@ class Workbook(object):
         if stylesfp is not None:
             self.styles = Styles(stylesfp)
 
+    @property
+    def sheets(self):
+        """:obj:`list` of :obj:`str`: List of sheet names in this workbook."""
+        return list(v[0] for v in self._sheets)
+
     def get_sheet(self, idx_or_name, with_rels=False):
         """Get a sheet by name or 1-based index.
 
         Args:
-            idx_or_name (int or str): The 1-based index or name of the sheet
-            with_rels (bool, optional): If the relationships should be parsed, defaults to False
+            idx_or_name (:obj:`int` or :obj:`str`): The 1-based index or name of the sheet
+            with_rels (:obj:`bool`, optional): If the relationships should be parsed, defaults to False
 
         Returns:
             Worksheet: The corresponding worksheet instance.
@@ -86,7 +97,7 @@ class Workbook(object):
 
         Args:
             idx (int): The index of the sheet.
-            with_rels (bool, optional): If the relationships should be parsed, defaults to False
+            with_rels (:obj:`bool`, optional): If the relationships should be parsed, defaults to False
 
         Returns:
             Worksheet: The corresponding worksheet instance.
@@ -94,22 +105,25 @@ class Workbook(object):
         Raises:
             IndexError: When the provided index is out of range.
         """
-        if idx < 0 or idx >= len(self.sheets):
+        if idx < 0 or idx >= len(self._sheets):
             raise IndexError('sheet index out of range')
 
-        fp = self._pkg.get_worksheet_part(idx + 1)
+        target = self._sheets[idx][1]
+
+        fp = self._pkg.get_file('xl/' + target)
         if with_rels:
-            rels_fp = self._pkg.get_worksheet_rels(idx + 1)
+            parts = target.split('/')
+            rels_fp = self._pkg.get_file('xl/' + '/'.join(parts[:-1] + ['_rels'] + parts[-1:]) + '.rels')
         else:
             rels_fp = None
-        return Worksheet(self, self.sheets[idx], fp, rels_fp)
+        return Worksheet(self, self._sheets[idx][0], fp, rels_fp)
 
     def get_sheet_by_name(self, name, with_rels=False):
         """Get a worksheet by its name.
 
         Args:
             name (str): The name of the sheet.
-            with_rels (bool, optional): If the relationships should be parsed, defaults to False
+            with_rels (:obj:`bool`, optional): If the relationships should be parsed, defaults to False
 
         Returns:
             Worksheet: The corresponding worksheet instance.
@@ -118,7 +132,7 @@ class Workbook(object):
             IndexError: When the provided name is invalid.
         """
         n = name.lower()
-        idx = next((i for i, s in enumerate(self.sheets) if s.lower() == n), -1)
+        idx = next((i for i, (s, _) in enumerate(self._sheets) if s.lower() == n), -1)
         return self.get_sheet_by_index(idx, with_rels=with_rels)
 
     def get_shared_string(self, idx):
@@ -137,7 +151,7 @@ class Workbook(object):
         """Convert an Excel numeric date value to a ``datetime`` instance.
 
         Args:
-            value (int or float): The Excel date value.
+            value (:obj:`int` or :obj:`float`): The Excel date value.
 
         Returns:
             datetime.datetime: The equivalent datetime instance or None when invalid.

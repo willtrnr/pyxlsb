@@ -1,6 +1,6 @@
 import os
 import sys
-import xml.etree.ElementTree as ElementTree
+import xml.etree.ElementTree as ET
 from . import recordtypes as rt
 from .row import Row
 from .recordreader import RecordReader
@@ -57,7 +57,7 @@ class Worksheet(object):
 
         if self._rels_fp is not None:
             self._rels_fp.seek(0, os.SEEK_SET)
-            doc = ElementTree.parse(self._rels_fp)
+            doc = ET.parse(self._rels_fp)
             for el in doc.getroot():
                 self.rels[el.attrib['Id']] = el.attrib['Target']
 
