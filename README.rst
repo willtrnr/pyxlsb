@@ -113,6 +113,6 @@ anything else I might have missed, I'll try to prioritize what's most requested.
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/pyxlsb.svg
    :target: https://pypi.python.org/pypi/pyxlsb
-.. |Build Status| image:: https://travis-ci.org/wwwiiilll/pyxlsb.svg?branch=master
-   :target: https://travis-ci.org/wwwiiilll/pyxlsb
+.. |Build Status| image:: https://travis-ci.org/willtrnr/pyxlsb.svg?branch=master
+   :target: https://travis-ci.org/willtrnr/pyxlsb
 .. _API reference: https://willtrnr.github.io/pyxlsb/
