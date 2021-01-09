@@ -15,7 +15,7 @@ class Worksheet(object):
     super(Worksheet, self).__init__()
     self._reader = BIFF12Reader(fp=fp, debug=debug)
     self._rels_fp = rels_fp
-    if not rels_fp is None:
+    if rels_fp is not None:
       self._rels = ET.parse(rels_fp).getroot()
     else:
       self._rels = None

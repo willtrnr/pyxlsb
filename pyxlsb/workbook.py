@@ -54,6 +54,9 @@ class Workbook(object):
       self.stringtable = StringTable(fp=temp)
     except KeyError:
       pass
+    except Exception:
+      temp.close()
+      raise
 
   def get_sheet(self, idx, rels=False):
     if isinstance(idx, basestring):
@@ -80,3 +83,5 @@ class Workbook(object):
 
   def close(self):
     self._zf.close()
+    if self.stringtable is not None:
+      self.stringtable.close()

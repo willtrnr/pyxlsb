@@ -15,6 +15,12 @@ class RecordReader(object):
     self._fp = io.BytesIO(buf)
     self._enc = enc
 
+  def __enter__(self):
+    return self
+
+  def __exit__(self, type, value, traceback):
+    self._fp.close()
+
   def tell(self):
     return self._fp.tell()
 
@@ -171,7 +177,8 @@ class BIFF12Reader(object):
       if recid is None or reclen is None:
         raise StopIteration
       recdata = self._fp.read(reclen)
-      ret = (self.handlers.get(recid) or Handler()).read(RecordReader(recdata), recid, reclen)
+      with RecordReader(recdata) as reader:
+        ret = (self.handlers.get(recid) or Handler()).read(reader, recid, reclen)
       if self._debug:
         print('{:08X}  {:04X}  {:<6} {} {}'.format(pos, recid, reclen, ' '.join('{:02X}'.format(b) for b in recdata), ret))
     return (recid, ret)
