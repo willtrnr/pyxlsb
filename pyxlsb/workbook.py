@@ -53,7 +53,7 @@ class Workbook(object):
         temp.seek(0, os.SEEK_SET)
       self.stringtable = StringTable(fp=temp)
     except KeyError:
-      pass
+      temp.close()
     except Exception:
       temp.close()
       raise
