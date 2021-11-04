@@ -64,6 +64,7 @@ class Workbook(object):
     if idx < 1 or idx > len(self._sheets):
       raise IndexError('sheet index out of range')
 
+    name = self._sheets[idx - 1][0]
     target = self._sheets[idx - 1][1].split('/')
 
     temp = TemporaryFile()
@@ -79,7 +80,7 @@ class Workbook(object):
     else:
       rels_temp = None
 
-    return Worksheet(fp=temp, rels_fp=rels_temp, stringtable=self.stringtable, debug=self._debug)
+    return Worksheet(name=name, fp=temp, rels_fp=rels_temp, stringtable=self.stringtable, debug=self._debug)
 
   def close(self):
     self._zf.close()
