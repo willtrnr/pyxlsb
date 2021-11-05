@@ -11,8 +11,9 @@ if sys.version_info > (3,):
 Cell = namedtuple('Cell', ['r', 'c', 'v'])
 
 class Worksheet(object):
-  def __init__(self, fp, rels_fp=None, stringtable=None, debug=False):
+  def __init__(self, name, fp, rels_fp=None, stringtable=None, debug=False):
     super(Worksheet, self).__init__()
+    self.name = name
     self._reader = BIFF12Reader(fp=fp, debug=debug)
     self._rels_fp = rels_fp
     if rels_fp is not None:
