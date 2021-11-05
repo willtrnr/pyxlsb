@@ -18,7 +18,7 @@ class StringTable(object):
         return self._strings[key]
 
     def _parse(self):
-        strings = list()
+        strings = []
         self._fp.seek(0, os.SEEK_SET)
         for rectype, rec in RecordReader(self._fp):
             if rectype == rt.SST_ITEM:

@@ -35,9 +35,9 @@ class Worksheet(object):
 
     def _parse(self):
         self.dimension = None
-        self.cols = list()
-        self.rels = dict()
-        self.hyperlinks = dict()
+        self.cols = []
+        self.rels = {}
+        self.hyperlinks = {}
         self._data_offset = 0
 
         self._fp.seek(0, os.SEEK_SET)

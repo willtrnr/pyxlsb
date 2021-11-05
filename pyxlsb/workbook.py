@@ -37,9 +37,9 @@ class Workbook(object):
         self.props = None
         self.stringtable = None
         self.styles = None
-        self._sheets = list()
+        self._sheets = []
 
-        rels = dict()
+        rels = {}
         with self._pkg.get_workbook_rels() as f:
             for el in ET.parse(f).getroot():
                 rels[el.attrib['Id']] = el.attrib['Target']
@@ -64,7 +64,7 @@ class Workbook(object):
     @property
     def sheets(self):
         """:obj:`list` of :obj:`str`: List of sheet names in this workbook."""
-        return list(v[0] for v in self._sheets)
+        return [v[0] for v in self._sheets]
 
     def get_sheet(self, idx_or_name, with_rels=False):
         """Get a sheet by name or 1-based index.

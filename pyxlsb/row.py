@@ -14,7 +14,7 @@ class Row(object):
         self.sheet = sheet
         self.num = num
         self._cols = 0
-        self._cells = dict()
+        self._cells = {}
 
     def __len__(self):
         return self._cols

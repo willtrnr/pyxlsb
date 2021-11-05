@@ -90,9 +90,9 @@ class Styles(object):
         self.close()
 
     def _parse(self):
-        self._formats = dict()
-        self._cell_style_xfs = list()
-        self._cell_xfs = list()
+        self._formats = {}
+        self._cell_style_xfs = []
+        self._cell_xfs = []
 
         self._fp.seek(0, os.SEEK_SET)
         reader = RecordReader(self._fp)
