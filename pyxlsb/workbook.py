@@ -15,7 +15,7 @@ class Workbook(object):
     super(Workbook, self).__init__()
     self._zf = fp
     self._debug = debug
-    self._sheets = list()
+    self._sheets = []
     self.stringtable = None
     self._parse()
 
@@ -27,10 +27,10 @@ class Workbook(object):
 
   @property
   def sheets(self):
-      return list(v[0] for v in self._sheets)
+    return [v[0] for v in self._sheets]
 
   def _parse(self):
-    rels = dict()
+    rels = {}
     with self._zf.open('xl/_rels/workbook.bin.rels', 'r') as zf:
       for el in ET.parse(zf).getroot():
         rels[el.attrib['Id']] = el.attrib['Target']

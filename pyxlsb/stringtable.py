@@ -5,7 +5,7 @@ class StringTable(object):
   def __init__(self, fp):
     super(StringTable, self).__init__()
     self._reader = BIFF12Reader(fp=fp)
-    self._strings = list()
+    self._strings = []
     self._parse()
 
   def __enter__(self):
