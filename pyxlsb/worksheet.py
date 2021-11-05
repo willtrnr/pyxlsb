@@ -16,16 +16,13 @@ class Worksheet(object):
     self.name = name
     self._reader = BIFF12Reader(fp=fp, debug=debug)
     self._rels_fp = rels_fp
-    if rels_fp is not None:
-      self._rels = ET.parse(rels_fp).getroot()
-    else:
-      self._rels = None
+    self._rels = ET.parse(rels_fp).getroot() if rels_fp is not None else None
     self._stringtable = stringtable
     self._data_offset = 0
     self.dimension = None
-    self.cols = list()
-    self.rels = dict()
-    self.hyperlinks = dict()
+    self.cols = []
+    self.rels = {}
+    self.hyperlinks = {}
     self._parse()
 
   def __enter__(self):
