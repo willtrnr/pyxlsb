@@ -78,8 +78,8 @@ class DataReader(object):
     def read_string(self, size=None, enc=None):
         if size is None:
             size = self.read_int()
-            if size is None:
-                return None
+        if size is None:
+            return None
 
         size *= 2
         buf = self.read(size)

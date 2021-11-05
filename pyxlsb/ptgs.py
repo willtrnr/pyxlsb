@@ -348,8 +348,8 @@ class ArrayPtg(ClassifiedPtg):
         if cols == 0:
             cols = 256
         rows = reader.read_short()
-        values = list()
-        for i in xrange(cols * rows):
+        values = []
+        for _ in xrange(cols * rows):
             flag = reader.read_byte()
             value = None
             if flag == 0x01:
@@ -448,10 +448,10 @@ class MemAreaPtg(ClassifiedPtg):
     def read(cls, reader, ptg):
         res = reader.read(4)  # Reserved
         subex_len = reader.read_short()
-        rects = list()
+        rects = []
         if subex_len:
             rect_count = reader.read_short()
-            for i in xrange(rect_count):
+            for _ in xrange(rect_count):
                 r1 = reader.read_int()
                 r2 = reader.read_int()
                 c1 = reader.read_short()
@@ -763,10 +763,11 @@ class AttrPtg(BasePtg):
 
     def stringify(self, tokens, workbook):
         spaces = ''
-        if self.attr_space:
-            if self.data & 0x00FF == 0x00 or self.data & 0x00FF == 0x06:
+        if self.data & 0x00FF in [0x00, 0x06]:
+            if self.attr_space:
                 spaces = ' ' * (self.data >> 1)
-            elif self.data & 0x00FF == 0x01:
+        elif self.data & 0x00FF == 0x01:
+            if self.attr_space:
                 spaces = '\n' * (self.data >> 1)
         return spaces + tokens.pop().stringify(tokens, workbook)
 
@@ -863,8 +864,8 @@ class FuncVarPtg(ClassifiedPtg):
         self.ce = ce
 
     def stringify(self, tokens, workbook):
-        args = list()
-        for i in xrange(self.argc):
+        args = []
+        for _ in xrange(self.argc):
             arg = tokens.pop().stringify(tokens, workbook)
             args.append(arg)
         return 'VAR_FUNC_{}({})'.format(self.idx, ', '.join(args))

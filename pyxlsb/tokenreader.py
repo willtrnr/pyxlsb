@@ -84,5 +84,4 @@ class TokenReader(object):
         if ptg is None:
             raise StopIteration
         base = ((ptg | 0x20) if ptg & 0x40 == 0x40 else ptg) & 0x3F
-        res = self._ptgs.get(base, self._default_ptg).read(self._reader, ptg)
-        return res
+        return self._ptgs.get(base, self._default_ptg).read(self._reader, ptg)

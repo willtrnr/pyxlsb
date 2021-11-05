@@ -16,7 +16,7 @@ except ImportError:
         def hexed(it):
             conv = (lambda x: x) if sys.version_info > (3,) else ord
             for chunk in it:
-                yield tuple(['%02X' % conv(b) for b in chunk])
+                yield tuple('%02X' % conv(b) for b in chunk)
 
         def formatted(d):
             for i, c in enumerate(hexed(chunked(d, 16))):
