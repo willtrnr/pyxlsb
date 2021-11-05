@@ -1,11 +1,12 @@
 import os
+
 from . import recordtypes as rt
 from .recordreader import RecordReader
 from .records import FormatRecord
 
 
 class Format(object):
-    __slots__ = ('code', 'is_builtin', '_is_date_format')
+    __slots__ = ("code", "is_builtin", "_is_date_format")
 
     def __init__(self, code):
         self.code = code
@@ -20,20 +21,19 @@ class Format(object):
                 # TODO Implement an actual parser
                 in_color = 0
                 for c in self.code:
-                    if c == '[':
+                    if c == "[":
                         in_color += 1
-                    elif c == ']' and in_color > 0:
+                    elif c == "]" and in_color > 0:
                         in_color -= 1
                     elif in_color > 0:
                         continue
-                    elif c in ('y', 'm', 'd', 'h', 's'):
+                    elif c in ("y", "m", "d", "h", "s"):
                         self._is_date_format = True
                         break
         return self._is_date_format
 
     def __repr__(self):
-        return 'Format(code={}, is_builtin={})' \
-            .format(self.code, self.is_builtin)
+        return "Format(code={}, is_builtin={})".format(self.code, self.is_builtin)
 
 
 class BuiltinFormat(Format):
@@ -50,33 +50,33 @@ class Styles(object):
 
     # See: ISO/IEC29500-1:2016 section 18.8.30
     _builtin_formats = {
-        1: BuiltinFormat('0'),
-        2: BuiltinFormat('0.00'),
-        3: BuiltinFormat('#,##0'),
-        4: BuiltinFormat('#,##0.00'),
-        9: BuiltinFormat('0%'),
-        10: BuiltinFormat('0.00%'),
-        11: BuiltinFormat('0.00E+00'),
-        12: BuiltinFormat('# ?/?'),
-        13: BuiltinFormat('# ??/??'),
-        14: BuiltinFormat('mm-dd-yy'),
-        15: BuiltinFormat('d-mmm-yy'),
-        16: BuiltinFormat('d-mmm'),
-        17: BuiltinFormat('mmm-yy'),
-        18: BuiltinFormat('h:mm AM/PM'),
-        19: BuiltinFormat('h:mm:ss AM/PM'),
-        20: BuiltinFormat('h:mm'),
-        21: BuiltinFormat('h:mm:ss'),
-        22: BuiltinFormat('m/d/yy h:mm'),
-        37: BuiltinFormat('#,##0;(#,##0)'),
-        38: BuiltinFormat('#,##0;[Red](#,##0)'),
-        39: BuiltinFormat('#,##0.00;(#,##0.00)'),
-        40: BuiltinFormat('#,##0.00;[Red](#,##0.00)'),
-        45: BuiltinFormat('mm:ss'),
-        46: BuiltinFormat('[h]:mm:ss'),
-        47: BuiltinFormat('mmss.0'),
-        48: BuiltinFormat('##0.0E+0'),
-        49: BuiltinFormat('@')
+        1: BuiltinFormat("0"),
+        2: BuiltinFormat("0.00"),
+        3: BuiltinFormat("#,##0"),
+        4: BuiltinFormat("#,##0.00"),
+        9: BuiltinFormat("0%"),
+        10: BuiltinFormat("0.00%"),
+        11: BuiltinFormat("0.00E+00"),
+        12: BuiltinFormat("# ?/?"),
+        13: BuiltinFormat("# ??/??"),
+        14: BuiltinFormat("mm-dd-yy"),
+        15: BuiltinFormat("d-mmm-yy"),
+        16: BuiltinFormat("d-mmm"),
+        17: BuiltinFormat("mmm-yy"),
+        18: BuiltinFormat("h:mm AM/PM"),
+        19: BuiltinFormat("h:mm:ss AM/PM"),
+        20: BuiltinFormat("h:mm"),
+        21: BuiltinFormat("h:mm:ss"),
+        22: BuiltinFormat("m/d/yy h:mm"),
+        37: BuiltinFormat("#,##0;(#,##0)"),
+        38: BuiltinFormat("#,##0;[Red](#,##0)"),
+        39: BuiltinFormat("#,##0.00;(#,##0.00)"),
+        40: BuiltinFormat("#,##0.00;[Red](#,##0.00)"),
+        45: BuiltinFormat("mm:ss"),
+        46: BuiltinFormat("[h]:mm:ss"),
+        47: BuiltinFormat("mmss.0"),
+        48: BuiltinFormat("##0.0E+0"),
+        49: BuiltinFormat("@"),
     }
 
     def __init__(self, fp):

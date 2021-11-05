@@ -46,6 +46,7 @@ class DeprecatedCellMixin(object):
         """
         return self.formula
 
+
 class Cell(DeprecatedCellMixin):
     """A cell in a worksheet.
 
@@ -57,7 +58,7 @@ class Cell(DeprecatedCellMixin):
         style_id (int): The style index in the style table.
     """
 
-    __slots__ = ('row', 'col', 'value', 'formula', 'style_id')
+    __slots__ = ("row", "col", "value", "formula", "style_id")
 
     def __init__(self, row, col, value=None, formula=None, style_id=None):
         self.row = row
@@ -67,8 +68,9 @@ class Cell(DeprecatedCellMixin):
         self.style_id = style_id
 
     def __repr__(self):
-        return 'Cell(row={}, col={}, value={}, formula={}, style_id={})' \
-            .format(self.row, self.col, self.value, self.formula, self.style_id)
+        return "Cell(row={}, col={}, value={}, formula={}, style_id={})".format(
+            self.row, self.col, self.value, self.formula, self.style_id
+        )
 
     @property
     def row_num(self):

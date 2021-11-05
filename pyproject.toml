@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "pyxlsb"
+version = "1.1.0"
+description = "Excel 2007+ Binary Workbook (xlsb) reader"
+license = "MIT"
+authors = ["William Turner <willtur.will@gmail.com>"]
+readme = "README.rst"
+homepage = "https://github.com/willtrnr/pyxlsb"
+repository = "https://github.com/willtrnr/pyxlsb"
+documentation = "https://willtrnr.github.io/pyxlsb/"
+keywords = ["pyxlsb", "excel", "xlsb", "office"]
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+
+[tool.poetry.dev-dependencies]
+Sphinx = "^4.2.0"
+black = "^21.10b0"
+isort = "^5.10.0"
+pylint = "^2.11.1"
+pytest = "^6.2.5"
+wheel = "^0.37.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+extend-exclude = "^/setup.py"
+
+[tool.pylint.messages-control]
+disable = """
+  consider-using-f-string,
+  line-too-long,
+  missing-class-docstring,
+  missing-function-docstring,
+  missing-module-docstring,
+  no-else-return,
+  no-self-use,
+  protected-access,
+  super-with-arguments,
+  useless-object-inheritance,
+"""
+
+[tool.pylint.basic]
+good-names = "a,b,c,c1,c2,d,e,ee,el,ex,f,fp,h,i,it,j,n,r,r1,r2,s,t,tf,v,w,x,xf,y,zf,zf,long,xrange"
+good-names-rgxs = "^_?[A-Z]$,^_?T_."
+
+[tool.pylint.similarities]
+min-similarity-lines = 10
+
+[tool.pylint.design]
+max-args = 10
+max-attributes = 20
+min-public-methods = 0
+
+[tool.pyright]
+
+[tool.isort]
+profile = "black"
+extend_skip = ["setup.py"]
+skip_gitignore = true
+treat_all_comments_as_code = true
+combine_as_imports = true
+combine_star = true

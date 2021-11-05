@@ -1,11 +1,14 @@
+# pylint: disable=invalid-name,unused-argument
+
 from enum import Enum
+
 from . import recordtypes as rt
 
 
 class BaseRecord(object):
     def __repr__(self):
-        args = ('{}={}'.format(str(k), repr(v)) for k, v in self.__dict__.items())
-        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
+        args = ("{}={}".format(str(k), repr(v)) for k, v in self.__dict__.items())
+        return "{}({})".format(self.__class__.__name__, ", ".join(args))
 
     @classmethod
     def read(cls, reader, rectype, reclen):
@@ -22,7 +25,8 @@ def SimpleRecord(name):
         res = cls()
         res.brt = rectype
         return res
-    return type(name + 'Record', (BaseRecord,), {'brt': 0xFFFF, 'read': read})
+
+    return type(name + "Record", (BaseRecord,), {"brt": 0xFFFF, "read": read})
 
 
 class UnknownRecord(BaseRecord):
@@ -128,16 +132,16 @@ class RowRecord(BaseRecord):
 
 # TODO Map error values
 class ErrorValue(object):
-    __slots__ = ('value',)
+    __slots__ = ("value",)
 
     def __init__(self, value):
         self.value = value
 
     def __repr__(self):
-        return 'ErrorValue(value=0x{})'.format(hex(self.value))
+        return "ErrorValue(value=0x{})".format(hex(self.value))
 
     def __str__(self):
-        return '#ERR!' + str(self.value)
+        return "#ERR!" + str(self.value)
 
 
 class CellRecord(BaseRecord):
@@ -169,7 +173,7 @@ class CellRecord(BaseRecord):
         elif rectype == rt.CELL_ISST:
             value = reader.read_int()
         else:
-            raise ValueError('unknwon cell record type: ' + str(rectype))
+            raise ValueError("unknwon cell record type: " + str(rectype))
 
         res = cls(col, value, None, style)
         res.brt = rectype
@@ -193,7 +197,7 @@ class FormulaCellRecord(CellRecord):
         elif rectype == rt.FMLA_ERROR:
             value = ErrorValue(reader.read_byte())
         else:
-            raise ValueError('unknown formula cell record type: ' + str(rectype))
+            raise ValueError("unknown formula cell record type: " + str(rectype))
 
         formula = None
         # 0x0001 = Recalc always, 0x0002 = Calc on open, 0x0008 = Part of shared

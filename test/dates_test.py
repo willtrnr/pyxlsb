@@ -1,11 +1,12 @@
 import os.path
 import unittest
+
 from pyxlsb import open_workbook
 
 
 class DatesTestCase(unittest.TestCase):
     def setUp(self):
-        self.wb = open_workbook(os.path.join('test_files', 'dates.xlsb'))
+        self.wb = open_workbook(os.path.join("test_files", "dates.xlsb"))
 
     def tearDown(self):
         self.wb.close()

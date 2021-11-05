@@ -2,19 +2,18 @@ import os
 import struct
 from io import BytesIO
 
-
-_uint8_t = struct.Struct('<B')
-_uint16_t = struct.Struct('<H')
-_int32_t = struct.Struct('<i')
-_uint32_t = struct.Struct('<I')
-_float_t = struct.Struct('<f')
-_double_t = struct.Struct('<d')
+_uint8_t = struct.Struct("<B")
+_uint16_t = struct.Struct("<H")
+_int32_t = struct.Struct("<i")
+_uint32_t = struct.Struct("<I")
+_float_t = struct.Struct("<f")
+_double_t = struct.Struct("<d")
 
 
 class DataReader(object):
     def __init__(self, buf, enc=None):
         self._buf = BytesIO(buf)
-        self._enc = enc if enc is not None else 'utf-16'
+        self._enc = enc if enc is not None else "utf-16"
 
     def skip(self, size):
         self._buf.seek(size, os.SEEK_CUR)
@@ -26,7 +25,7 @@ class DataReader(object):
         buf = self.read(1)
         if not buf:
             return None
-        return buf != b'\x00'
+        return buf != b"\x00"
 
     def read_byte(self):
         buf = self.read(1)
@@ -68,7 +67,9 @@ class DataReader(object):
         if intval & 0x02 == 0x02:
             value = float(intval >> 2)
         else:
-            value = _double_t.unpack(b'\x00\x00\x00\x00' + _uint32_t.pack(intval & 0xFFFFFFFC))[0]
+            value = _double_t.unpack(
+                b"\x00\x00\x00\x00" + _uint32_t.pack(intval & 0xFFFFFFFC)
+            )[0]
 
         if intval & 0x01 == 0x01:
             value /= 100
@@ -86,4 +87,4 @@ class DataReader(object):
         if len(buf) != size:
             return None
 
-        return buf.decode(enc or self._enc, errors='replace')
+        return buf.decode(enc or self._enc, errors="replace")

@@ -1,9 +1,10 @@
 import warnings
 from datetime import datetime, timedelta
+
 from .workbook import Workbook
 from .xlsbpackage import XlsbPackage
 
-__version__ = '1.1.0'
+__version__ = "1.1.0"
 
 
 def open_workbook(name, *args, **kwargs):
@@ -47,7 +48,11 @@ def convert_date(date):
         return datetime(1900, 1, 1, 0, 0, 0) + timedelta(seconds=date * 24 * 60 * 60)
     elif date >= 61:
         # According to Lotus 1-2-3, Feb 29th 1900 is a real thing, therefore we have to remove one day after that date
-        return datetime(1899, 12, 31, 0, 0, 0) + timedelta(days=int(date) - 1, seconds=int((date % 1) * 24 * 60 * 60))
+        return datetime(1899, 12, 31, 0, 0, 0) + timedelta(
+            days=int(date) - 1, seconds=int((date % 1) * 24 * 60 * 60)
+        )
     else:
         # Feb 29th 1900 will show up as Mar 1st 1900 because Python won't handle that date
-        return datetime(1899, 12, 31, 0, 0, 0) + timedelta(days=int(date), seconds=int((date % 1) * 24 * 60 * 60))
+        return datetime(1899, 12, 31, 0, 0, 0) + timedelta(
+            days=int(date), seconds=int((date % 1) * 24 * 60 * 60)
+        )

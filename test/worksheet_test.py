@@ -1,13 +1,17 @@
 import os.path
 import unittest
-from mock import Mock
+from unittest.mock import Mock
+
 from pyxlsb.worksheet import Worksheet
+
 
 class WorksheetTestCase(unittest.TestCase):
     def setUp(self):
         wb = Mock()
-        wb.get_shared_string = Mock(return_value='SS')
-        self.sheet = Worksheet(wb, 'Sheet1', open(os.path.join('test_files', 'parts', 'sheet1.bin'), 'rb'))
+        wb.get_shared_string = Mock(return_value="SS")
+        self.sheet = Worksheet(
+            wb, "Sheet1", open(os.path.join("test_files", "parts", "sheet1.bin"), "rb")
+        )
 
     def tearDown(self):
         self.sheet.close()

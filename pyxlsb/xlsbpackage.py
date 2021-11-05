@@ -20,12 +20,12 @@ class BasePackage(object):
 
 class ZipPackage(BasePackage):
     def __init__(self, name):
-        self._zf = ZipFile(name, 'r')
+        self._zf = ZipFile(name, "r")
 
     def get_file(self, name):
         tf = TemporaryFile()
         try:
-            with self._zf.open(name, 'r') as zf:
+            with self._zf.open(name, "r") as zf:
                 shutil.copyfileobj(zf, tf)
             tf.seek(0, os.SEEK_SET)
             return tf
@@ -53,13 +53,13 @@ class WorkbookPackage(BasePackage):
 
 class XlsbPackage(ZipPackage, WorkbookPackage):
     def get_workbook_part(self):
-        return self.get_file('xl/workbook.bin')
+        return self.get_file("xl/workbook.bin")
 
     def get_workbook_rels(self):
-        return self.get_file('xl/_rels/workbook.bin.rels')
+        return self.get_file("xl/_rels/workbook.bin.rels")
 
     def get_sharedstrings_part(self):
-        return self.get_file('xl/sharedStrings.bin')
+        return self.get_file("xl/sharedStrings.bin")
 
     def get_styles_part(self):
-        return self.get_file('xl/styles.bin')
+        return self.get_file("xl/styles.bin")

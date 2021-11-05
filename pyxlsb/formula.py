@@ -6,7 +6,7 @@ class Formula(object):
         self._tokens = list(tokens)
 
     def __repr__(self):
-        return 'Formula({})'.format(self._tokens)
+        return "Formula({})".format(self._tokens)
 
     def __str__(self):
         return self.stringify()

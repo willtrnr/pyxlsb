@@ -1,5 +1,7 @@
 import unittest
+
 from pyxlsb.ptgs import ClassifiedPtg
+
 
 class ClassifiedPtgTestCase(unittest.TestCase):
     def test_base_ptg(self):

@@ -1,9 +1,10 @@
 import os
 import sys
 import xml.etree.ElementTree as ET
+
 from . import recordtypes as rt
-from .row import Row
 from .recordreader import RecordReader
+from .row import Row
 
 if sys.version_info > (3,):
     xrange = range
@@ -59,7 +60,7 @@ class Worksheet(object):
             self._rels_fp.seek(0, os.SEEK_SET)
             doc = ET.parse(self._rels_fp)
             for el in doc.getroot():
-                self.rels[el.attrib['Id']] = el.attrib['Target']
+                self.rels[el.attrib["Id"]] = el.attrib["Target"]
 
     def rows(self, sparse=True):
         """Get a row iterator to iterate through the cell data.
@@ -83,7 +84,9 @@ class Worksheet(object):
                 row_num = rec.r
                 row = Row(self, row_num)
             elif rectype == rt.CELL_ISST:
-                row._add_cell(rec.c, self.workbook.get_shared_string(rec.v), rec.f, rec.style)
+                row._add_cell(
+                    rec.c, self.workbook.get_shared_string(rec.v), rec.f, rec.style
+                )
             elif rectype >= rt.CELL_BLANK and rectype <= rt.FMLA_ERROR:
                 row._add_cell(rec.c, rec.v, rec.f, rec.style)
             elif rectype == rt.END_SHEET_DATA:

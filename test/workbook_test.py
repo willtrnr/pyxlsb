@@ -1,15 +1,20 @@
 import os.path
 import unittest
 from datetime import datetime, time
+
 from pyxlsb.workbook import Workbook
 from pyxlsb.xlsbpackage import XlsbPackage
 
 
 class WorkbookTestCase(unittest.TestCase):
     def setUp(self):
-        self.wb = Workbook(XlsbPackage(os.path.join('test_files', 'test.xlsb')))
-        self.wb1904 = Workbook(XlsbPackage(os.path.join('test_files', 'test_1904.xlsb')))
-        self.wb_chart = Workbook(XlsbPackage(os.path.join('test_files', 'test_chart_sheet.xlsb')))
+        self.wb = Workbook(XlsbPackage(os.path.join("test_files", "test.xlsb")))
+        self.wb1904 = Workbook(
+            XlsbPackage(os.path.join("test_files", "test_1904.xlsb"))
+        )
+        self.wb_chart = Workbook(
+            XlsbPackage(os.path.join("test_files", "test_chart_sheet.xlsb"))
+        )
 
     def tearDown(self):
         self.wb.close()
@@ -25,8 +30,8 @@ class WorkbookTestCase(unittest.TestCase):
         self.assertEqual(self.wb1904.props.date1904, True)
 
     def test_sheets(self):
-        self.assertEqual(self.wb.sheets, ['Test'])
-        self.assertEqual(self.wb_chart.sheets, ['Sheet1', 'Chart1', 'Sheet3'])
+        self.assertEqual(self.wb.sheets, ["Test"])
+        self.assertEqual(self.wb_chart.sheets, ["Sheet1", "Chart1", "Sheet3"])
 
     def test_convert_date(self):
         # Both 0 and 1 are the same date, only 0 is used for time only values

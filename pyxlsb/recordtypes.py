@@ -774,5 +774,5 @@ PIVOT_CACHE_ID_VERSION = 2135
 SXDI15 = 2136
 REVISION_PTR = 3073
 
-_by_name = {k: v for k, v in locals().items() if not k.startswith('_')}
+_by_name = {k: v for k, v in locals().items() if not k.startswith("_")}
 _by_num = {v: k for k, v in _by_name.items()}

@@ -1,19 +1,15 @@
 import sys
-import logging
 import warnings
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
+
 from . import recordtypes as rt
 from .recordreader import RecordReader
 from .stringtable import StringTable
 from .styles import Styles
 from .worksheet import Worksheet
 
-if sys.version_info > (3,):
-    basestring = (str, bytes)
-    long = int
-
-_MICROSECONDS_IN_DAY = 24 * 60 * 60 * 1000 * 1000
+_MICROSECONDS_PER_DAY = 24 * 60 * 60 * 1000 * 1000
 
 
 class Workbook(object):
@@ -30,7 +26,8 @@ class Workbook(object):
     def __enter__(self):
         return self
 
-    def __exit__(self, typ, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
+        del exc_type, exc_value, traceback
         self.close()
 
     def _parse(self):
@@ -42,7 +39,7 @@ class Workbook(object):
         rels = {}
         with self._pkg.get_workbook_rels() as f:
             for el in ET.parse(f).getroot():
-                rels[el.attrib['Id']] = el.attrib['Target']
+                rels[el.attrib["Id"]] = el.attrib["Target"]
 
         with self._pkg.get_workbook_part() as f:
             for rectype, rec in RecordReader(f):
@@ -84,13 +81,15 @@ class Workbook(object):
             Will be removed in 1.2.0. Use either ``get_sheet_by_index`` or ``get_sheet_by_name``
             instead.
         """
-        warnings.warn("get_sheet was replaced with get_sheet_by_name/index", DeprecationWarning)
-        if isinstance(idx_or_name, basestring):
+        warnings.warn(
+            "get_sheet was replaced with get_sheet_by_name/index", DeprecationWarning
+        )
+        if isinstance(idx_or_name, str):
             return self.get_sheet_by_name(idx_or_name, with_rels)
-        elif isinstance(idx_or_name, (int, long)):
+        elif isinstance(idx_or_name, int):
             return self.get_sheet_by_index(idx_or_name - 1, with_rels)
         else:
-            raise ValueError('string or int expected')
+            raise ValueError("string or int expected")
 
     def get_sheet_by_index(self, idx, with_rels=False):
         """Get a worksheet by index.
@@ -106,14 +105,16 @@ class Workbook(object):
             IndexError: When the provided index is out of range.
         """
         if idx < 0 or idx >= len(self._sheets):
-            raise IndexError('sheet index out of range')
+            raise IndexError("sheet index out of range")
 
         target = self._sheets[idx][1]
 
-        fp = self._pkg.get_file('xl/' + target)
+        fp = self._pkg.get_file("xl/" + target)
         if with_rels:
-            parts = target.split('/')
-            rels_fp = self._pkg.get_file('xl/' + '/'.join(parts[:-1] + ['_rels'] + parts[-1:]) + '.rels')
+            parts = target.split("/")
+            rels_fp = self._pkg.get_file(
+                "xl/" + "/".join(parts[:-1] + ["_rels"] + parts[-1:]) + ".rels"
+            )
         else:
             rels_fp = None
         return Worksheet(self, self._sheets[idx][0], fp, rels_fp)
@@ -156,11 +157,11 @@ class Workbook(object):
         Returns:
             datetime.datetime: The equivalent datetime instance or None when invalid.
         """
-        if not isinstance(value, (int, long, float)):
+        if not isinstance(value, (int, float)):
             return None
 
         era = datetime(1904 if self.props.date1904 else 1900, 1, 1, tzinfo=None)
-        timeoffset = timedelta(microseconds=long((value % 1) * _MICROSECONDS_IN_DAY))
+        timeoffset = timedelta(microseconds=round((value % 1) * _MICROSECONDS_PER_DAY))
 
         if int(value) == 0:
             return era + timeoffset
@@ -183,9 +184,12 @@ class Workbook(object):
         Returns:
             datetime.time: The equivalent time instance or None if invalid.
         """
-        if not isinstance(value, (int, long, float)):
+        if not isinstance(value, (int, float)):
             return None
-        return (datetime.min + timedelta(microseconds=long((value % 1) * _MICROSECONDS_IN_DAY))).time()
+        return (
+            datetime.min
+            + timedelta(microseconds=round((value % 1) * _MICROSECONDS_PER_DAY))
+        ).time()
 
     def close(self):
         """Release the resources associated with this workbook."""
