@@ -35,21 +35,15 @@ class RecordReader(object):
 
   def read_int(self):
     buff = self._fp.read(4)
-    if len(buff) < 4:
-      return None
-    return uint32_t.unpack(buff)[0]
+    return None if len(buff) < 4 else uint32_t.unpack(buff)[0]
 
   def read_short(self):
     buff = self._fp.read(2)
-    if len(buff) < 2:
-      return None
-    return uint16_t.unpack(buff)[0]
+    return None if len(buff) < 2 else uint16_t.unpack(buff)[0]
 
   def read_byte(self):
     byte = self._fp.read(1)
-    if not byte:
-      return None
-    return uint8_t.unpack(byte)[0]
+    return uint8_t.unpack(byte)[0] if byte else None
 
   def read_float(self):
     buff = self._fp.read(4)
@@ -67,18 +61,14 @@ class RecordReader(object):
 
   def read_double(self):
     buff = self._fp.read(8)
-    if len(buff) < 8:
-      return None
-    return double_t.unpack(buff)[0]
+    return None if len(buff) < 8 else double_t.unpack(buff)[0]
 
   def read_string(self):
     l = self.read_int()
     if l is None:
       return None
     buff = self.read(l * 2)
-    if len(buff) < l * 2:
-      return None
-    return buff.decode(self._enc, errors='replace')
+    return None if len(buff) < l * 2 else buff.decode(self._enc, errors='replace')
 
 
 class BIFF12Reader(object):
