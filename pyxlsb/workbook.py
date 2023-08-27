@@ -42,7 +42,10 @@ class Workbook(object):
       reader = BIFF12Reader(fp=temp, debug=self._debug)
       for item in reader:
         if item[0] == biff12.SHEET:
-          self._sheets.append((item[1].name, rels[item[1].rId]))
+          name = item[1].name
+          rId = item[1].rId
+          if rId:
+            self._sheets.append((name, rels[rId]))
         elif item[0] == biff12.SHEETS_END:
           break
 
