@@ -43,8 +43,7 @@ class Workbook(object):
       for item in reader:
         if item[0] == biff12.SHEET:
           name = item[1].name
-          rId = item[1].rId
-          if rId:
+          if rId := item[1].rId:
             self._sheets.append((name, rels[rId]))
         elif item[0] == biff12.SHEETS_END:
           break
@@ -71,13 +70,13 @@ class Workbook(object):
     target = self._sheets[idx - 1][1].split('/')
 
     temp = TemporaryFile()
-    with self._zf.open('xl/{}/{}'.format(target[0], target[-1]), 'r') as zf:
+    with self._zf.open(f'xl/{target[0]}/{target[-1]}', 'r') as zf:
       temp.write(zf.read())
       temp.seek(0, os.SEEK_SET)
 
     if rels:
       rels_temp = TemporaryFile()
-      with self._zf.open('xl/{}/_rels/{}.rels'.format(target[0], target[-1]), 'r') as zf:
+      with self._zf.open(f'xl/{target[0]}/_rels/{target[-1]}.rels', 'r') as zf:
         rels_temp.write(zf.read())
         rels_temp.seek(0, os.SEEK_SET)
     else:
